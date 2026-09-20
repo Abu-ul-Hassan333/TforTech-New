@@ -1,0 +1,657 @@
+/* =========================================================
+   CONTACT PAGE
+   Products / Categories Visual Language
+   ========================================================= */
+
+.contact-page {
+  --contact-primary: #2563eb;
+  --contact-primary-dark: #1d4ed8;
+  --contact-secondary: #5b6cff;
+  --contact-text: #172033;
+  --contact-muted: #687386;
+  --contact-border: #e6e9ef;
+  --contact-background: #f7f8fa;
+  --contact-surface: #ffffff;
+  --contact-soft-surface: #f4f6f8;
+  --contact-button-text: #ffffff;
+  --contact-shadow: 0 10px 30px rgba(20, 32, 56, 0.08);
+  min-height: 100vh;
+  background: var(--contact-background);
+  color: var(--contact-text);
+}
+
+/* =========================================================
+   CUSTOM ADMIN THEME
+   ========================================================= */
+body.gojuniors-theme-active .contact-page {
+  --contact-primary: var(--gojuniors-primary-color, #2563eb);
+  --contact-primary-dark: var(--gojuniors-accent-dark-color, #1d4ed8);
+  --contact-secondary: var(--gojuniors-secondary-color, #5b6cff);
+  --contact-text: var(--gojuniors-text-color, #172033);
+  --contact-muted: var(--gojuniors-muted-text-color, #687386);
+  --contact-border: var(--gojuniors-border-color, #e6e9ef);
+  --contact-background: var(--gojuniors-surface-color, #f7f8fa);
+  --contact-surface: var(--gojuniors-background-color, #ffffff);
+  --contact-soft-surface: var(--gojuniors-surface-color, #f4f6f8);
+  --contact-button-text: var(--gojuniors-button-text-color, #ffffff);
+}
+
+/* =========================================================
+   COMMON
+   ========================================================= */
+.contact-eyebrow {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--contact-primary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 1.8px;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   HERO / PAGE HEADER
+   ==== COLOR CHANGE FIX - Ye wala section change kiya hai ====
+   ========================================================= */
+.contact-hero {
+  position: relative;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  /* Pehle white tha, ab dark premium kar diya Categories jaisa */
+  background: radial-gradient(120% 120% at 80% 0%, #1e3a8a 0%, #0f172a 55%, #0b1220 100%);
+  color: #ffffff;
+}
+
+/* decorative shape - Right side wala khali area ab fill karega */
+.contact-hero::before {
+  content: "";
+  position: absolute;
+  width: 520px;
+  height: 520px;
+  top: -180px;
+  right: -120px;
+  border-radius: 50%;
+  background: rgba(59, 130, 246, 0.12);
+  pointer-events: none;
+  filter: blur(1px);
+}
+
+/* second decorative shape */
+.contact-hero::after {
+  content: "";
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  bottom: -160px;
+  right: 80px;
+  border-radius: 50%;
+  background: rgba(214, 158, 120, 0.08);
+  pointer-events: none;
+}
+
+body.gojuniors-theme-active .contact-hero::before {
+  background: color-mix(in srgb, var(--contact-primary) 18%, transparent);
+}
+body.gojuniors-theme-active .contact-hero::after {
+  background: color-mix(in srgb, var(--contact-secondary) 12%, transparent);
+}
+
+/* =========================================================
+   HERO CONTAINER
+   ========================================================= */
+.contact-hero .contact-container {
+  position: relative;
+  z-index: 2;
+  padding: 64px 0 58px;
+}
+
+/* =========================================================
+   HERO EYEBROW
+   ========================================================= */
+.contact-hero .contact-eyebrow {
+  color: #93c5fd;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+
+/* =========================================================
+   HERO TITLE - Ab white hoga
+   ========================================================= */
+.contact-hero h1 {
+  max-width: 800px;
+  margin: 0 0 15px;
+  color: #ffffff;
+  font-size: clamp(38px, 5vw, 58px);
+  line-height: 1.05;
+  letter-spacing: -2px;
+  font-weight: 800;
+}
+.contact-hero h1 span {
+  display: block;
+  color: #f3f1f0;
+}
+
+/* =========================================================
+   HERO DESCRIPTION
+   ========================================================= */
+.contact-hero p {
+  max-width: 700px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+/* =========================================================
+   BREADCRUMB
+   ========================================================= */
+.contact-breadcrumb {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 9px;
+  margin-top: 21px;
+  color: #94a3b8;
+  font-size: 12px;
+}
+.contact-breadcrumb a {
+  color: #e2e8f0;
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+.contact-breadcrumb a:hover {
+  color: #d69e78;
+}
+
+/* =========================================================
+   MAIN CONTACT AREA
+   ========================================================= */
+.contact-main {
+  padding: 68px 0 76px;
+  background: var(--contact-background);
+}
+
+/* =========================================================
+   CONTAINER
+   ========================================================= */
+.contact-container {
+  width: min(1280px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* =========================================================
+   CONTACT GRID
+   ========================================================= */
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  align-items: start;
+  gap: 55px;
+}
+
+/* =========================================================
+   CONTACT INFORMATION
+   ========================================================= */
+.contact-info {
+  padding-top: 8px;
+}
+.contact-info h2 {
+  max-width: 500px;
+  margin: 0 0 17px;
+  color: var(--contact-text);
+  font-size: clamp(32px, 3.5vw, 45px);
+  line-height: 1.12;
+  letter-spacing: -1.4px;
+  font-weight: 800;
+}
+.contact-info h2 span {
+  display: block;
+  color: var(--contact-primary);
+}
+.contact-info-intro {
+  max-width: 510px;
+  margin: 0 0 30px;
+  color: var(--contact-muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+
+/* =========================================================
+   CONTACT INFO LIST
+   ========================================================= */
+.contact-info-list {
+  display: grid;
+  gap: 15px;
+}
+.contact-info-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 0;
+}
+.contact-info-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 46px;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--contact-border);
+  border-radius: 11px;
+  background: var(--contact-surface);
+  color: var(--contact-primary);
+  box-shadow: 0 2px 6px rgba(20, 32, 56, 0.025);
+}
+.contact-info-icon svg {
+  width: 20px;
+  height: 20px;
+}
+.contact-info-item div:last-child {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.contact-info-item span {
+  color: #8992a3;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+}
+body.gojuniors-theme-active .contact-info-item span {
+  color: var(--contact-muted);
+}
+.contact-info-item strong {
+  color: var(--contact-text);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+/* =========================================================
+   CONTACT FORM
+   ========================================================= */
+.contact-form-wrapper {
+  padding: 34px;
+  border: 1px solid var(--contact-border);
+  border-radius: 16px;
+  background: var(--contact-surface);
+  box-shadow: var(--contact-shadow);
+}
+
+/* =========================================================
+   FORM HEADER
+   ========================================================= */
+.contact-form-header {
+  margin-bottom: 24px;
+}
+.contact-form-header .contact-eyebrow {
+  margin-bottom: 7px;
+}
+.contact-form-header h2 {
+  margin: 0 0 9px;
+  color: var(--contact-text);
+  font-size: 28px;
+  line-height: 1.15;
+  letter-spacing: -0.7px;
+  font-weight: 800;
+}
+.contact-form-header p {
+  margin: 0;
+  color: var(--contact-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   FORM
+   ========================================================= */
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.contact-form-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 15px;
+}
+
+/* =========================================================
+   FIELD
+   ========================================================= */
+.contact-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.contact-field label {
+  color: var(--contact-text);
+  font-size: 11px;
+  font-weight: 800;
+}
+.contact-field input,
+.contact-field textarea {
+  width: 100%;
+  border: 1px solid var(--contact-border);
+  border-radius: 9px;
+  outline: none;
+  background: var(--contact-surface);
+  color: var(--contact-text);
+  font-family: inherit;
+  font-size: 13px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.contact-field input {
+  height: 45px;
+  padding: 0 13px;
+}
+.contact-field textarea {
+  min-height: 130px;
+  padding: 12px 13px;
+  resize: vertical;
+  line-height: 1.65;
+}
+.contact-field input::placeholder,
+.contact-field textarea::placeholder {
+  color: #a3aab7;
+}
+.contact-field input:focus,
+.contact-field textarea:focus {
+  border-color: var(--contact-primary);
+  background: var(--contact-surface);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--contact-primary) 9%, transparent);
+}
+
+/* =========================================================
+   SUBMIT BUTTON
+   ========================================================= */
+.contact-submit-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  margin-top: 2px;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 9px;
+  background: var(--contact-primary);
+  color: var(--contact-button-text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 800;
+  transition: transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+.contact-submit-button span {
+  font-size: 17px;
+  line-height: 1;
+}
+.contact-submit-button:hover {
+  background: var(--contact-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--contact-primary) 18%, transparent);
+}
+
+/* =========================================================
+   SUCCESS MESSAGE
+   ========================================================= */
+.contact-success-message {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 14px 15px;
+  border: 1px solid #dce8df;
+  border-radius: 9px;
+  background: #f5faf6;
+}
+.contact-success-message > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 25px;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  background: #dcefe1;
+  color: #317044;
+  font-size: 13px;
+  font-weight: 800;
+}
+.contact-success-message strong {
+  display: block;
+  margin-bottom: 3px;
+  color: #285e36;
+  font-size: 13px;
+}
+.contact-success-message p {
+  margin: 0;
+  color: #52725a;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+/* =========================================================
+   HELP / CTA
+   ========================================================= */
+.contact-help {
+  padding: 0 0 76px;
+  background: var(--contact-background);
+}
+.contact-help-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 38px 44px;
+  border: 1px solid var(--contact-border);
+  border-radius: 16px;
+  background: var(--contact-soft-surface);
+}
+.contact-help-content .contact-eyebrow {
+  margin-bottom: 8px;
+}
+.contact-help-content h2 {
+  margin: 0 0 9px;
+  color: var(--contact-text);
+  font-size: 29px;
+  line-height: 1.15;
+  letter-spacing: -0.7px;
+  font-weight: 800;
+}
+.contact-help-content p {
+  max-width: 600px;
+  margin: 0;
+  color: var(--contact-muted);
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+/* =========================================================
+   CTA BUTTONS
+   ========================================================= */
+.contact-help-buttons {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+.contact-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  min-height: 42px;
+  padding: 10px 18px;
+  border-radius: 9px;
+  background: var(--contact-primary);
+  color: var(--contact-button-text);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+  transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+.contact-primary-button span {
+  font-size: 16px;
+}
+.contact-primary-button:hover {
+  background: var(--contact-primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--contact-primary) 18%, transparent);
+}
+.contact-secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 18px;
+  border: 1px solid var(--contact-border);
+  border-radius: 9px;
+  background: var(--contact-surface);
+  color: var(--contact-text);
+  text-decoration: none;
+  font-size: 11px;
+  font-weight: 800;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.contact-secondary-button:hover {
+  border-color: var(--contact-primary);
+  background: var(--contact-surface);
+  color: var(--contact-primary);
+  transform: translateY(-1px);
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+@media (max-width: 1000px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    gap: 45px;
+  }
+  .contact-info {
+    max-width: 720px;
+  }
+  .contact-form-wrapper {
+    max-width: 800px;
+    width: 100%;
+  }
+  .contact-help-content {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .contact-help-buttons {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+@media (max-width: 700px) {
+  .contact-container {
+    width: min(100% - 28px, 1180px);
+  }
+  .contact-hero .contact-container {
+    padding: 46px 0 40px;
+  }
+  .contact-hero h1 {
+    font-size: 38px;
+    letter-spacing: -1.6px;
+  }
+  .contact-hero p {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+  .contact-breadcrumb {
+    margin-top: 17px;
+    font-size: 11px;
+  }
+  .contact-main {
+    padding: 55px 0 60px;
+  }
+  .contact-grid {
+    gap: 35px;
+  }
+  .contact-info h2 {
+    font-size: 31px;
+  }
+  .contact-info-intro {
+    font-size: 13px;
+    margin-bottom: 25px;
+  }
+  .contact-form-wrapper {
+    padding: 25px 20px;
+    border-radius: 14px;
+  }
+  .contact-form-row {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+  .contact-form-header h2 {
+    font-size: 25px;
+  }
+  .contact-help {
+    padding-bottom: 58px;
+  }
+  .contact-help-content {
+    padding: 28px 21px;
+    border-radius: 14px;
+  }
+  .contact-help-content h2 {
+    font-size: 26px;
+  }
+  .contact-help-buttons {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .contact-primary-button,
+  .contact-secondary-button {
+    width: 100%;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+@media (max-width: 450px) {
+  .contact-hero .contact-container {
+    padding: 40px 0 34px;
+  }
+  .contact-hero h1 {
+    font-size: 33px;
+    letter-spacing: -1.3px;
+  }
+  .contact-hero p {
+    font-size: 13px;
+  }
+  .contact-main {
+    padding: 48px 0 54px;
+  }
+  .contact-info h2 {
+    font-size: 28px;
+  }
+  .contact-info-item {
+    gap: 11px;
+  }
+  .contact-info-icon {
+    flex-basis: 42px;
+    width: 42px;
+    height: 42px;
+  }
+  .contact-info-item strong {
+    font-size: 13px;
+  }
+  .contact-form-wrapper {
+    padding: 22px 17px;
+  }
+  .contact-help {
+    padding-bottom: 52px;
+  }
+}

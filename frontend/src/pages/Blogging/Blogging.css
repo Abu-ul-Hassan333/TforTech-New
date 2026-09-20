@@ -1,0 +1,716 @@
+/* ============================================================
+   BLOGGING PAGE
+   Laptop & Technology Store
+   ============================================================ */
+
+.blogging-page {
+  --blog-primary: #2563eb;
+  --blog-primary-dark: #1d4ed8;
+  --blog-text: #172033;
+  --blog-muted: #687386;
+  --blog-border: #e6e9ef;
+  --blog-background: #f7f8fa;
+  --blog-white: #ffffff;
+  --blog-surface: #ffffff;
+  --blog-soft-surface: #f1f5f9;
+  --blog-button-text: #ffffff;
+  --blog-shadow: 0 12px 35px rgba(20, 32, 56, 0.08);
+
+  min-height: 100vh;
+  background: var(--blog-background);
+  color: var(--blog-text);
+}
+
+/* ============================================================
+   CUSTOM ADMIN THEME
+   ============================================================ */
+
+body.gojuniors-theme-active .blogging-page {
+  --blog-primary: var(--gojuniors-primary-color, #2563eb);
+  --blog-primary-dark: color-mix(in srgb, var(--blog-primary, #2563eb) 84%, #000000);
+  --blog-text: var(--gojuniors-text-color, #172033);
+  --blog-muted: var(--gojuniors-muted-text-color, #687386);
+  --blog-border: var(--gojuniors-border-color, #e6e9ef);
+  --blog-background: var(--gojuniors-surface-color, #f7f8fa);
+  --blog-white: var(--gojuniors-background-color, #ffffff);
+  --blog-surface: var(--gojuniors-background-color, #ffffff);
+  --blog-soft-surface: var(--gojuniors-surface-color, #f1f5f9);
+  --blog-button-text: var(--gojuniors-button-text-color, #ffffff);
+  --blog-shadow: 0 12px 35px rgba(20, 32, 56, 0.08);
+}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+
+.blogging-hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, #111827 0%, #1e293b 100%);
+}
+
+body.gojuniors-theme-active .blogging-hero {
+  background: linear-gradient(
+    135deg,
+    var(--gojuniors-header-background, var(--blog-text)) 0%,
+    color-mix(in srgb, var(--gojuniors-header-background, var(--blog-text)) 78%, #000000) 100%
+  );
+}
+
+.blogging-hero::before {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -100px;
+  top: -105px;
+  border: 1px solid rgba(255, 255, 255, 0.045);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.blogging-hero::after {
+  content: "";
+  position: absolute;
+  width: 120px;
+  height: 120px;
+  right: 80px;
+  bottom: -90px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.018);
+  pointer-events: none;
+}
+
+/* ============================================================
+   HERO CONTENT
+   ============================================================ */
+
+.blogging-hero-content {
+  position: relative;
+  z-index: 1;
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  padding: 34px 0 30px;
+}
+
+/* ============================================================
+   HERO LABEL
+   ============================================================ */
+
+.blogging-hero-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 11px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 999px;
+  color: #dbeafe;
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.12em;
+}
+
+body.gojuniors-theme-active .blogging-hero-label {
+  color: color-mix(in srgb, var(--gojuniors-header-text-color, #ffffff) 82%, var(--blog-primary));
+}
+
+/* ============================================================
+   HERO HEADING - WHITE COLOR FIX
+   ============================================================ */
+
+.blogging-hero h1 {
+  max-width: 700px;
+  margin: 13px 0 9px;
+  color: #ffffff !important;
+  font-size: clamp(30px, 3.4vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -0.04em;
+}
+
+/* ============================================================
+   HERO DESCRIPTION
+   ============================================================ */
+
+.blogging-hero p {
+  max-width: 625px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+body.gojuniors-theme-active .blogging-hero p {
+  color: color-mix(in srgb, var(--gojuniors-header-text-color, #ffffff) 74%, transparent);
+}
+
+/* ============================================================
+   BREADCRUMB
+   ============================================================ */
+
+.blogging-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+body.gojuniors-theme-active .blogging-breadcrumb {
+  color: color-mix(in srgb, var(--gojuniors-header-text-color, #ffffff) 55%, transparent);
+}
+
+.blogging-breadcrumb a {
+  color: #ffffff;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.blogging-breadcrumb a:hover {
+  color: #93c5fd;
+}
+
+body.gojuniors-theme-active .blogging-breadcrumb a:hover {
+  color: var(--blog-primary);
+}
+
+/* ============================================================
+   COMMON CONTAINER
+   ============================================================ */
+
+.blogging-container {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+}
+
+/* ============================================================
+   SECTION EYEBROW
+   ============================================================ */
+
+.section-eyebrow {
+  display: inline-block;
+  margin-bottom: 8px;
+  color: var(--blog-primary);
+  font-size: 9px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ============================================================
+   SECTION HEADING
+   ============================================================ */
+
+.blogging-section-heading {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 25px;
+  margin-bottom: 27px;
+}
+
+.blogging-section-heading h2 {
+  margin: 0;
+  color: var(--blog-text);
+  font-size: clamp(26px, 3vw, 34px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.blogging-section-heading > p {
+  max-width: 440px;
+  margin: 0;
+  color: var(--blog-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+/* ============================================================
+   INTRO
+   ============================================================ */
+
+.blogging-intro {
+  padding: 48px 0 38px;
+  background: var(--blog-white);
+}
+
+.blogging-intro-content {
+  max-width: 730px;
+}
+
+.blogging-intro-content h2 {
+  margin: 0 0 11px;
+  color: var(--blog-text);
+  font-size: clamp(27px, 3vw, 36px);
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+}
+
+.blogging-intro-content p {
+  margin: 0;
+  color: var(--blog-muted);
+  font-size: 13px;
+  line-height: 1.75;
+}
+
+/* ============================================================
+   BLOG CATEGORIES
+   ============================================================ */
+
+.blogging-categories {
+  padding: 28px 0 45px;
+  background: var(--blog-white);
+}
+
+.blog-category-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+
+.blog-category-list button {
+  min-height: 40px;
+  padding: 0 15px;
+  border: 1px solid var(--blog-border);
+  border-radius: 999px;
+  background: var(--blog-white);
+  color: #596579;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+body.gojuniors-theme-active .blog-category-list button {
+  color: var(--blog-muted);
+}
+
+.blog-category-list button:hover {
+  border-color: var(--blog-primary);
+  background: color-mix(in srgb, var(--blog-primary) 8%, var(--blog-white));
+  color: var(--blog-primary);
+  transform: translateY(-1px);
+}
+
+/* ============================================================
+   ARTICLES SECTION
+   ============================================================ */
+
+.blogging-articles {
+  padding: 58px 0 68px;
+  background: var(--blog-background);
+}
+
+.blog-articles-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 20px;
+}
+
+/* ============================================================
+   BLOG CARD
+   ============================================================ */
+
+.blog-card {
+  min-width: 0;
+  overflow: hidden;
+  background: var(--blog-white);
+  border: 1px solid var(--blog-border);
+  border-radius: 15px;
+  box-shadow: 0 2px 6px rgba(20, 32, 56, 0.025);
+  transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+}
+
+.blog-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--blog-border);
+  box-shadow: var(--blog-shadow);
+}
+
+/* ============================================================
+   BLOG IMAGE / VISUAL
+   ============================================================ */
+
+.blog-card-image {
+  position: relative;
+  height: 185px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: radial-gradient(circle at center, #ffffff 0%, #f1f5f9 60%, #e9eef4 100%);
+}
+
+body.gojuniors-theme-active .blog-card-image {
+  background: radial-gradient(
+    circle at center,
+    var(--blog-white) 0%,
+    var(--blog-soft-surface) 60%,
+    color-mix(in srgb, var(--blog-background) 90%, var(--blog-text)) 100%
+  );
+}
+
+.blog-card-image::before {
+  content: "";
+  position: absolute;
+  width: 150px;
+  height: 150px;
+  border: 1px solid rgba(37, 99, 235, 0.07);
+  border-radius: 50%;
+}
+
+body.gojuniors-theme-active .blog-card-image::before {
+  border-color: color-mix(in srgb, var(--blog-primary) 8%, transparent);
+}
+
+.blog-card-image::after {
+  content: "";
+  position: absolute;
+  width: 95px;
+  height: 95px;
+  border: 1px solid rgba(37, 99, 235, 0.05);
+  border-radius: 50%;
+}
+
+body.gojuniors-theme-active .blog-card-image::after {
+  border-color: color-mix(in srgb, var(--blog-primary) 6%, transparent);
+}
+
+.blog-card-icon {
+  position: relative;
+  z-index: 1;
+  font-size: 60px;
+  line-height: 1;
+  filter: drop-shadow(0 8px 12px rgba(20, 32, 56, 0.08));
+}
+
+/* ============================================================
+   BLOG CATEGORY BADGE
+   ============================================================ */
+
+.blog-card-category {
+  position: absolute;
+  z-index: 2;
+  top: 12px;
+  left: 12px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: rgba(17, 24, 39, 0.88);
+  color: #ffffff;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+body.gojuniors-theme-active .blog-card-category {
+  background: color-mix(in srgb, var(--blog-primary) 88%, #000000);
+}
+
+/* ============================================================
+   BLOG CONTENT
+   ============================================================ */
+
+.blog-card-content {
+  padding: 18px;
+}
+
+.blog-card-date {
+  display: block;
+  margin-bottom: 7px;
+  color: var(--blog-primary);
+  font-size: 9px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.blog-card-content h3 {
+  min-height: 50px;
+  margin: 0 0 9px;
+  color: var(--blog-text);
+  font-size: 17px;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+}
+
+.blog-card-content p {
+  display: -webkit-box;
+  min-height: 63px;
+  margin: 0 0 15px;
+  overflow: hidden;
+  color: var(--blog-muted);
+  font-size: 11px;
+  line-height: 1.75;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+
+/* ============================================================
+   READ ARTICLE BUTTON
+   ============================================================ */
+
+.read-article-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 36px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--blog-primary);
+  font-size: 11px;
+  font-weight: 800;
+  cursor: pointer;
+  transition: color 0.2s ease, gap 0.2s ease;
+}
+
+.read-article-button span {
+  font-size: 15px;
+  transition: transform 0.2s ease;
+}
+
+.read-article-button:hover {
+  color: var(--blog-primary-dark);
+  gap: 10px;
+}
+
+.read-article-button:hover span {
+  transform: translateX(2px);
+}
+
+/* ============================================================
+   CTA
+   ============================================================ */
+
+.blogging-cta {
+  padding: 0 0 65px;
+  background: var(--blog-background);
+}
+
+.blogging-cta-box {
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 30px;
+  padding: 34px 38px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #172033 0%, #26364f 100%);
+}
+
+body.gojuniors-theme-active .blogging-cta-box {
+  background: linear-gradient(
+    135deg,
+    var(--gojuniors-primary-color, #172033) 0%,
+    color-mix(in srgb, var(--gojuniors-primary-color, #172033) 78%, #ffffff) 100%
+  );
+}
+
+.blogging-cta-box::after {
+  content: "";
+  position: absolute;
+  width: 190px;
+  height: 190px;
+  right: -100px;
+  bottom: -125px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.blogging-cta-box > div {
+  position: relative;
+  z-index: 1;
+}
+
+.blogging-cta-box .section-eyebrow {
+  color: #93c5fd;
+}
+
+body.gojuniors-theme-active .blogging-cta-box .section-eyebrow {
+  color: color-mix(in srgb, var(--gojuniors-header-text-color, #ffffff) 72%, var(--blog-primary));
+}
+
+.blogging-cta-box h2 {
+  max-width: 580px;
+  margin: 0 0 8px;
+  color: #ffffff;
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1.2;
+  letter-spacing: -0.035em;
+}
+
+body.gojuniors-theme-active .blogging-cta-box h2 {
+  color: var(--gojuniors-header-text-color, #ffffff);
+}
+
+.blogging-cta-box p {
+  max-width: 580px;
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+body.gojuniors-theme-active .blogging-cta-box p {
+  color: color-mix(in srgb, var(--gojuniors-header-text-color, #ffffff) 72%, transparent);
+}
+
+.blogging-cta-button {
+  position: relative;
+  z-index: 2;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 43px;
+  padding: 0 18px;
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--blog-text);
+  font-size: 11px;
+  font-weight: 800;
+  text-decoration: none;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+body.gojuniors-theme-active .blogging-cta-button {
+  background: var(--blog-white);
+  color: var(--blog-text);
+}
+
+.blogging-cta-button:hover {
+  background: #eff6ff;
+  color: var(--blog-primary);
+  transform: translateY(-2px);
+}
+
+body.gojuniors-theme-active .blogging-cta-button:hover {
+  background: color-mix(in srgb, var(--blog-primary) 10%, var(--blog-white));
+  color: var(--blog-primary);
+}
+
+.blogging-cta-button span {
+  font-size: 15px;
+}
+
+/* ============================================================
+   TABLET
+   ============================================================ */
+
+@media (max-width: 1000px) {
+  .blog-articles-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .blogging-section-heading {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .blogging-section-heading > p {
+    max-width: 650px;
+  }
+}
+
+/* ============================================================
+   MOBILE
+   ============================================================ */
+
+@media (max-width: 680px) {
+  .blogging-container,
+  .blogging-hero-content {
+    width: calc(100% - 28px);
+  }
+  .blogging-hero-content {
+    padding: 30px 0 28px;
+  }
+  .blogging-hero h1 {
+    max-width: 100%;
+    font-size: 32px;
+    line-height: 1.1;
+  }
+  .blogging-hero p {
+    max-width: 100%;
+    font-size: 12px;
+    line-height: 1.65;
+  }
+  .blogging-intro {
+    padding: 42px 0 32px;
+  }
+  .blogging-intro-content h2 {
+    font-size: 29px;
+  }
+  .blogging-intro-content p {
+    font-size: 12px;
+  }
+  .blogging-categories {
+    padding: 24px 0 40px;
+  }
+  .blogging-articles {
+    padding: 48px 0 55px;
+  }
+  .blog-articles-grid {
+    grid-template-columns: 1fr;
+    gap: 17px;
+  }
+  .blog-card-image {
+    height: 210px;
+  }
+  .blogging-cta {
+    padding-bottom: 50px;
+  }
+  .blogging-cta-box {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 20px;
+    padding: 29px 23px;
+  }
+  .blogging-cta-button {
+    width: 100%;
+  }
+}
+
+/* ============================================================
+   SMALL MOBILE
+   ============================================================ */
+
+@media (max-width: 430px) {
+  .blogging-hero-content {
+    padding: 27px 0 25px;
+  }
+  .blogging-hero-label {
+    padding: 6px 9px;
+    font-size: 8px;
+  }
+  .blogging-hero h1 {
+    margin-top: 11px;
+    font-size: 29px;
+  }
+  .blogging-hero p {
+    font-size: 11px;
+  }
+  .blogging-breadcrumb {
+    margin-top: 12px;
+    font-size: 10px;
+  }
+  .blog-category-list {
+    gap: 7px;
+  }
+  .blog-category-list button {
+    min-height: 37px;
+    padding: 0 12px;
+    font-size: 10px;
+  }
+  .blog-card-image {
+    height: 195px;
+  }
+  .blog-card-content {
+    padding: 17px;
+  }
+  .blog-card-content h3 {
+    font-size: 16px;
+  }
+}

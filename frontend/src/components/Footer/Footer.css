@@ -1,0 +1,503 @@
+/* =========================================================
+   GOJUNIORS FOOTER
+   ========================================================= */
+
+.site-footer {
+  --footer-background: #1f2937;
+  --footer-text: #ffffff;
+  --footer-accent: #d69e78;
+  --footer-accent-dark: #c78962;
+  --footer-muted: #cbd5e1;
+  --footer-soft-muted: #94a3b8;
+  --footer-border: rgba(255, 255, 255, 0.1);
+  --footer-button-text: #ffffff;
+
+  width: 100%;
+  background: var(--footer-background);
+  color: var(--footer-text);
+  margin-top: 0;
+}
+
+/* =========================================================
+   CUSTOM ADMIN THEME
+   Default footer colors remain unchanged until a custom
+   theme is actually activated.
+========================================================= */
+
+body.gojuniors-theme-active .site-footer {
+  --footer-background: var(
+    --gojuniors-footer-background,
+    #1f2937
+  );
+
+  --footer-text: var(
+    --gojuniors-footer-text-color,
+    #ffffff
+  );
+
+  --footer-accent: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+
+  --footer-accent-dark: color-mix(
+    in srgb,
+    var(--footer-accent, #d69e78) 82%,
+    #000000
+  );
+
+  --footer-muted: color-mix(
+    in srgb,
+    var(--footer-text, #ffffff) 76%,
+    transparent
+  );
+
+  --footer-soft-muted: color-mix(
+    in srgb,
+    var(--footer-text, #ffffff) 56%,
+    transparent
+  );
+
+  --footer-border: color-mix(
+    in srgb,
+    var(--footer-text, #ffffff) 12%,
+    transparent
+  );
+
+  --footer-button-text: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+}
+
+.footer-container {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* =========================================================
+   FOOTER TOP
+========================================================= */
+
+.footer-top {
+  display: grid;
+  grid-template-columns: 1.5fr 0.8fr 0.8fr 0.8fr 1.5fr;
+  gap: 45px;
+  padding: 70px 0 55px;
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.footer-brand {
+  max-width: 300px;
+}
+
+.footer-logo {
+  display: inline-block;
+  color: var(--footer-text);
+  text-decoration: none;
+  font-size: 29px;
+  font-weight: 800;
+  letter-spacing: -1.4px;
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.footer-logo span {
+  color: var(--footer-accent);
+}
+
+.footer-description {
+  margin: 0;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.8;
+}
+
+body.gojuniors-theme-active .footer-description {
+  color: var(--footer-muted);
+}
+
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.footer-socials a {
+  color: var(--footer-text);
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  transition:
+    color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.footer-socials a:hover {
+  color: var(--footer-accent);
+}
+
+/* =========================================================
+   FOOTER COLUMNS
+========================================================= */
+
+.footer-column {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.footer-column h3,
+.footer-newsletter h3 {
+  margin: 0 0 20px;
+  color: var(--footer-text);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.footer-column a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 13px;
+  line-height: 1.5;
+  margin-bottom: 12px;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
+}
+
+body.gojuniors-theme-active .footer-column a {
+  color: var(--footer-muted);
+}
+
+.footer-column a:hover {
+  color: var(--footer-accent);
+  transform: translateX(2px);
+}
+
+/* =========================================================
+   NEWSLETTER
+========================================================= */
+
+.footer-newsletter {
+  max-width: 320px;
+}
+
+.footer-newsletter p {
+  margin: 0 0 18px;
+  color: #cbd5e1;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+body.gojuniors-theme-active .footer-newsletter p {
+  color: var(--footer-muted);
+}
+
+.newsletter-form {
+  width: 100%;
+  display: flex;
+  align-items: stretch;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+body.gojuniors-theme-active .newsletter-form {
+  border-color: color-mix(
+    in srgb,
+    var(--footer-text) 20%,
+    transparent
+  );
+
+  background: color-mix(
+    in srgb,
+    var(--footer-text) 6%,
+    transparent
+  );
+}
+
+.newsletter-form input {
+  min-width: 0;
+  flex: 1;
+  height: 46px;
+  padding: 0 14px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--footer-text);
+  font-size: 13px;
+}
+
+.newsletter-form input::placeholder {
+  color: #94a3b8;
+}
+
+body.gojuniors-theme-active .newsletter-form input::placeholder {
+  color: var(--footer-soft-muted);
+}
+
+.newsletter-form button {
+  flex-shrink: 0;
+  height: 46px;
+  padding: 0 16px;
+  border: none;
+  background: var(--footer-accent);
+  color: var(--footer-button-text);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition:
+    background-color 0.2s ease,
+    opacity 0.2s ease;
+}
+
+.newsletter-form button:hover {
+  background: var(--footer-accent-dark);
+}
+
+/* =========================================================
+   DELIVERY STRIP
+========================================================= */
+
+.footer-delivery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 25px 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.gojuniors-theme-active .footer-delivery {
+  border-top-color: var(--footer-border);
+  border-bottom-color: var(--footer-border);
+}
+
+.footer-delivery-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.footer-delivery-icon {
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(214, 158, 120, 0.6);
+  border-radius: 50%;
+  color: var(--footer-accent);
+  font-size: 16px;
+}
+
+body.gojuniors-theme-active .footer-delivery-icon {
+  border-color: color-mix(
+    in srgb,
+    var(--footer-accent) 60%,
+    transparent
+  );
+}
+
+.footer-delivery-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.footer-delivery-item strong {
+  color: var(--footer-text);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.footer-delivery-item span:not(.footer-delivery-icon) {
+  color: #94a3b8;
+  font-size: 11px;
+}
+
+body.gojuniors-theme-active
+  .footer-delivery-item
+  span:not(.footer-delivery-icon) {
+  color: var(--footer-soft-muted);
+}
+
+/* =========================================================
+   FOOTER BOTTOM
+========================================================= */
+
+.footer-bottom {
+  min-height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.footer-bottom p {
+  margin: 0;
+  color: #94a3b8;
+  font-size: 12px;
+}
+
+body.gojuniors-theme-active .footer-bottom p {
+  color: var(--footer-soft-muted);
+}
+
+.footer-legal-links {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.footer-legal-links a {
+  color: #94a3b8;
+  text-decoration: none;
+  font-size: 12px;
+  transition: color 0.2s ease;
+}
+
+body.gojuniors-theme-active .footer-legal-links a {
+  color: var(--footer-soft-muted);
+}
+
+.footer-legal-links a:hover {
+  color: var(--footer-text);
+}
+
+/* =========================================================
+   TABLET
+========================================================= */
+
+@media (max-width: 1050px) {
+  .footer-top {
+    grid-template-columns: 1.4fr 1fr 1fr;
+    gap: 40px;
+  }
+
+  .footer-brand {
+    max-width: 100%;
+  }
+
+  .footer-newsletter {
+    max-width: 100%;
+    grid-column: span 2;
+  }
+}
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+  .footer-container {
+    padding: 0 20px;
+  }
+
+  .footer-top {
+    grid-template-columns: 1fr 1fr;
+    gap: 35px 25px;
+    padding: 50px 0 40px;
+  }
+
+  .footer-brand {
+    grid-column: span 2;
+  }
+
+  .footer-newsletter {
+    grid-column: span 2;
+  }
+
+  .footer-delivery {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    padding: 25px 0;
+  }
+
+  .footer-delivery-item {
+    justify-content: flex-start;
+  }
+
+  .footer-bottom {
+    min-height: auto;
+    padding: 22px 0;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 14px;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 420px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+
+  .footer-brand,
+  .footer-newsletter {
+    grid-column: auto;
+  }
+
+  .footer-socials {
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+
+  .newsletter-form {
+    flex-direction: column;
+    border: none;
+    background: transparent;
+    gap: 8px;
+    overflow: visible;
+  }
+
+  body.gojuniors-theme-active .newsletter-form {
+    border: none;
+    background: transparent;
+  }
+
+  .newsletter-form input {
+    width: 100%;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  body.gojuniors-theme-active .newsletter-form input {
+    border-color: color-mix(
+      in srgb,
+      var(--footer-text) 20%,
+      transparent
+    );
+
+    background: color-mix(
+      in srgb,
+      var(--footer-text) 6%,
+      transparent
+    );
+  }
+
+  .newsletter-form button {
+    width: 100%;
+    border-radius: 7px;
+  }
+
+  .footer-legal-links {
+    flex-wrap: wrap;
+    gap: 10px 18px;
+  }
+}

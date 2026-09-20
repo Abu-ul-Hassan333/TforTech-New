@@ -1,0 +1,82 @@
+﻿# FRONTEND
+frontend/node_modules/
+frontend/build/
+frontend/.cache/
+frontend/.env
+frontend/.env.local
+frontend/.env.development
+frontend/.env.development.local
+frontend/.env.test
+frontend/.env.production
+frontend/.env.production.local
+
+# BACKEND
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/.pytest_cache/
+backend/.mypy_cache/
+backend/.venv/
+backend/venv/
+backend/env/
+backend/.env
+
+# GENERAL ENV
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.production
+.env.production.local
+
+# PYTHON
+__pycache__/
+*.py[cod]
+*.class
+.Python
+venv/
+env/
+ENV/
+
+# NODE
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# BUILD / CACHE
+dist/
+build/
+.cache/
+.parcel-cache/
+.vite/
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# TEMP / LOGS
+*.log
+*.tmp
+*.temp
+
+# PYTHON DATABASE / LOCAL FILES
+*.sqlite
+*.sqlite3
+
+# LOCAL UPLOAD / GENERATED FILES
+backend/uploads/
+backend/media/
+backend/tmp/

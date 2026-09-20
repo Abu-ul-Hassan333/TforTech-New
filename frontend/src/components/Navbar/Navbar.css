@@ -1,0 +1,1093 @@
+/* =========================================================
+   GOJUNIORS / TFOR TECH NAVBAR
+   ORIGINAL COLORS PRESERVED
+   CUSTOM ADMIN THEME APPLIES ONLY WHEN ACTIVE
+========================================================= */
+
+
+/* =========================================================
+   ANNOUNCEMENT BAR
+========================================================= */
+
+.announcement-bar {
+  width: 100%;
+  min-height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 9px 20px;
+  background: #1f2937;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.1px;
+  text-align: center;
+  box-sizing: border-box;
+}
+
+body.gojuniors-theme-active .announcement-bar {
+  background: var(
+    --gojuniors-header-background,
+    #1f2937
+  );
+
+  color: var(
+    --gojuniors-header-text-color,
+    #ffffff
+  );
+}
+
+.announcement-divider {
+  opacity: 0.65;
+}
+
+
+/* =========================================================
+   MAIN NAVBAR
+========================================================= */
+
+.navbar {
+  width: 100%;
+  height: 78px;
+  background: #ffffff;
+  border-bottom: 1px solid #eeeeee;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.025);
+}
+
+body.gojuniors-theme-active .navbar {
+  background: var(
+    --gojuniors-header-background,
+    #ffffff
+  );
+
+  border-bottom-color: var(
+    --gojuniors-border-color,
+    #eeeeee
+  );
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1440px;
+  height: 100%;
+  margin: 0 auto;
+  padding: 0 12px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+.navbar-logo {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: #1f2937;
+  text-decoration: none;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -1.4px;
+  transform: translateX(-6px);
+}
+
+body.gojuniors-theme-active .navbar-logo {
+  color: var(
+    --gojuniors-header-text-color,
+    #1f2937
+  );
+}
+
+.navbar-logo span {
+  color: #d69e78;
+}
+
+body.gojuniors-theme-active .navbar-logo span {
+  color: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navbar-menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1 1 auto;
+  gap: 32px;
+  min-width: 0;
+  white-space: nowrap;
+  margin: 0 auto;
+  position: relative;
+  left: -10px;
+}
+
+.navbar-menu > a {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  color: #222222;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+  transition: color 0.2s ease;
+}
+
+body.gojuniors-theme-active .navbar-menu > a {
+  color: var(
+    --gojuniors-header-text-color,
+    #222222
+  );
+}
+
+.navbar-menu > a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 1px;
+  width: 0;
+  height: 2px;
+  background: #d69e78;
+  border-radius: 2px;
+  transition: width 0.25s ease;
+}
+
+body.gojuniors-theme-active .navbar-menu > a::after {
+  background: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+}
+
+.navbar-menu > a:hover {
+  color: #d69e78;
+}
+
+body.gojuniors-theme-active .navbar-menu > a:hover {
+  color: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+}
+
+.navbar-menu > a:hover::after {
+  width: 100%;
+}
+
+.navbar-mobile-admin {
+  display: none !important;
+}
+
+
+/* =========================================================
+   CATEGORY DROPDOWN
+========================================================= */
+
+.navbar-category-dropdown {
+  position: relative;
+  display: flex;
+  align-items: center;
+  height: 100%;
+  flex: 0 0 auto;
+}
+
+.navbar-category-dropdown::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 100%;
+  height: 10px;
+  background: transparent;
+  z-index: 9998;
+}
+
+.navbar-category-link {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  color: #222222;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 8px 0;
+}
+
+body.gojuniors-theme-active .navbar-category-link {
+  color: var(
+    --gojuniors-header-text-color,
+    #222222
+  );
+}
+
+.navbar-category-link:hover {
+  color: #d69e78;
+}
+
+body.gojuniors-theme-active .navbar-category-link:hover {
+  color: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+}
+
+.navbar-category-link::after {
+  display: none !important;
+}
+
+.category-arrow {
+  font-size: 13px;
+  transition: transform 0.2s ease;
+}
+
+.navbar-category-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  min-width: 175px;
+  padding: 8px;
+  background: #ffffff;
+  border: 1px solid #e7eaf0;
+  border-radius: 12px;
+  box-shadow: 0 14px 35px rgba(15, 23, 42, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  z-index: 9999;
+  transition: all 0.2s ease;
+}
+
+body.gojuniors-theme-active .navbar-category-menu {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  border-color: var(
+    --gojuniors-border-color,
+    #e7eaf0
+  );
+}
+
+.navbar-category-menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  left: 50%;
+  width: 11px;
+  height: 11px;
+  background: #ffffff;
+  border-left: 1px solid #e7eaf0;
+  border-top: 1px solid #e7eaf0;
+  transform: translateX(-50%) rotate(45deg);
+}
+
+body.gojuniors-theme-active .navbar-category-menu::before {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  border-left-color: var(
+    --gojuniors-border-color,
+    #e7eaf0
+  );
+
+  border-top-color: var(
+    --gojuniors-border-color,
+    #e7eaf0
+  );
+}
+
+.navbar-category-menu a {
+  display: flex !important;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 8px;
+  color: #1f2937;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+body.gojuniors-theme-active .navbar-category-menu a {
+  color: var(
+    --gojuniors-text-color,
+    #1f2937
+  );
+}
+
+.navbar-category-menu a:hover {
+  background: #f3f6fb;
+  color: #d69a6b;
+  padding-left: 18px;
+}
+
+body.gojuniors-theme-active .navbar-category-menu a:hover {
+  background: color-mix(
+    in srgb,
+    var(--gojuniors-primary-color, #111827) 6%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  color: var(
+    --gojuniors-accent-color,
+    #d69a6b
+  );
+}
+
+.navbar-category-dropdown:hover .navbar-category-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.navbar-category-dropdown:hover .category-arrow {
+  transform: rotate(180deg);
+}
+
+
+/* =========================================================
+   RIGHT ACTIONS
+========================================================= */
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex: 0 0 auto;
+  gap: 6px;
+  margin-left: auto;
+  height: 100%;
+  transform: translateX(6px);
+}
+
+.navbar-search-button {
+  order: 1 !important;
+}
+
+.navbar-wishlist-button {
+  order: 2 !important;
+}
+
+.navbar-cart-button {
+  order: 3 !important;
+}
+
+.navbar-user-area,
+.navbar-login-button {
+  order: 4 !important;
+}
+
+
+/* =========================================================
+   ICON BUTTONS
+========================================================= */
+
+.navbar-icon-button {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  color: #171717;
+}
+
+body.gojuniors-theme-active .navbar-icon-button {
+  color: var(
+    --gojuniors-text-color,
+    #171717
+  );
+}
+
+.navbar-icon-button:hover {
+  background: #f7f2ed;
+  color: #d69e78;
+}
+
+body.gojuniors-theme-active .navbar-icon-button:hover {
+  background: color-mix(
+    in srgb,
+    var(--gojuniors-accent-color, #d69e78) 10%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  color: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+}
+
+.navbar-svg-icon {
+  width: 22px;
+  height: 22px;
+  color: currentColor;
+}
+
+.navbar-wishlist-button,
+.navbar-cart-button {
+  position: relative !important;
+  display: inline-flex !important;
+  width: 42px !important;
+  height: 42px !important;
+  margin: 0 !important;
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+.navbar-wishlist-count,
+.navbar-cart-count {
+  position: absolute !important;
+  top: 1px !important;
+  right: 0 !important;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #d69e78;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+  font-size: 9px;
+  font-weight: 700;
+}
+
+body.gojuniors-theme-active .navbar-wishlist-count,
+body.gojuniors-theme-active .navbar-cart-count {
+  background: var(
+    --gojuniors-accent-color,
+    #d69e78
+  );
+
+  color: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+
+  border-color: var(
+    --gojuniors-header-background,
+    #ffffff
+  );
+}
+
+
+/* =========================================================
+   LOGIN
+========================================================= */
+
+.navbar-login-button {
+  min-width: 92px;
+  height: 42px;
+  margin-left: 6px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #3b82f6;
+  color: #ffffff;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+body.gojuniors-theme-active .navbar-login-button {
+  background: var(
+    --gojuniors-secondary-color,
+    #3b82f6
+  );
+
+  color: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+}
+
+.navbar-login-button:hover {
+  filter: brightness(0.94);
+}
+
+
+/* =========================================================
+   USER AREA
+========================================================= */
+
+.navbar-user-area {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  margin-left: 6px;
+}
+
+.navbar-admin-button {
+  height: 38px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #3b82f6;
+  color: #ffffff;
+  border: 1px solid #3b82f6;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+body.gojuniors-theme-active .navbar-admin-button {
+  background: var(
+    --gojuniors-secondary-color,
+    #3b82f6
+  );
+
+  color: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+
+  border-color: var(
+    --gojuniors-secondary-color,
+    #3b82f6
+  );
+}
+
+.navbar-admin-button:hover {
+  filter: brightness(0.94);
+}
+
+.navbar-user-button {
+  min-width: 42px;
+  height: 42px;
+  padding: 0 11px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  background: #f7f2ed;
+  color: #1f2937;
+  border: 1px solid #eadfd7;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+body.gojuniors-theme-active .navbar-user-button {
+  background: color-mix(
+    in srgb,
+    var(--gojuniors-accent-color, #d69e78) 10%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  color: var(
+    --gojuniors-text-color,
+    #1f2937
+  );
+
+  border-color: color-mix(
+    in srgb,
+    var(--gojuniors-accent-color, #d69e78) 24%,
+    var(--gojuniors-border-color, #eadfd7)
+  );
+}
+
+.navbar-user-name {
+  max-width: 125px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.navbar-logout-button {
+  height: 38px;
+  padding: 0 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  color: #374151;
+  border: 1px solid #dfe3e8;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+body.gojuniors-theme-active .navbar-logout-button {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  color: var(
+    --gojuniors-text-color,
+    #374151
+  );
+
+  border-color: var(
+    --gojuniors-border-color,
+    #dfe3e8
+  );
+}
+
+.navbar-logout-button:hover {
+  border-color: var(
+    --gojuniors-primary-color,
+    #374151
+  );
+}
+
+.login-user-icon {
+  width: 18px;
+  height: 18px;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+.navbar-mobile-logout,
+.mobile-menu-button {
+  display: none;
+}
+
+.mobile-menu-button {
+  width: 42px;
+  height: 42px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+}
+
+.mobile-menu-button span {
+  width: 22px;
+  height: 2px;
+  background: #1f2937;
+  border-radius: 2px;
+}
+
+body.gojuniors-theme-active .mobile-menu-button span {
+  background: var(
+    --gojuniors-header-text-color,
+    #1f2937
+  );
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+/*
+   Desktop styling remains unchanged at large widths.
+
+   Intermediate breakpoints gradually reduce spacing so the
+   desktop navbar does not overlap before mobile mode starts.
+*/
+
+@media (max-width: 1350px) {
+  .navbar-container {
+    padding-left: 12px;
+    padding-right: 12px;
+    gap: 14px;
+  }
+
+  .navbar-menu {
+    gap: 22px;
+    left: 0;
+  }
+
+  .navbar-logo {
+    font-size: 26px;
+    letter-spacing: -1.2px;
+  }
+
+  .navbar-actions {
+    gap: 4px;
+    transform: none;
+  }
+
+  .navbar-icon-button {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .navbar-wishlist-button,
+  .navbar-cart-button {
+    width: 40px !important;
+    height: 40px !important;
+  }
+
+  .navbar-svg-icon {
+    width: 21px;
+    height: 21px;
+  }
+
+  .navbar-login-button {
+    min-width: 86px;
+    padding: 0 13px;
+    font-size: 13px;
+  }
+
+  .navbar-admin-button {
+    padding: 0 11px;
+    font-size: 12px;
+  }
+
+  .navbar-user-area {
+    gap: 5px;
+    margin-left: 3px;
+  }
+
+  .navbar-user-button {
+    padding-left: 9px;
+    padding-right: 9px;
+    font-size: 12px;
+  }
+
+  .navbar-user-name {
+    max-width: 105px;
+  }
+
+  .navbar-logout-button {
+    padding-left: 11px;
+    padding-right: 11px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .navbar-container {
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 10px;
+  }
+
+  .navbar-menu {
+    gap: 18px;
+  }
+
+  .navbar-menu > a,
+  .navbar-category-link {
+    font-size: 13px;
+  }
+
+  .navbar-logo {
+    font-size: 25px;
+    letter-spacing: -1.1px;
+  }
+
+  .navbar-actions {
+    gap: 2px;
+  }
+
+  .navbar-icon-button {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .navbar-wishlist-button,
+  .navbar-cart-button {
+    width: 38px !important;
+    height: 38px !important;
+  }
+
+  .navbar-svg-icon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .navbar-login-button {
+    min-width: 80px;
+    height: 40px;
+    margin-left: 3px;
+    padding: 0 10px;
+    font-size: 12px;
+  }
+
+  .navbar-admin-button {
+    height: 36px;
+    padding: 0 9px;
+    font-size: 11px;
+  }
+
+  .navbar-user-button {
+    height: 38px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .navbar-user-name {
+    max-width: 88px;
+  }
+
+  .navbar-logout-button {
+    height: 36px;
+    padding-left: 9px;
+    padding-right: 9px;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 1050px) {
+  .navbar-container {
+    padding-left: 10px;
+    padding-right: 10px;
+    gap: 8px;
+  }
+
+  .navbar-menu {
+    gap: 12px;
+  }
+
+  .navbar-menu > a,
+  .navbar-category-link {
+    font-size: 12px;
+  }
+
+  .navbar-logo {
+    font-size: 23px;
+  }
+
+  .navbar-actions {
+    gap: 1px;
+  }
+
+  .navbar-user-name {
+    max-width: 65px;
+  }
+
+  .navbar-login-button {
+    min-width: 73px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .navbar-admin-button {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .navbar-logout-button {
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+}
+
+
+/* =========================================================
+   TABLET / MOBILE NAVIGATION
+========================================================= */
+
+@media (max-width: 900px) {
+  .navbar {
+    height: 68px;
+  }
+
+  .navbar-container {
+    padding: 0 16px;
+    gap: 10px;
+  }
+
+  .navbar-logo {
+    font-size: 24px;
+    transform: none;
+  }
+
+  /*
+    Switch to the existing mobile navigation before the
+    desktop layout becomes crowded.
+  */
+
+  .navbar-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: 100%;
+    max-height: calc(100vh - 68px);
+    overflow-y: auto;
+    padding: 18px 20px;
+    box-sizing: border-box;
+
+    background: #ffffff;
+    border-bottom: 1px solid #eeeeee;
+
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 4px;
+
+    margin: 0;
+  }
+
+  body.gojuniors-theme-active .navbar-menu {
+    background: var(
+      --gojuniors-header-background,
+      #ffffff
+    );
+
+    border-bottom-color: var(
+      --gojuniors-border-color,
+      #eeeeee
+    );
+  }
+
+  .navbar-menu.active {
+    display: flex;
+  }
+
+  .navbar-menu > a,
+  .navbar-category-link {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 10px 0;
+    font-size: 14px;
+  }
+
+  .navbar-category-dropdown {
+    width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  .navbar-category-link {
+    justify-content: space-between;
+  }
+
+  /*
+    Keep category dropdown from exceeding viewport width.
+  */
+
+  .navbar-category-menu {
+    left: 0;
+    right: 0;
+    top: calc(100% + 4px);
+    transform: translateY(8px);
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  .navbar-category-dropdown:hover .navbar-category-menu {
+    transform: translateY(0);
+  }
+
+  .navbar-category-menu::before {
+    left: 20px;
+  }
+
+  .navbar-actions {
+    display: none;
+  }
+
+  .mobile-menu-button {
+    display: flex;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media (max-width: 760px) {
+  .navbar {
+    height: 68px;
+  }
+
+  .navbar-container {
+    padding: 0 16px;
+    gap: 12px;
+  }
+
+  .navbar-logo {
+    font-size: 24px;
+    transform: none;
+  }
+
+  .navbar-menu {
+    padding: 20px;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL MOBILE
+========================================================= */
+
+@media (max-width: 450px) {
+  .navbar {
+    height: 64px;
+  }
+
+  .navbar-container {
+    padding: 0 12px;
+    gap: 8px;
+  }
+
+  .navbar-logo {
+    font-size: 21px;
+    letter-spacing: -0.9px;
+  }
+
+  .mobile-menu-button {
+    width: 40px;
+    height: 40px;
+  }
+
+  .mobile-menu-button span {
+    width: 21px;
+  }
+
+  .navbar-menu {
+    max-height: calc(100vh - 64px);
+    padding: 16px;
+  }
+
+  .navbar-menu > a,
+  .navbar-category-link {
+    font-size: 13px;
+  }
+}

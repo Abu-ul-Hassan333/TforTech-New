@@ -1,0 +1,660 @@
+/* ==========================================
+   ORDERS PAGE
+========================================== */
+
+.orders-page {
+  --orders-primary: #2563eb;
+  --orders-primary-dark: #1d4ed8;
+  --orders-text: #1f2937;
+  --orders-heading: #111827;
+  --orders-muted: #6b7280;
+  --orders-border: #e5e7eb;
+  --orders-background: #f5f7fb;
+  --orders-surface: #ffffff;
+  --orders-soft-surface: #fafafa;
+  --orders-button-text: #ffffff;
+
+  min-height: 100vh;
+  background: var(--orders-background);
+  padding: 40px 20px;
+}
+
+/* ==========================================
+   CUSTOM ADMIN THEME
+   Default colors remain unchanged until
+   a custom theme is activated.
+========================================== */
+
+body.gojuniors-theme-active .orders-page {
+  --orders-primary: var(
+    --gojuniors-primary-color,
+    #2563eb
+  );
+
+  --orders-primary-dark: color-mix(
+    in srgb,
+    var(--orders-primary, #2563eb) 84%,
+    #000000
+  );
+
+  --orders-text: var(
+    --gojuniors-text-color,
+    #1f2937
+  );
+
+  --orders-heading: var(
+    --gojuniors-text-color,
+    #111827
+  );
+
+  --orders-muted: var(
+    --gojuniors-muted-text-color,
+    #6b7280
+  );
+
+  --orders-border: var(
+    --gojuniors-border-color,
+    #e5e7eb
+  );
+
+  --orders-background: var(
+    --gojuniors-surface-color,
+    #f5f7fb
+  );
+
+  --orders-surface: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  --orders-soft-surface: var(
+    --gojuniors-surface-color,
+    #fafafa
+  );
+
+  --orders-button-text: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+}
+
+.orders-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* ==========================================
+   HEADER
+========================================== */
+
+.orders-header {
+  background: var(--orders-surface);
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.orders-header h1 {
+  margin: 0 0 8px;
+  color: var(--orders-heading);
+  font-size: 30px;
+}
+
+.orders-header p {
+  margin: 0;
+  color: var(--orders-muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* ==========================================
+   ORDER COUNT
+========================================== */
+
+.orders-count-card {
+  display: flex;
+  align-items: center;
+  background: var(--orders-surface);
+  border-radius: 14px;
+  padding: 20px 25px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.05);
+}
+
+.orders-count-label {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--orders-muted);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.orders-count-number {
+  color: var(--orders-heading);
+  font-size: 26px;
+}
+
+/* ==========================================
+   ORDER LIST
+========================================== */
+
+.orders-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.orders-card {
+  overflow: hidden;
+  background: var(--orders-surface);
+  border: 1px solid var(--orders-border);
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* ==========================================
+   ORDER HEADER
+========================================== */
+
+.orders-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 22px 25px;
+  border-bottom: 1px solid var(--orders-border);
+}
+
+.orders-order-label {
+  display: block;
+  margin-bottom: 5px;
+  color: var(--orders-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+}
+
+.orders-order-id {
+  display: block;
+  max-width: 500px;
+  color: var(--orders-heading);
+  font-size: 14px;
+  word-break: break-all;
+}
+
+/* ==========================================
+   ORDER STATUS
+========================================== */
+
+.orders-status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 85px;
+  padding: 7px 12px;
+  border-radius: 20px;
+  background: #f3f4f6;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.orders-status-pending {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.orders-status-confirmed {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.orders-status-processing {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+
+.orders-status-shipped {
+  background: #cffafe;
+  color: #155e75;
+}
+
+.orders-status-delivered {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.orders-status-cancelled {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+/* ==========================================
+   ORDER DATE
+========================================== */
+
+.orders-date {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 15px 25px;
+  border-bottom: 1px solid #f0f0f0;
+  color: var(--orders-muted);
+  font-size: 13px;
+}
+
+body.gojuniors-theme-active .orders-date {
+  border-bottom-color: var(--orders-border);
+}
+
+.orders-date strong {
+  color: var(--orders-text);
+}
+
+/* ==========================================
+   PRODUCTS
+========================================== */
+
+.orders-products {
+  padding: 5px 25px;
+}
+
+.orders-product {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  padding: 18px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+body.gojuniors-theme-active .orders-product {
+  border-bottom-color: var(--orders-border);
+}
+
+.orders-product:last-child {
+  border-bottom: none;
+}
+
+.orders-product-image {
+  width: 70px;
+  height: 70px;
+  flex-shrink: 0;
+  overflow: hidden;
+  border-radius: 10px;
+  background: #f3f4f6;
+}
+
+body.gojuniors-theme-active .orders-product-image {
+  background: var(--orders-soft-surface);
+}
+
+.orders-product-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+}
+
+.orders-product-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--orders-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.orders-product-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.orders-product-info h3 {
+  margin: 0 0 6px;
+  color: var(--orders-heading);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.orders-product-info p {
+  margin: 0;
+  color: var(--orders-muted);
+  font-size: 13px;
+}
+
+.orders-product-price {
+  flex-shrink: 0;
+  color: var(--orders-heading);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+/* ==========================================
+   SHIPPING INFORMATION
+========================================== */
+
+.orders-shipping {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  padding: 20px 25px;
+  border-top: 1px solid var(--orders-border);
+  background: var(--orders-soft-surface);
+}
+
+.orders-shipping div {
+  min-width: 0;
+}
+
+.orders-shipping span {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--orders-muted);
+  font-size: 12px;
+}
+
+.orders-shipping strong {
+  display: block;
+  color: var(--orders-text);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+/* ==========================================
+   ORDER TOTAL
+========================================== */
+
+.orders-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 18px 25px;
+  border-top: 1px solid var(--orders-border);
+}
+
+.orders-card-footer span {
+  color: var(--orders-muted);
+  font-size: 14px;
+}
+
+.orders-card-footer strong {
+  color: var(--orders-heading);
+  font-size: 18px;
+}
+
+/* ==========================================
+   ORDER WHATSAPP ACTION
+========================================== */
+
+.orders-whatsapp-action {
+  display: flex;
+  justify-content: flex-end;
+  padding: 15px 25px 20px;
+  border-top: 1px solid #eef0f3;
+  background: var(--orders-surface);
+}
+
+body.gojuniors-theme-active .orders-whatsapp-action {
+  border-top-color: var(--orders-border);
+}
+
+.orders-whatsapp-button {
+  min-height: 44px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  border: 1px solid #16a34a;
+  border-radius: 9px;
+  background: #16a34a;
+  color: #ffffff;
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 5px 14px rgba(22, 163, 74, 0.16);
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.orders-whatsapp-button svg {
+  flex-shrink: 0;
+  font-size: 19px;
+}
+
+.orders-whatsapp-button:hover {
+  border-color: #15803d;
+  background: #15803d;
+  color: #ffffff;
+  transform: translateY(-1px);
+  box-shadow: 0 7px 18px rgba(22, 163, 74, 0.22);
+}
+
+.orders-whatsapp-button:active {
+  transform: translateY(0);
+}
+
+.orders-whatsapp-button:focus-visible {
+  outline: none;
+  box-shadow:
+    0 0 0 3px rgba(34, 197, 94, 0.18),
+    0 5px 14px rgba(22, 163, 74, 0.16);
+}
+
+/* ==========================================
+   EMPTY / ERROR STATE
+========================================== */
+
+.orders-empty-card {
+  background: var(--orders-surface);
+  border-radius: 16px;
+  padding: 60px 30px;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.orders-empty-icon {
+  margin-bottom: 15px;
+  font-size: 48px;
+}
+
+.orders-empty-card h2 {
+  margin: 0 0 10px;
+  color: var(--orders-text);
+  font-size: 23px;
+}
+
+.orders-empty-card p {
+  max-width: 500px;
+  margin: 0 auto 25px;
+  color: var(--orders-muted);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ==========================================
+   PRIMARY BUTTON
+========================================== */
+
+.orders-primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 20px;
+  border: 1px solid var(--orders-primary);
+  border-radius: 9px;
+  background: var(--orders-primary);
+  color: var(--orders-button-text);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.orders-primary-button:hover {
+  border-color: var(--orders-primary-dark);
+  background: var(--orders-primary-dark);
+  color: var(--orders-button-text);
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.orders-primary-button:active {
+  transform: translateY(0);
+}
+
+/* ==========================================
+   BOTTOM ACTION
+========================================== */
+
+.orders-bottom-action {
+  display: flex;
+  justify-content: center;
+  margin-top: 25px;
+}
+
+/* ==========================================
+   TABLET
+========================================== */
+
+@media (max-width: 768px) {
+  .orders-page {
+    padding: 25px 15px;
+  }
+
+  .orders-header {
+    padding: 22px;
+  }
+
+  .orders-header h1 {
+    font-size: 26px;
+  }
+
+  .orders-card-header {
+    padding: 18px;
+  }
+
+  .orders-date {
+    padding: 13px 18px;
+    flex-wrap: wrap;
+  }
+
+  .orders-products {
+    padding: 5px 18px;
+  }
+
+  .orders-shipping {
+    grid-template-columns: 1fr;
+    gap: 15px;
+    padding: 18px;
+  }
+
+  .orders-card-footer {
+    padding: 17px 18px;
+  }
+
+  .orders-whatsapp-action {
+    padding: 14px 18px 18px;
+  }
+}
+
+/* ==========================================
+   MOBILE
+========================================== */
+
+@media (max-width: 480px) {
+  .orders-page {
+    padding: 20px 12px;
+  }
+
+  .orders-header {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .orders-header h1 {
+    font-size: 23px;
+  }
+
+  .orders-header p {
+    font-size: 14px;
+  }
+
+  .orders-count-card {
+    padding: 17px 18px;
+  }
+
+  .orders-card {
+    border-radius: 12px;
+  }
+
+  .orders-card-header {
+    align-items: flex-start;
+    flex-direction: column;
+    padding: 17px;
+  }
+
+  .orders-status {
+    align-self: flex-start;
+  }
+
+  .orders-product {
+    align-items: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .orders-product-image {
+    width: 60px;
+    height: 60px;
+  }
+
+  .orders-product-info {
+    width: calc(100% - 80px);
+  }
+
+  .orders-product-price {
+    width: 100%;
+    padding-left: 75px;
+  }
+
+  .orders-shipping {
+    padding: 17px;
+  }
+
+  .orders-card-footer {
+    padding: 16px 17px;
+  }
+
+  .orders-card-footer strong {
+    font-size: 16px;
+  }
+
+  .orders-whatsapp-action {
+    padding: 13px 17px 17px;
+  }
+
+  .orders-whatsapp-button {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .orders-empty-card {
+    padding: 45px 20px;
+  }
+}

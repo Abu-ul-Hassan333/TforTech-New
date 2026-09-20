@@ -1,0 +1,137 @@
+/* ============================================================
+   GLOBAL BOX SIZING
+============================================================ */
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* ============================================================
+   HTML
+============================================================ */
+
+html {
+  scroll-behavior: smooth;
+}
+
+
+/* ============================================================
+   ROOT
+   Default values match the existing GoJuniors storefront
+   appearance. Custom Admin Theme overrides these only when
+   body.gojuniors-theme-active is active.
+============================================================ */
+
+:root {
+  --gojuniors-primary-color: #1f2937;
+  --gojuniors-secondary-color: #f4f7fb;
+  --gojuniors-accent-color: #3b82f6;
+  --gojuniors-accent-dark-color: #2563eb;
+
+  --gojuniors-background-color: #ffffff;
+  --gojuniors-surface-color: #f8fafc;
+
+  --gojuniors-text-color: #171717;
+  --gojuniors-muted-text-color: #6b7280;
+
+  --gojuniors-button-text-color: #ffffff;
+  --gojuniors-border-color: #e5e7eb;
+
+  --gojuniors-header-background: #ffffff;
+  --gojuniors-header-text-color: #1f2937;
+
+  --gojuniors-footer-background: #1f2937;
+  --gojuniors-footer-text-color: #ffffff;
+
+  --gojuniors-font-family: Inter, Arial, sans-serif;
+
+  --gojuniors-border-radius: 12px;
+  --gojuniors-button-radius: 8px;
+
+  --gojuniors-container-width: 1180px;
+}
+
+
+/* ============================================================
+   BODY
+============================================================ */
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #ffffff;
+  color: #171717;
+}
+
+
+/* ============================================================
+   CUSTOMER STOREFRONT THEME
+   These values become active only after a custom theme
+   has been saved and ThemeContext enables the class.
+============================================================ */
+
+body.gojuniors-theme-active {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  color: var(
+    --gojuniors-text-color,
+    #171717
+  );
+
+  font-family: var(
+    --gojuniors-font-family,
+    Inter,
+    Arial,
+    sans-serif
+  );
+}
+
+
+/* ============================================================
+   FORM ELEMENTS
+============================================================ */
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+
+/* ============================================================
+   LINKS
+============================================================ */
+
+a {
+  color: inherit;
+}
+
+
+/* ============================================================
+   IMAGES
+============================================================ */
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+
+/* ============================================================
+   CUSTOMER THEME HELPERS
+============================================================ */
+
+body.gojuniors-theme-active button {
+  font-family: inherit;
+}
+
+body.gojuniors-theme-active input,
+body.gojuniors-theme-active textarea,
+body.gojuniors-theme-active select {
+  font-family: inherit;
+}

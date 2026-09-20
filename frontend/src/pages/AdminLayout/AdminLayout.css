@@ -1,0 +1,459 @@
+/* =========================================================
+   TFORTECH ADMIN LAYOUT
+   Common Navbar + Sidebar + Admin Content + Footer
+   ========================================================= */
+
+.admin-layout-wrapper {
+  --admin-layout-primary: #2563eb;
+  --admin-layout-primary-dark: #1d4ed8;
+  --admin-layout-text: #111827;
+  --admin-layout-body-text: #4b5563;
+  --admin-layout-muted: #6b7280;
+  --admin-layout-section-title: #9ca3af;
+  --admin-layout-background: #f5f7fb;
+  --admin-layout-surface: #ffffff;
+  --admin-layout-soft-surface: #f3f6fb;
+  --admin-layout-border: #e5e7eb;
+  --admin-layout-divider: #eef0f4;
+  --admin-layout-scrollbar: #d1d5db;
+  --admin-layout-button-text: #ffffff;
+
+  width: 100%;
+  min-height: 100vh;
+  background: var(--admin-layout-background);
+}
+
+/* =========================================================
+   ACTIVE CUSTOM THEME
+   ========================================================= */
+
+body.gojuniors-theme-active .admin-layout-wrapper {
+  --admin-layout-primary: var(
+    --gojuniors-accent-color,
+    #2563eb
+  );
+
+  --admin-layout-primary-dark: color-mix(
+    in srgb,
+    var(--gojuniors-accent-color, #2563eb) 82%,
+    #000000
+  );
+
+  --admin-layout-text: var(
+    --gojuniors-text-color,
+    #111827
+  );
+
+  --admin-layout-body-text: color-mix(
+    in srgb,
+    var(--gojuniors-text-color, #111827) 68%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  --admin-layout-muted: var(
+    --gojuniors-muted-text-color,
+    #6b7280
+  );
+
+  --admin-layout-section-title: color-mix(
+    in srgb,
+    var(--gojuniors-muted-text-color, #6b7280) 72%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  --admin-layout-background: var(
+    --gojuniors-surface-color,
+    #f5f7fb
+  );
+
+  --admin-layout-surface: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  --admin-layout-soft-surface: color-mix(
+    in srgb,
+    var(--gojuniors-surface-color, #f5f7fb) 72%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  --admin-layout-border: var(
+    --gojuniors-border-color,
+    #e5e7eb
+  );
+
+  --admin-layout-divider: color-mix(
+    in srgb,
+    var(--gojuniors-border-color, #e5e7eb) 78%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  --admin-layout-scrollbar: color-mix(
+    in srgb,
+    var(--gojuniors-muted-text-color, #6b7280) 45%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  --admin-layout-button-text: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+}
+
+/* =========================================================
+   ADMIN AREA
+   Starts AFTER the common Navbar
+   ========================================================= */
+
+.admin-layout {
+  width: 100%;
+  min-height: calc(100vh - 1px);
+  display: flex;
+  position: relative;
+  background: var(--admin-layout-background);
+}
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.admin-sidebar {
+  width: 260px;
+  min-width: 260px;
+  height: calc(100vh - 82px);
+  background: var(--admin-layout-surface);
+  border-right: 1px solid var(--admin-layout-border);
+  display: flex;
+  flex-direction: column;
+
+  /*
+    IMPORTANT:
+    Sidebar is no longer fixed from the top of the website.
+    It stays inside .admin-layout, which starts after Navbar.
+  */
+
+  position: sticky;
+  top: 0;
+  z-index: 100;
+
+  box-shadow: 2px 0 12px rgba(15, 23, 42, 0.04);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   BRAND
+   ========================================================= */
+
+.admin-sidebar-brand {
+  height: 82px;
+  min-height: 82px;
+  padding: 0 22px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid var(--admin-layout-divider);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.admin-brand-logo {
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: var(--admin-layout-primary);
+  color: var(--admin-layout-button-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+.admin-brand-text {
+  min-width: 0;
+}
+
+.admin-brand-text h2 {
+  margin: 0;
+  color: var(--admin-layout-text);
+  font-size: 17px;
+  line-height: 1.2;
+  font-weight: 800;
+  letter-spacing: 0.4px;
+}
+
+.admin-brand-text span {
+  display: block;
+  margin-top: 3px;
+  color: var(--admin-layout-muted);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.admin-sidebar-nav {
+  flex: 1;
+  padding: 24px 14px;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+.admin-nav-section {
+  margin-bottom: 28px;
+}
+
+.admin-nav-section-title {
+  display: block;
+  padding: 0 12px;
+  margin-bottom: 9px;
+  color: var(--admin-layout-section-title);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.admin-nav-link {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  margin-bottom: 5px;
+  border-radius: 9px;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  color: var(--admin-layout-body-text);
+  background: transparent;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  box-sizing: border-box;
+}
+
+.admin-nav-link svg {
+  width: 17px;
+  min-width: 17px;
+  font-size: 16px;
+}
+
+.admin-nav-link:hover {
+  background: var(--admin-layout-soft-surface);
+  color: var(--admin-layout-primary);
+  transform: translateX(2px);
+}
+
+.admin-nav-link.active {
+  background: var(--admin-layout-primary);
+  color: var(--admin-layout-button-text);
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.18);
+}
+
+.admin-nav-link.active:hover {
+  background: var(--admin-layout-primary);
+  color: var(--admin-layout-button-text);
+  transform: none;
+}
+
+/* =========================================================
+   SIDEBAR FOOTER
+   ========================================================= */
+
+.admin-sidebar-footer {
+  padding: 14px;
+  border-top: 1px solid var(--admin-layout-divider);
+  flex-shrink: 0;
+  box-sizing: border-box;
+}
+
+.admin-logout-button {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 13px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: #dc2626;
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease;
+}
+
+.admin-logout-button svg {
+  width: 17px;
+  min-width: 17px;
+}
+
+.admin-logout-button:hover {
+  background: #fef2f2;
+  color: #b91c1c;
+}
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.admin-main-content {
+  flex: 1;
+  min-width: 0;
+  min-height: calc(100vh - 82px);
+  background: var(--admin-layout-background);
+  box-sizing: border-box;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+.admin-sidebar-nav::-webkit-scrollbar {
+  width: 5px;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.admin-sidebar-nav::-webkit-scrollbar-thumb {
+  background: var(--admin-layout-scrollbar);
+  border-radius: 10px;
+}
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+  .admin-sidebar {
+    width: 225px;
+    min-width: 225px;
+    height: calc(100vh - 82px);
+  }
+
+  .admin-sidebar-brand {
+    padding: 0 17px;
+  }
+
+  .admin-sidebar-nav {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .admin-nav-link {
+    font-size: 13px;
+    gap: 10px;
+  }
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+  .admin-layout {
+    display: block;
+    min-height: auto;
+  }
+
+  .admin-sidebar {
+    position: relative;
+    width: 100%;
+    min-width: 100%;
+    min-height: auto;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--admin-layout-border);
+    box-shadow: 0 2px 10px rgba(15, 23, 42, 0.05);
+  }
+
+  .admin-sidebar-brand {
+    height: 72px;
+    min-height: 72px;
+  }
+
+  .admin-sidebar-nav {
+    padding: 12px 14px 8px;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .admin-nav-section {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+  }
+
+  .admin-nav-section-title {
+    display: none;
+  }
+
+  .admin-nav-link {
+    width: auto;
+    min-height: 42px;
+    margin: 0;
+    padding: 0 12px;
+    white-space: nowrap;
+  }
+
+  .admin-sidebar-footer {
+    padding: 8px 14px 12px;
+  }
+
+  .admin-logout-button {
+    min-height: 42px;
+  }
+
+  .admin-main-content {
+    min-height: auto;
+  }
+}
+
+/* =========================================================
+   SMALL MOBILE
+   ========================================================= */
+
+@media (max-width: 450px) {
+  .admin-brand-text h2 {
+    font-size: 15px;
+  }
+
+  .admin-brand-text span {
+    font-size: 10px;
+  }
+
+  .admin-brand-logo {
+    width: 38px;
+    height: 38px;
+    font-size: 14px;
+  }
+
+  .admin-sidebar-nav {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+
+  .admin-nav-link {
+    padding: 0 10px;
+    font-size: 12px;
+  }
+}

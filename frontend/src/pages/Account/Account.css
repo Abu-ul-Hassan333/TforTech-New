@@ -1,0 +1,793 @@
+/* =========================================================
+   ACCOUNT PAGE
+   ========================================================= */
+
+.account-page {
+  min-height: 100vh;
+  background: #f5f7fb;
+  color: #1f2937;
+  padding: 40px 20px;
+
+  /*
+    Theme variables are available globally through
+    ThemeContext. Existing colors remain the defaults
+    until a custom theme is saved.
+  */
+}
+
+.account-container {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+
+/* =========================================================
+   ACCOUNT HEADER
+========================================================= */
+
+.account-header {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.account-header h1 {
+  margin: 0 0 8px;
+  font-size: 30px;
+  color: #1f2937;
+}
+
+.account-header p {
+  margin: 0;
+  color: #6b7280;
+  font-size: 15px;
+}
+
+
+/* =========================================================
+   ACCOUNT CARD
+========================================================= */
+
+.account-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  margin-bottom: 25px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.account-card-title {
+  margin: 0 0 25px;
+  color: #1f2937;
+  font-size: 22px;
+}
+
+
+/* =========================================================
+   PROFILE HEADING
+========================================================= */
+
+.account-profile-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.account-profile-heading .account-card-title {
+  margin-bottom: 6px;
+}
+
+.account-profile-subtitle {
+  margin: 0;
+  color: #6b7280;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   EDIT PROFILE BUTTON
+========================================================= */
+
+.account-edit-btn {
+  flex-shrink: 0;
+  padding: 11px 18px;
+  border: none;
+  border-radius: 9px;
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.account-edit-btn:hover {
+  background: #1d4ed8;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.account-edit-btn:active {
+  transform: translateY(0);
+}
+
+
+/* =========================================================
+   SUCCESS / ERROR MESSAGES
+========================================================= */
+
+.account-success-message {
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  border: 1px solid #bbf7d0;
+  border-radius: 9px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.account-error-message {
+  margin-bottom: 20px;
+  padding: 12px 15px;
+  border: 1px solid #fecaca;
+  border-radius: 9px;
+  background: #fef2f2;
+  color: #b91c1c;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   ACCOUNT INFORMATION
+========================================================= */
+
+.account-info-item {
+  padding: 16px 0;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.account-info-item:last-child {
+  border-bottom: none;
+}
+
+.account-info-label {
+  color: #6b7280;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.account-info-value {
+  color: #111827;
+  font-size: 16px;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.account-name {
+  font-weight: 600;
+}
+
+.account-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  background: #dcfce7;
+  color: #166534;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+
+/* =========================================================
+   PROFILE EDIT FORM
+========================================================= */
+
+.account-edit-form {
+  margin-top: 10px;
+}
+
+.account-form-group {
+  margin-bottom: 20px;
+}
+
+.account-form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #374151;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.account-form-group input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 9px;
+  background: #ffffff;
+  color: #111827;
+  font-family: inherit;
+  font-size: 15px;
+  outline: none;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.account-form-group input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.account-form-group input:disabled {
+  background: #f3f4f6;
+  color: #6b7280;
+  cursor: not-allowed;
+}
+
+.account-form-group input::placeholder {
+  color: #9ca3af;
+}
+
+.account-form-group small {
+  display: block;
+  margin-top: 7px;
+  color: #6b7280;
+  font-size: 12px;
+}
+
+
+/* =========================================================
+   EDIT FORM BUTTONS
+========================================================= */
+
+.account-edit-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+  margin-top: 25px;
+}
+
+.account-cancel-btn,
+.account-save-btn {
+  min-width: 125px;
+  padding: 12px 18px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    border-color 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.account-cancel-btn {
+  border: 1px solid #d1d5db;
+  background: #ffffff;
+  color: #374151;
+}
+
+.account-cancel-btn:hover {
+  background: #f9fafb;
+  border-color: #9ca3af;
+}
+
+.account-save-btn {
+  border: 1px solid #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.account-save-btn:hover {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  box-shadow: 0 5px 14px rgba(37, 99, 235, 0.2);
+  transform: translateY(-1px);
+}
+
+.account-cancel-btn:active,
+.account-save-btn:active {
+  transform: translateY(0);
+}
+
+.account-cancel-btn:disabled,
+.account-save-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   ACCOUNT ACTIVITIES
+========================================================= */
+
+.account-activities {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 15px;
+}
+
+.account-activity-btn {
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #ffffff;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.account-activity-btn:hover {
+  transform: translateY(-2px);
+  border-color: #d1d5db;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+}
+
+.account-activity-btn:active {
+  transform: translateY(0);
+}
+
+.account-activity-icon {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.account-activity-title {
+  display: block;
+  color: #111827;
+  margin-bottom: 5px;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.account-activity-description {
+  color: #6b7280;
+  font-size: 13px;
+}
+
+.account-activity-btn.disabled {
+  background: #f9fafb;
+  cursor: not-allowed;
+}
+
+.account-activity-btn.disabled:hover {
+  transform: none;
+  border-color: #e5e7eb;
+  box-shadow: none;
+}
+
+
+/* =========================================================
+   LOGOUT
+========================================================= */
+
+.account-logout-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 25px 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.account-logout-btn {
+  width: 100%;
+  padding: 13px 20px;
+  border: none;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.account-logout-btn:hover {
+  background: #b91c1c;
+  box-shadow: 0 5px 14px rgba(220, 38, 38, 0.18);
+}
+
+.account-logout-btn:active {
+  transform: scale(0.99);
+}
+
+
+/* =========================================================
+   CUSTOM THEME
+   =========================================================
+   These rules are activated by ThemeContext only on
+   customer-facing pages.
+
+   Existing colors above remain the default appearance.
+========================================================= */
+
+body.gojuniors-theme-active .account-page {
+  background: var(
+    --gojuniors-surface-color,
+    #f5f7fb
+  );
+
+  color: var(
+    --gojuniors-text-color,
+    #1f2937
+  );
+}
+
+
+/* =========================================================
+   THEME — CARDS
+========================================================= */
+
+body.gojuniors-theme-active .account-header,
+body.gojuniors-theme-active .account-card,
+body.gojuniors-theme-active .account-logout-card,
+body.gojuniors-theme-active .account-activity-btn {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  border-radius: var(
+    --gojuniors-border-radius,
+    16px
+  );
+}
+
+body.gojuniors-theme-active .account-activity-btn {
+  border-color: var(
+    --gojuniors-border-color,
+    #e5e7eb
+  );
+}
+
+
+/* =========================================================
+   THEME — HEADINGS
+========================================================= */
+
+body.gojuniors-theme-active .account-header h1,
+body.gojuniors-theme-active .account-card-title,
+body.gojuniors-theme-active .account-info-value,
+body.gojuniors-theme-active .account-activity-title {
+  color: var(
+    --gojuniors-text-color,
+    #1f2937
+  );
+}
+
+
+/* =========================================================
+   THEME — MUTED TEXT
+========================================================= */
+
+body.gojuniors-theme-active .account-header p,
+body.gojuniors-theme-active .account-profile-subtitle,
+body.gojuniors-theme-active .account-info-label,
+body.gojuniors-theme-active .account-form-group small,
+body.gojuniors-theme-active .account-activity-description {
+  color: var(
+    --gojuniors-muted-text-color,
+    #6b7280
+  );
+}
+
+
+/* =========================================================
+   THEME — BORDERS
+========================================================= */
+
+body.gojuniors-theme-active .account-info-item,
+body.gojuniors-theme-active .account-activity-btn {
+  border-color: var(
+    --gojuniors-border-color,
+    #e5e7eb
+  );
+}
+
+body.gojuniors-theme-active .account-form-group input,
+body.gojuniors-theme-active .account-cancel-btn {
+  border-color: var(
+    --gojuniors-border-color,
+    #d1d5db
+  );
+}
+
+
+/* =========================================================
+   THEME — PRIMARY BUTTONS
+========================================================= */
+
+body.gojuniors-theme-active .account-edit-btn,
+body.gojuniors-theme-active .account-save-btn {
+  background: var(
+    --gojuniors-secondary-color,
+    #2563eb
+  );
+
+  border-color: var(
+    --gojuniors-secondary-color,
+    #2563eb
+  );
+
+  color: var(
+    --gojuniors-button-text-color,
+    #ffffff
+  );
+
+  border-radius: var(
+    --gojuniors-button-radius,
+    9px
+  );
+}
+
+body.gojuniors-theme-active .account-edit-btn:hover,
+body.gojuniors-theme-active .account-save-btn:hover {
+  background: var(
+    --gojuniors-primary-color,
+    #1d4ed8
+  );
+
+  border-color: var(
+    --gojuniors-primary-color,
+    #1d4ed8
+  );
+}
+
+
+/* =========================================================
+   THEME — FORM
+========================================================= */
+
+body.gojuniors-theme-active .account-form-group label {
+  color: var(
+    --gojuniors-text-color,
+    #374151
+  );
+}
+
+body.gojuniors-theme-active .account-form-group input {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  color: var(
+    --gojuniors-text-color,
+    #111827
+  );
+
+  border-radius: var(
+    --gojuniors-button-radius,
+    9px
+  );
+}
+
+body.gojuniors-theme-active .account-form-group input:focus {
+  border-color: var(
+    --gojuniors-secondary-color,
+    #2563eb
+  );
+
+  box-shadow:
+    0 0 0 3px
+    color-mix(
+      in srgb,
+      var(--gojuniors-secondary-color, #2563eb) 10%,
+      transparent
+    );
+}
+
+body.gojuniors-theme-active .account-form-group input:disabled {
+  background: var(
+    --gojuniors-surface-color,
+    #f3f4f6
+  );
+
+  color: var(
+    --gojuniors-muted-text-color,
+    #6b7280
+  );
+}
+
+
+/* =========================================================
+   THEME — CANCEL BUTTON
+========================================================= */
+
+body.gojuniors-theme-active .account-cancel-btn {
+  background: var(
+    --gojuniors-background-color,
+    #ffffff
+  );
+
+  color: var(
+    --gojuniors-text-color,
+    #374151
+  );
+
+  border-radius: var(
+    --gojuniors-button-radius,
+    9px
+  );
+}
+
+body.gojuniors-theme-active .account-cancel-btn:hover {
+  background: var(
+    --gojuniors-surface-color,
+    #f9fafb
+  );
+
+  border-color: var(
+    --gojuniors-secondary-color,
+    #9ca3af
+  );
+}
+
+
+/* =========================================================
+   THEME — ACCOUNT ACTIVITIES
+========================================================= */
+
+body.gojuniors-theme-active .account-activity-btn:hover {
+  border-color: var(
+    --gojuniors-secondary-color,
+    #d1d5db
+  );
+}
+
+body.gojuniors-theme-active .account-activity-btn.disabled {
+  background: var(
+    --gojuniors-surface-color,
+    #f9fafb
+  );
+}
+
+
+/* =========================================================
+   THEME — STATUS
+========================================================= */
+
+body.gojuniors-theme-active .account-status {
+  background: color-mix(
+    in srgb,
+    var(--gojuniors-accent-color, #d69e78) 16%,
+    var(--gojuniors-background-color, #ffffff)
+  );
+
+  color: var(
+    --gojuniors-primary-color,
+    #166534
+  );
+}
+
+
+/* =========================================================
+   THEME — LOGOUT
+   Keep danger semantics, but integrate button radius.
+========================================================= */
+
+body.gojuniors-theme-active .account-logout-btn {
+  border-radius: var(
+    --gojuniors-button-radius,
+    10px
+  );
+}
+
+
+/* =========================================================
+   RESPONSIVE - TABLET
+========================================================= */
+
+@media (max-width: 768px) {
+  .account-page {
+    padding: 25px 15px;
+  }
+
+  .account-header,
+  .account-card {
+    padding: 22px;
+  }
+
+  .account-header h1 {
+    font-size: 26px;
+  }
+
+  .account-card-title {
+    font-size: 20px;
+  }
+
+  .account-profile-heading {
+    align-items: flex-start;
+  }
+
+  .account-edit-btn {
+    padding: 10px 15px;
+  }
+
+  .account-logout-card {
+    padding: 20px 22px;
+  }
+}
+
+
+/* =========================================================
+   RESPONSIVE - MOBILE
+========================================================= */
+
+@media (max-width: 480px) {
+  .account-page {
+    padding: 20px 12px;
+  }
+
+  .account-header,
+  .account-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+
+  .account-header h1 {
+    font-size: 23px;
+  }
+
+  .account-header p {
+    font-size: 14px;
+  }
+
+  .account-card-title {
+    font-size: 18px;
+  }
+
+  .account-profile-heading {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .account-edit-btn {
+    width: 100%;
+  }
+
+  .account-info-value {
+    font-size: 15px;
+  }
+
+  .account-edit-actions {
+    flex-direction: column-reverse;
+    width: 100%;
+  }
+
+  .account-cancel-btn,
+  .account-save-btn {
+    width: 100%;
+  }
+
+  .account-activities {
+    grid-template-columns: 1fr;
+  }
+
+  .account-logout-card {
+    padding: 18px;
+    border-radius: 12px;
+  }
+}
