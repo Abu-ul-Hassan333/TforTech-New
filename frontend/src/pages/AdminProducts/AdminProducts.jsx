@@ -109,7 +109,7 @@ function AdminProducts() {
 
       if (response.status === 403) {
         setError(
-          "Access denied. Only administrators can manage products."
+          "Access denied. Only authorized administrators can manage products."
         );
         return;
       }
@@ -128,7 +128,10 @@ function AdminProducts() {
         setProducts([]);
       }
     } catch (fetchError) {
-      console.error("Admin products fetch error:", fetchError);
+      console.error(
+        "Admin products fetch error:",
+        fetchError
+      );
 
       setError(
         fetchError.message ||
@@ -149,16 +152,27 @@ function AdminProducts() {
 
     const token = getToken();
 
-    const userRole = localStorage.getItem("tfortech_user_role");
+    const userRole =
+      String(
+        localStorage.getItem(
+          "tfortech_user_role"
+        ) || "customer"
+      )
+        .toLowerCase()
+        .trim();
 
     if (!loggedIn || !token) {
       navigate("/login");
       return;
     }
 
-    if (userRole !== "admin") {
+    const canManageProducts =
+      userRole === "admin" ||
+      userRole === "co_admin";
+
+    if (!canManageProducts) {
       setError(
-        "Access denied. Only administrators can access product management."
+        "Access denied. Only authorized administrators can access product management."
       );
       setLoading(false);
       return;
@@ -343,30 +357,43 @@ function AdminProducts() {
     setError("");
     setSuccessMessage("");
 
-    const specifications = product.specifications || {};
+    const specifications =
+      product.specifications || {};
 
     setForm({
       name: product.name || "",
       price:
-        product.price !== undefined && product.price !== null
+        product.price !== undefined &&
+        product.price !== null
           ? String(product.price)
           : "",
       category: product.category || "",
       image: product.image || "",
-      shortDescription: product.shortDescription || "",
-      description: product.description || "",
-      processor: specifications.processor || "",
-      ram: specifications.ram || "",
-      storage: specifications.storage || "",
-      display: specifications.display || "",
-      graphics: specifications.graphics || "",
-      operatingSystem: specifications.operatingSystem || "",
+      shortDescription:
+        product.shortDescription || "",
+      description:
+        product.description || "",
+      processor:
+        specifications.processor || "",
+      ram:
+        specifications.ram || "",
+      storage:
+        specifications.storage || "",
+      display:
+        specifications.display || "",
+      graphics:
+        specifications.graphics || "",
+      operatingSystem:
+        specifications.operatingSystem || "",
       stock:
-        product.stock !== undefined && product.stock !== null
+        product.stock !== undefined &&
+        product.stock !== null
           ? String(product.stock)
           : "",
-      condition: product.condition || "Used",
-      is_featured: Boolean(product.is_featured),
+      condition:
+        product.condition || "Used",
+      is_featured:
+        Boolean(product.is_featured),
     });
 
     setImageSource("url");
@@ -395,7 +422,10 @@ function AdminProducts() {
       return "Product name is required.";
     }
 
-    if (form.price === "" || Number(form.price) < 0) {
+    if (
+      form.price === "" ||
+      Number(form.price) < 0
+    ) {
       return "Please enter a valid product price.";
     }
 
@@ -411,7 +441,10 @@ function AdminProducts() {
       return "Product description is required.";
     }
 
-    if (form.stock === "" || Number(form.stock) < 0) {
+    if (
+      form.stock === "" ||
+      Number(form.stock) < 0
+    ) {
       return "Please enter a valid stock quantity.";
     }
 
@@ -428,7 +461,8 @@ function AdminProducts() {
     setError("");
     setSuccessMessage("");
 
-    const validationError = validateForm();
+    const validationError =
+      validateForm();
 
     if (validationError) {
       setError(validationError);
@@ -449,39 +483,61 @@ function AdminProducts() {
         name: form.name.trim(),
         price: Number(form.price),
         category: form.category.trim(),
-        image: form.image.trim() || null,
-        shortDescription: form.shortDescription.trim(),
-        description: form.description.trim(),
+        image:
+          form.image.trim() || null,
+        shortDescription:
+          form.shortDescription.trim(),
+        description:
+          form.description.trim(),
         specifications: {
-          processor: form.processor.trim(),
-          ram: form.ram.trim(),
-          storage: form.storage.trim(),
-          display: form.display.trim(),
-          graphics: form.graphics.trim(),
-          operatingSystem: form.operatingSystem.trim(),
+          processor:
+            form.processor.trim(),
+          ram:
+            form.ram.trim(),
+          storage:
+            form.storage.trim(),
+          display:
+            form.display.trim(),
+          graphics:
+            form.graphics.trim(),
+          operatingSystem:
+            form.operatingSystem.trim(),
         },
         stock: Number(form.stock),
-        condition: form.condition || "Used",
-        is_featured: form.is_featured,
+        condition:
+          form.condition || "Used",
+        is_featured:
+          form.is_featured,
       };
 
-      const isEditing = Boolean(editingProductId);
+      const isEditing =
+        Boolean(editingProductId);
 
       const endpoint = isEditing
         ? `${API_URL}/api/products/${editingProductId}`
         : `${API_URL}/api/products/`;
 
-      const method = isEditing ? "PUT" : "POST";
+      const method = isEditing
+        ? "PUT"
+        : "POST";
 
-      const response = await fetch(endpoint, {
-        method,
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(productData),
-      });
+      const response = await fetch(
+        endpoint,
+        {
+          method,
+          headers: {
+            Authorization:
+              `Bearer ${token}`,
+            Accept:
+              "application/json",
+            "Content-Type":
+              "application/json",
+          },
+          body: JSON.stringify(
+            productData
+          ),
+        }
+      );
 
       if (response.status === 401) {
         handleAuthenticationFailure();
@@ -490,65 +546,94 @@ function AdminProducts() {
 
       if (response.status === 403) {
         setError(
-          "Access denied. Only administrators can manage products."
+          "Access denied. Only authorized administrators can manage products."
         );
         return;
       }
 
       if (!response.ok) {
-        let errorMessage = isEditing
-          ? "Unable to update product."
-          : "Unable to create product.";
+        let errorMessage =
+          isEditing
+            ? "Unable to update product."
+            : "Unable to create product.";
 
         try {
-          const errorData = await response.json();
+          const errorData =
+            await response.json();
 
           if (errorData.detail) {
-            if (Array.isArray(errorData.detail)) {
-              errorMessage = errorData.detail
-                .map(
-                  (item) =>
-                    item.msg || "Invalid product data."
-                )
-                .join(" ");
+            if (
+              Array.isArray(
+                errorData.detail
+              )
+            ) {
+              errorMessage =
+                errorData.detail
+                  .map(
+                    (item) =>
+                      item.msg ||
+                      "Invalid product data."
+                  )
+                  .join(" ");
             } else {
-              errorMessage = errorData.detail;
+              errorMessage =
+                errorData.detail;
             }
           }
         } catch (parseError) {
           // Keep default error message.
         }
 
-        throw new Error(errorMessage);
+        throw new Error(
+          errorMessage
+        );
       }
 
-      const savedProduct = await response.json();
+      const savedProduct =
+        await response.json();
+
+      const productResult =
+        savedProduct?.product ||
+        savedProduct;
 
       if (isEditing) {
-        setProducts((currentProducts) =>
-          currentProducts.map((product) =>
-            product.id === savedProduct.id
-              ? savedProduct
-              : product
-          )
+        setProducts(
+          (currentProducts) =>
+            currentProducts.map(
+              (product) =>
+                product.id ===
+                productResult.id
+                  ? productResult
+                  : product
+            )
         );
 
-        setSuccessMessage("Product updated successfully.");
+        setSuccessMessage(
+          "Product updated successfully."
+        );
       } else {
-        setProducts((currentProducts) => [
-          savedProduct,
-          ...currentProducts,
-        ]);
+        setProducts(
+          (currentProducts) => [
+            productResult,
+            ...currentProducts,
+          ]
+        );
 
-        setSuccessMessage("Product added successfully.");
+        setSuccessMessage(
+          "Product added successfully."
+        );
       }
 
       resetForm();
     } catch (submitError) {
-      console.error("Admin product save error:", submitError);
+      console.error(
+        "Admin product save error:",
+        submitError
+      );
 
       setError(
-        submitError.message || "Unable to save product."
+        submitError.message ||
+          "Unable to save product."
       );
     } finally {
       setSaving(false);
@@ -559,211 +644,263 @@ function AdminProducts() {
   // DELETE PRODUCT
   // =========================================================
 
-  const handleDeleteProduct = async (productId) => {
-    const product = products.find(
-      (item) => item.id === productId
-    );
-
-    const productName = product?.name || "this product";
-
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${productName}"?`
-    );
-
-    if (!confirmed) {
-      return;
-    }
-
-    try {
-      setDeletingId(productId);
-      setError("");
-      setSuccessMessage("");
-
-      const token = getToken();
-
-      if (!token) {
-        handleAuthenticationFailure();
-        return;
-      }
-
-      const response = await fetch(
-        `${API_URL}/api/products/${productId}`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-          },
-        }
-      );
-
-      if (response.status === 401) {
-        handleAuthenticationFailure();
-        return;
-      }
-
-      if (response.status === 403) {
-        setError(
-          "Access denied. Only administrators can delete products."
+  const handleDeleteProduct =
+    async (productId) => {
+      const product =
+        products.find(
+          (item) =>
+            item.id === productId
         );
+
+      const productName =
+        product?.name ||
+        "this product";
+
+      const confirmed =
+        window.confirm(
+          `Are you sure you want to delete "${productName}"?`
+        );
+
+      if (!confirmed) {
         return;
       }
 
-      if (!response.ok) {
-        let errorMessage = "Unable to delete product.";
+      try {
+        setDeletingId(productId);
+        setError("");
+        setSuccessMessage("");
 
-        try {
-          const errorData = await response.json();
+        const token = getToken();
 
-          errorMessage =
-            errorData.detail || errorMessage;
-        } catch (parseError) {
-          // Keep default error message.
+        if (!token) {
+          handleAuthenticationFailure();
+          return;
         }
 
-        throw new Error(errorMessage);
+        const response =
+          await fetch(
+            `${API_URL}/api/products/${productId}`,
+            {
+              method: "DELETE",
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+                Accept:
+                  "application/json",
+              },
+            }
+          );
+
+        if (response.status === 401) {
+          handleAuthenticationFailure();
+          return;
+        }
+
+        if (response.status === 403) {
+          setError(
+            "Access denied. Only authorized administrators can delete products."
+          );
+          return;
+        }
+
+        if (!response.ok) {
+          let errorMessage =
+            "Unable to delete product.";
+
+          try {
+            const errorData =
+              await response.json();
+
+            errorMessage =
+              errorData.detail ||
+              errorMessage;
+          } catch (parseError) {
+            // Keep default error message.
+          }
+
+          throw new Error(
+            errorMessage
+          );
+        }
+
+        setProducts(
+          (currentProducts) =>
+            currentProducts.filter(
+              (product) =>
+                product.id !==
+                productId
+            )
+        );
+
+        if (
+          editingProductId ===
+          productId
+        ) {
+          resetForm();
+        }
+
+        setSuccessMessage(
+          "Product deleted successfully."
+        );
+      } catch (deleteError) {
+        console.error(
+          "Admin product delete error:",
+          deleteError
+        );
+
+        setError(
+          deleteError.message ||
+            "Unable to delete product."
+        );
+      } finally {
+        setDeletingId("");
       }
-
-      setProducts((currentProducts) =>
-        currentProducts.filter(
-          (product) => product.id !== productId
-        )
-      );
-
-      if (editingProductId === productId) {
-        resetForm();
-      }
-
-      setSuccessMessage("Product deleted successfully.");
-    } catch (deleteError) {
-      console.error(
-        "Admin product delete error:",
-        deleteError
-      );
-
-      setError(
-        deleteError.message ||
-          "Unable to delete product."
-      );
-    } finally {
-      setDeletingId("");
-    }
-  };
+    };
 
   // =========================================================
   // UPDATE STOCK
   // =========================================================
 
-  const handleStockUpdate = async (
-    productId,
-    currentStock
-  ) => {
-    const newStock = window.prompt(
-      "Enter the new stock quantity:",
-      String(currentStock ?? 0)
-    );
+  const handleStockUpdate =
+    async (
+      productId,
+      currentStock
+    ) => {
+      const newStock =
+        window.prompt(
+          "Enter the new stock quantity:",
+          String(
+            currentStock ?? 0
+          )
+        );
 
-    if (newStock === null) {
-      return;
-    }
-
-    if (
-      newStock.trim() === "" ||
-      Number.isNaN(Number(newStock)) ||
-      Number(newStock) < 0
-    ) {
-      setError("Please enter a valid stock quantity.");
-      return;
-    }
-
-    try {
-      setUpdatingStockId(productId);
-      setError("");
-      setSuccessMessage("");
-
-      const token = getToken();
-
-      if (!token) {
-        handleAuthenticationFailure();
+      if (newStock === null) {
         return;
       }
 
-      const response = await fetch(
-        `${API_URL}/api/products/${productId}/stock`,
-        {
-          method: "PATCH",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            stock: Number(newStock),
-          }),
-        }
-      );
-
-      if (response.status === 401) {
-        handleAuthenticationFailure();
-        return;
-      }
-
-      if (response.status === 403) {
+      if (
+        newStock.trim() === "" ||
+        Number.isNaN(
+          Number(newStock)
+        ) ||
+        Number(newStock) < 0
+      ) {
         setError(
-          "Access denied. Only administrators can update product stock."
+          "Please enter a valid stock quantity."
         );
         return;
       }
 
-      if (!response.ok) {
-        let errorMessage = "Unable to update stock.";
+      try {
+        setUpdatingStockId(
+          productId
+        );
+        setError("");
+        setSuccessMessage("");
 
-        try {
-          const errorData = await response.json();
+        const token = getToken();
 
-          errorMessage =
-            errorData.detail || errorMessage;
-        } catch (parseError) {
-          // Keep default error message.
+        if (!token) {
+          handleAuthenticationFailure();
+          return;
         }
 
-        throw new Error(errorMessage);
+        const response =
+          await fetch(
+            `${API_URL}/api/products/${productId}/stock`,
+            {
+              method: "PATCH",
+              headers: {
+                Authorization:
+                  `Bearer ${token}`,
+                Accept:
+                  "application/json",
+                "Content-Type":
+                  "application/json",
+              },
+              body: JSON.stringify({
+                stock:
+                  Number(newStock),
+              }),
+            }
+          );
+
+        if (response.status === 401) {
+          handleAuthenticationFailure();
+          return;
+        }
+
+        if (response.status === 403) {
+          setError(
+            "Access denied. Only authorized administrators can update product stock."
+          );
+          return;
+        }
+
+        if (!response.ok) {
+          let errorMessage =
+            "Unable to update stock.";
+
+          try {
+            const errorData =
+              await response.json();
+
+            errorMessage =
+              errorData.detail ||
+              errorMessage;
+          } catch (parseError) {
+            // Keep default error message.
+          }
+
+          throw new Error(
+            errorMessage
+          );
+        }
+
+        const updatedProductResponse =
+          await response.json();
+
+        const updatedProduct =
+          updatedProductResponse?.product ||
+          updatedProductResponse;
+
+        setProducts(
+          (currentProducts) =>
+            currentProducts.map(
+              (product) =>
+                product.id ===
+                updatedProduct.id
+                  ? updatedProduct
+                  : product
+            )
+        );
+
+        setSuccessMessage(
+          "Product stock updated successfully."
+        );
+      } catch (stockError) {
+        console.error(
+          "Admin product stock update error:",
+          stockError
+        );
+
+        setError(
+          stockError.message ||
+            "Unable to update product stock."
+        );
+      } finally {
+        setUpdatingStockId("");
       }
-
-      const updatedProduct = await response.json();
-
-      setProducts((currentProducts) =>
-        currentProducts.map((product) =>
-          product.id === updatedProduct.id
-            ? updatedProduct
-            : product
-        )
-      );
-
-      setSuccessMessage(
-        "Product stock updated successfully."
-      );
-    } catch (stockError) {
-      console.error(
-        "Admin product stock update error:",
-        stockError
-      );
-
-      setError(
-        stockError.message ||
-          "Unable to update product stock."
-      );
-    } finally {
-      setUpdatingStockId("");
-    }
-  };
+    };
 
   // =========================================================
   // FORMAT CURRENCY
   // =========================================================
 
   const formatCurrency = (amount) => {
-    return `PKR ${Number(amount || 0).toLocaleString(
+    return `PKR ${Number(
+      amount || 0
+    ).toLocaleString(
       "en-PK",
       {
         minimumFractionDigits: 0,
@@ -776,23 +913,27 @@ function AdminProducts() {
   // PRODUCT IMAGE
   // =========================================================
 
-  const renderProductImage = (product) => {
-    if (product.image) {
-      return (
-        <img
-          src={product.image}
-          alt={product.name || "Product"}
-          className="admin-product-image"
-        />
-      );
-    }
+  const renderProductImage =
+    (product) => {
+      if (product.image) {
+        return (
+          <img
+            src={product.image}
+            alt={
+              product.name ||
+              "Product"
+            }
+            className="admin-product-image"
+          />
+        );
+      }
 
-    return (
-      <div className="admin-product-image-placeholder">
-        💻
-      </div>
-    );
-  };
+      return (
+        <div className="admin-product-image-placeholder">
+          💻
+        </div>
+      );
+    };
 
   // =========================================================
   // LOADING
@@ -806,10 +947,13 @@ function AdminProducts() {
             <div className="admin-products-loading">
               <div className="admin-products-spinner"></div>
 
-              <h2>Loading Products</h2>
+              <h2>
+                Loading Products
+              </h2>
 
               <p>
-                Please wait while we load the products.
+                Please wait while we
+                load the products.
               </p>
             </div>
           </main>
@@ -838,15 +982,19 @@ function AdminProducts() {
                   ADMIN PANEL
                 </span>
 
-                <h1>Product Management</h1>
+                <h1>
+                  Product Management
+                </h1>
 
                 <p>
-                  Add, edit, delete and manage products
-                  in your store.
+                  Add, edit, delete and
+                  manage products in your
+                  store.
                 </p>
               </div>
 
               <div className="admin-products-header-actions">
+
                 <button
                   type="button"
                   className="admin-products-dashboard-button"
@@ -860,10 +1008,13 @@ function AdminProducts() {
                 <button
                   type="button"
                   className="admin-products-add-button"
-                  onClick={handleAddProduct}
+                  onClick={
+                    handleAddProduct
+                  }
                 >
                   + Add Product
                 </button>
+
               </div>
             </section>
 
@@ -887,7 +1038,9 @@ function AdminProducts() {
                   Something went wrong
                 </strong>
 
-                <span>{error}</span>
+                <span>
+                  {error}
+                </span>
               </div>
             )}
 
@@ -899,6 +1052,7 @@ function AdminProducts() {
               <section className="admin-products-form-section">
 
                 <div className="admin-products-form-header">
+
                   <div>
                     <span className="admin-products-section-label">
                       {editingProductId
@@ -916,16 +1070,21 @@ function AdminProducts() {
                   <button
                     type="button"
                     className="admin-products-cancel-button"
-                    onClick={resetForm}
+                    onClick={
+                      resetForm
+                    }
                     disabled={saving}
                   >
                     Cancel
                   </button>
+
                 </div>
 
                 <form
                   className="admin-products-form"
-                  onSubmit={handleSubmit}
+                  onSubmit={
+                    handleSubmit
+                  }
                 >
 
                   <div className="admin-products-form-grid">
@@ -940,7 +1099,9 @@ function AdminProducts() {
                         name="name"
                         type="text"
                         value={form.name}
-                        onChange={handleInputChange}
+                        onChange={
+                          handleInputChange
+                        }
                         placeholder="e.g. Dell Latitude 5420"
                         required
                       />
@@ -957,8 +1118,12 @@ function AdminProducts() {
                         type="number"
                         min="0"
                         step="0.01"
-                        value={form.price}
-                        onChange={handleInputChange}
+                        value={
+                          form.price
+                        }
+                        onChange={
+                          handleInputChange
+                        }
                         placeholder="85000"
                         required
                       />
@@ -973,8 +1138,12 @@ function AdminProducts() {
                         id="category"
                         name="category"
                         type="text"
-                        value={form.category}
-                        onChange={handleInputChange}
+                        value={
+                          form.category
+                        }
+                        onChange={
+                          handleInputChange
+                        }
                         placeholder="Dell"
                         required
                       />
@@ -988,8 +1157,12 @@ function AdminProducts() {
                       <select
                         id="condition"
                         name="condition"
-                        value={form.condition}
-                        onChange={handleInputChange}
+                        value={
+                          form.condition
+                        }
+                        onChange={
+                          handleInputChange
+                        }
                       >
                         <option value="New">
                           New
@@ -1017,35 +1190,50 @@ function AdminProducts() {
 
                       <div
                         style={{
-                          display: "flex",
+                          display:
+                            "flex",
                           gap: "10px",
-                          marginBottom: "14px",
-                          flexWrap: "wrap",
+                          marginBottom:
+                            "14px",
+                          flexWrap:
+                            "wrap",
                         }}
                       >
+
                         <button
                           type="button"
                           onClick={() =>
-                            handleImageSourceChange("url")
+                            handleImageSourceChange(
+                              "url"
+                            )
                           }
-                          disabled={saving}
+                          disabled={
+                            saving
+                          }
                           style={{
-                            padding: "10px 18px",
-                            borderRadius: "8px",
+                            padding:
+                              "10px 18px",
+                            borderRadius:
+                              "8px",
                             border:
-                              imageSource === "url"
+                              imageSource ===
+                              "url"
                                 ? "2px solid #111827"
                                 : "1px solid #d1d5db",
                             background:
-                              imageSource === "url"
+                              imageSource ===
+                              "url"
                                 ? "#111827"
                                 : "#ffffff",
                             color:
-                              imageSource === "url"
+                              imageSource ===
+                              "url"
                                 ? "#ffffff"
                                 : "#374151",
-                            cursor: "pointer",
-                            fontWeight: 600,
+                            cursor:
+                              "pointer",
+                            fontWeight:
+                              600,
                           }}
                         >
                           Image URL
@@ -1058,63 +1246,90 @@ function AdminProducts() {
                               "gallery"
                             )
                           }
-                          disabled={saving}
+                          disabled={
+                            saving
+                          }
                           style={{
-                            padding: "10px 18px",
-                            borderRadius: "8px",
+                            padding:
+                              "10px 18px",
+                            borderRadius:
+                              "8px",
                             border:
-                              imageSource === "gallery"
+                              imageSource ===
+                              "gallery"
                                 ? "2px solid #111827"
                                 : "1px solid #d1d5db",
                             background:
-                              imageSource === "gallery"
+                              imageSource ===
+                              "gallery"
                                 ? "#111827"
                                 : "#ffffff",
                             color:
-                              imageSource === "gallery"
+                              imageSource ===
+                              "gallery"
                                 ? "#ffffff"
                                 : "#374151",
-                            cursor: "pointer",
-                            fontWeight: 600,
+                            cursor:
+                              "pointer",
+                            fontWeight:
+                              600,
                           }}
                         >
                           Choose from Gallery
                         </button>
+
                       </div>
 
-                      {imageSource === "url" && (
+                      {imageSource ===
+                        "url" && (
                         <input
                           id="image"
                           name="image"
                           type="url"
-                          value={form.image}
-                          onChange={handleInputChange}
+                          value={
+                            form.image
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="https://example.com/product.jpg"
-                          disabled={saving}
+                          disabled={
+                            saving
+                          }
                         />
                       )}
 
-                      {imageSource === "gallery" && (
+                      {imageSource ===
+                        "gallery" && (
                         <div
                           style={{
                             border:
                               "1px dashed #cbd5e1",
-                            borderRadius: "12px",
-                            padding: "18px",
-                            background: "#f8fafc",
+                            borderRadius:
+                              "12px",
+                            padding:
+                              "18px",
+                            background:
+                              "#f8fafc",
                           }}
                         >
+
                           <input
-                            ref={imageInputRef}
+                            ref={
+                              imageInputRef
+                            }
                             id="product-gallery-image"
                             type="file"
                             accept="image/*"
                             onChange={
                               handleGalleryImageChange
                             }
-                            disabled={saving}
+                            disabled={
+                              saving
+                            }
                             style={{
-                              display: "none",
+                              display:
+                                "none",
                             }}
                           />
 
@@ -1123,18 +1338,28 @@ function AdminProducts() {
                             onClick={() =>
                               imageInputRef.current?.click()
                             }
-                            disabled={saving}
+                            disabled={
+                              saving
+                            }
                             style={{
-                              width: "100%",
-                              padding: "14px 18px",
-                              borderRadius: "10px",
+                              width:
+                                "100%",
+                              padding:
+                                "14px 18px",
+                              borderRadius:
+                                "10px",
                               border:
                                 "1px solid #d1d5db",
-                              background: "#ffffff",
-                              color: "#111827",
-                              cursor: "pointer",
-                              fontWeight: 600,
-                              fontSize: "14px",
+                              background:
+                                "#ffffff",
+                              color:
+                                "#111827",
+                              cursor:
+                                "pointer",
+                              fontWeight:
+                                600,
+                              fontSize:
+                                "14px",
                             }}
                           >
                             📁 Choose Image from Gallery
@@ -1144,64 +1369,86 @@ function AdminProducts() {
                             style={{
                               margin:
                                 "10px 0 0",
-                              fontSize: "13px",
-                              color: "#64748b",
-                              textAlign: "center",
+                              fontSize:
+                                "13px",
+                              color:
+                                "#64748b",
+                              textAlign:
+                                "center",
                             }}
                           >
-                            JPG, JPEG, PNG, WEBP and
-                            other image formats up to
-                            5 MB.
+                            JPG, JPEG, PNG,
+                            WEBP and other
+                            image formats up
+                            to 5 MB.
                           </p>
 
                           {selectedImageName && (
                             <div
                               style={{
-                                marginTop: "12px",
-                                padding: "10px 12px",
-                                borderRadius: "8px",
+                                marginTop:
+                                  "12px",
+                                padding:
+                                  "10px 12px",
+                                borderRadius:
+                                  "8px",
                                 background:
                                   "#ecfdf5",
-                                color: "#166534",
-                                fontSize: "13px",
+                                color:
+                                  "#166534",
+                                fontSize:
+                                  "13px",
                                 wordBreak:
                                   "break-word",
                               }}
                             >
                               ✓ Selected:{" "}
-                              {selectedImageName}
+                              {
+                                selectedImageName
+                              }
                             </div>
                           )}
+
                         </div>
                       )}
 
                       {form.image && (
                         <div
                           style={{
-                            marginTop: "16px",
+                            marginTop:
+                              "16px",
                             border:
                               "1px solid #e5e7eb",
-                            borderRadius: "12px",
-                            padding: "14px",
-                            background: "#ffffff",
+                            borderRadius:
+                              "12px",
+                            padding:
+                              "14px",
+                            background:
+                              "#ffffff",
                           }}
                         >
+
                           <div
                             style={{
-                              display: "flex",
+                              display:
+                                "flex",
                               justifyContent:
                                 "space-between",
                               alignItems:
                                 "center",
-                              gap: "12px",
+                              gap:
+                                "12px",
                               marginBottom:
                                 "10px",
                             }}
                           >
+
                             <strong
                               style={{
-                                fontSize: "14px",
-                                color: "#111827",
+                                fontSize:
+                                  "14px",
+                                color:
+                                  "#111827",
                               }}
                             >
                               Image Preview
@@ -1212,31 +1459,43 @@ function AdminProducts() {
                               onClick={
                                 handleClearImage
                               }
-                              disabled={saving}
+                              disabled={
+                                saving
+                              }
                               style={{
-                                border: "none",
+                                border:
+                                  "none",
                                 background:
                                   "transparent",
-                                color: "#dc2626",
+                                color:
+                                  "#dc2626",
                                 cursor:
                                   "pointer",
-                                fontWeight: 600,
-                                fontSize: "13px",
+                                fontWeight:
+                                  600,
+                                fontSize:
+                                  "13px",
                               }}
                             >
                               Remove Image
                             </button>
+
                           </div>
 
                           <div
                             style={{
-                              width: "100%",
-                              height: "220px",
-                              borderRadius: "10px",
-                              overflow: "hidden",
+                              width:
+                                "100%",
+                              height:
+                                "220px",
+                              borderRadius:
+                                "10px",
+                              overflow:
+                                "hidden",
                               background:
                                 "#f8fafc",
-                              display: "flex",
+                              display:
+                                "flex",
                               alignItems:
                                 "center",
                               justifyContent:
@@ -1246,11 +1505,15 @@ function AdminProducts() {
                             }}
                           >
                             <img
-                              src={form.image}
+                              src={
+                                form.image
+                              }
                               alt="Product preview"
                               style={{
-                                width: "100%",
-                                height: "100%",
+                                width:
+                                  "100%",
+                                height:
+                                  "100%",
                                 objectFit:
                                   "contain",
                               }}
@@ -1261,8 +1524,10 @@ function AdminProducts() {
                               }}
                             />
                           </div>
+
                         </div>
                       )}
+
                     </div>
 
                     <div className="admin-products-field">
@@ -1276,8 +1541,12 @@ function AdminProducts() {
                         type="number"
                         min="0"
                         step="1"
-                        value={form.stock}
-                        onChange={handleInputChange}
+                        value={
+                          form.stock
+                        }
+                        onChange={
+                          handleInputChange
+                        }
                         placeholder="10"
                         required
                       />
@@ -1292,8 +1561,12 @@ function AdminProducts() {
                         id="shortDescription"
                         name="shortDescription"
                         type="text"
-                        value={form.shortDescription}
-                        onChange={handleInputChange}
+                        value={
+                          form.shortDescription
+                        }
+                        onChange={
+                          handleInputChange
+                        }
                         placeholder="Short product description"
                         required
                       />
@@ -1308,12 +1581,17 @@ function AdminProducts() {
                         id="description"
                         name="description"
                         rows="5"
-                        value={form.description}
-                        onChange={handleInputChange}
+                        value={
+                          form.description
+                        }
+                        onChange={
+                          handleInputChange
+                        }
                         placeholder="Enter complete product description..."
                         required
                       ></textarea>
                     </div>
+
                   </div>
 
                   {/* =========================================
@@ -1321,20 +1599,31 @@ function AdminProducts() {
                   ========================================= */}
 
                   <div className="admin-products-featured-section">
+
                     <label className="admin-products-featured-checkbox">
+
                       <input
                         id="is_featured"
                         name="is_featured"
                         type="checkbox"
-                        checked={form.is_featured}
-                        onChange={handleInputChange}
-                        disabled={saving}
+                        checked={
+                          form.is_featured
+                        }
+                        onChange={
+                          handleInputChange
+                        }
+                        disabled={
+                          saving
+                        }
                       />
 
                       <span>
-                        Show in Featured Products (Homepage)
+                        Show in Featured Products
+                        (Homepage)
                       </span>
+
                     </label>
+
                   </div>
 
                   {/* =========================================
@@ -1342,7 +1631,9 @@ function AdminProducts() {
                   ========================================= */}
 
                   <div className="admin-products-specifications">
+
                     <div className="admin-products-specifications-heading">
+
                       <span className="admin-products-section-label">
                         SPECIFICATIONS
                       </span>
@@ -1350,6 +1641,7 @@ function AdminProducts() {
                       <h3>
                         Product Specifications
                       </h3>
+
                     </div>
 
                     <div className="admin-products-form-grid">
@@ -1363,8 +1655,12 @@ function AdminProducts() {
                           id="processor"
                           name="processor"
                           type="text"
-                          value={form.processor}
-                          onChange={handleInputChange}
+                          value={
+                            form.processor
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="Intel Core i5"
                         />
                       </div>
@@ -1378,8 +1674,12 @@ function AdminProducts() {
                           id="ram"
                           name="ram"
                           type="text"
-                          value={form.ram}
-                          onChange={handleInputChange}
+                          value={
+                            form.ram
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="16GB"
                         />
                       </div>
@@ -1393,8 +1693,12 @@ function AdminProducts() {
                           id="storage"
                           name="storage"
                           type="text"
-                          value={form.storage}
-                          onChange={handleInputChange}
+                          value={
+                            form.storage
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="512GB SSD"
                         />
                       </div>
@@ -1408,8 +1712,12 @@ function AdminProducts() {
                           id="display"
                           name="display"
                           type="text"
-                          value={form.display}
-                          onChange={handleInputChange}
+                          value={
+                            form.display
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="14 inch"
                         />
                       </div>
@@ -1423,8 +1731,12 @@ function AdminProducts() {
                           id="graphics"
                           name="graphics"
                           type="text"
-                          value={form.graphics}
-                          onChange={handleInputChange}
+                          value={
+                            form.graphics
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="Intel Iris Xe"
                         />
                       </div>
@@ -1438,12 +1750,18 @@ function AdminProducts() {
                           id="operatingSystem"
                           name="operatingSystem"
                           type="text"
-                          value={form.operatingSystem}
-                          onChange={handleInputChange}
+                          value={
+                            form.operatingSystem
+                          }
+                          onChange={
+                            handleInputChange
+                          }
                           placeholder="Windows 11"
                         />
                       </div>
+
                     </div>
+
                   </div>
 
                   {/* =========================================
@@ -1455,8 +1773,12 @@ function AdminProducts() {
                     <button
                       type="button"
                       className="admin-products-secondary-button"
-                      onClick={resetForm}
-                      disabled={saving}
+                      onClick={
+                        resetForm
+                      }
+                      disabled={
+                        saving
+                      }
                     >
                       Cancel
                     </button>
@@ -1464,7 +1786,9 @@ function AdminProducts() {
                     <button
                       type="submit"
                       className="admin-products-submit-button"
-                      disabled={saving}
+                      disabled={
+                        saving
+                      }
                     >
                       {saving
                         ? "Saving..."
@@ -1474,7 +1798,9 @@ function AdminProducts() {
                     </button>
 
                   </div>
+
                 </form>
+
               </section>
             )}
 
@@ -1485,19 +1811,29 @@ function AdminProducts() {
             <section className="admin-products-list-section">
 
               <div className="admin-products-list-header">
+
                 <div>
                   <span className="admin-products-section-label">
                     INVENTORY
                   </span>
 
-                  <h2>All Products</h2>
+                  <h2>
+                    All Products
+                  </h2>
                 </div>
 
                 <div className="admin-products-count">
-                  <strong>{products.length}</strong>
 
-                  <span>Products</span>
+                  <strong>
+                    {products.length}
+                  </strong>
+
+                  <span>
+                    Products
+                  </span>
+
                 </div>
+
               </div>
 
               {products.length === 0 ? (
@@ -1508,17 +1844,22 @@ function AdminProducts() {
                     💻
                   </div>
 
-                  <h3>No Products Found</h3>
+                  <h3>
+                    No Products Found
+                  </h3>
 
                   <p>
-                    Add your first product to start
-                    managing your inventory.
+                    Add your first product
+                    to start managing your
+                    inventory.
                   </p>
 
                   <button
                     type="button"
                     className="admin-products-add-button"
-                    onClick={handleAddProduct}
+                    onClick={
+                      handleAddProduct
+                    }
                   >
                     + Add Product
                   </button>
@@ -1529,126 +1870,170 @@ function AdminProducts() {
 
                 <div className="admin-products-grid">
 
-                  {products.map((product) => (
+                  {products.map(
+                    (product) => (
 
-                    <article
-                      key={product.id}
-                      className="admin-product-card"
-                    >
+                      <article
+                        key={
+                          product.id
+                        }
+                        className="admin-product-card"
+                      >
 
-                      <div className="admin-product-card-image">
+                        <div className="admin-product-card-image">
 
-                        {renderProductImage(product)}
+                          {renderProductImage(
+                            product
+                          )}
 
-                        <span className="admin-product-condition">
-                          {product.condition || "Used"}
-                        </span>
+                          <span className="admin-product-condition">
+                            {
+                              product.condition ||
+                              "Used"
+                            }
+                          </span>
 
-                      </div>
-
-                      <div className="admin-product-card-content">
-
-                        <span className="admin-product-category">
-                          {product.category ||
-                            "Uncategorized"}
-                        </span>
-
-                        <h3>
-                          {product.name ||
-                            "Unnamed Product"}
-                        </h3>
-
-                        <p>
-                          {product.shortDescription ||
-                            "No short description available."}
-                        </p>
-
-                        <div className="admin-product-price">
-                          {formatCurrency(product.price)}
                         </div>
 
-                        <div className="admin-product-stock-row">
-                          <span>Stock</span>
+                        <div className="admin-product-card-content">
 
-                          <strong
-                            className={
-                              Number(product.stock) > 0
-                                ? "admin-stock-available"
-                                : "admin-stock-out"
+                          <span className="admin-product-category">
+                            {
+                              product.category ||
+                              "Uncategorized"
                             }
-                          >
-                            {Number(product.stock || 0)}{" "}
-                            units
-                          </strong>
-                        </div>
+                          </span>
 
-                        <div className="admin-product-actions">
-
-                          <button
-                            type="button"
-                            className="admin-product-edit-button"
-                            onClick={() =>
-                              handleEditProduct(product)
+                          <h3>
+                            {
+                              product.name ||
+                              "Unnamed Product"
                             }
-                            disabled={
-                              saving ||
-                              deletingId === product.id
-                            }
-                          >
-                            Edit
-                          </button>
+                          </h3>
 
-                          <button
-                            type="button"
-                            className="admin-product-stock-button"
-                            onClick={() =>
-                              handleStockUpdate(
-                                product.id,
-                                product.stock
+                          <p>
+                            {
+                              product.shortDescription ||
+                              "No short description available."
+                            }
+                          </p>
+
+                          <div className="admin-product-price">
+                            {
+                              formatCurrency(
+                                product.price
                               )
                             }
-                            disabled={
-                              updatingStockId ===
-                                product.id ||
-                              deletingId === product.id
-                            }
-                          >
-                            {updatingStockId === product.id
-                              ? "Updating..."
-                              : "Stock"}
-                          </button>
+                          </div>
 
-                          <button
-                            type="button"
-                            className="admin-product-delete-button"
-                            onClick={() =>
-                              handleDeleteProduct(
+                          <div className="admin-product-stock-row">
+
+                            <span>
+                              Stock
+                            </span>
+
+                            <strong
+                              className={
+                                Number(
+                                  product.stock
+                                ) > 0
+                                  ? "admin-stock-available"
+                                  : "admin-stock-out"
+                              }
+                            >
+                              {
+                                Number(
+                                  product.stock ||
+                                  0
+                                )
+                              }{" "}
+                              units
+                            </strong>
+
+                          </div>
+
+                          <div className="admin-product-actions">
+
+                            <button
+                              type="button"
+                              className="admin-product-edit-button"
+                              onClick={() =>
+                                handleEditProduct(
+                                  product
+                                )
+                              }
+                              disabled={
+                                saving ||
+                                deletingId ===
+                                  product.id
+                              }
+                            >
+                              Edit
+                            </button>
+
+                            <button
+                              type="button"
+                              className="admin-product-stock-button"
+                              onClick={() =>
+                                handleStockUpdate(
+                                  product.id,
+                                  product.stock
+                                )
+                              }
+                              disabled={
+                                updatingStockId ===
+                                  product.id ||
+                                deletingId ===
+                                  product.id
+                              }
+                            >
+                              {
+                                updatingStockId ===
                                 product.id
-                              )
-                            }
-                            disabled={
-                              deletingId ===
-                                product.id ||
-                              saving ||
-                              updatingStockId ===
+                                  ? "Updating..."
+                                  : "Stock"
+                              }
+                            </button>
+
+                            <button
+                              type="button"
+                              className="admin-product-delete-button"
+                              onClick={() =>
+                                handleDeleteProduct(
+                                  product.id
+                                )
+                              }
+                              disabled={
+                                deletingId ===
+                                  product.id ||
+                                saving ||
+                                updatingStockId ===
+                                  product.id
+                              }
+                            >
+                              {
+                                deletingId ===
                                 product.id
-                            }
-                          >
-                            {deletingId === product.id
-                              ? "Deleting..."
-                              : "Delete"}
-                          </button>
+                                  ? "Deleting..."
+                                  : "Delete"
+                              }
+                            </button>
+
+                          </div>
 
                         </div>
-                      </div>
-                    </article>
 
-                  ))}
+                      </article>
+
+                    )
+                  )}
 
                 </div>
 
               )}
+
             </section>
+
           </div>
         </main>
       </div>

@@ -5,7 +5,8 @@
 .admin-reviews-page {
   width: 100%;
   min-height: 100%;
-  padding: 8px 0 40px;
+  padding: 8px 0 40px 24px;
+  box-sizing: border-box;
   color: #171717;
 }
 
@@ -818,7 +819,6 @@ body.gojuniors-theme-active .admin-reviews-empty {
     --gojuniors-surface-color,
     #ffffff
   );
-
   border-color: var(
     --gojuniors-border-color,
     #e5e7eb
@@ -861,12 +861,10 @@ body.gojuniors-theme-active .admin-review-field textarea {
     --gojuniors-background-color,
     #ffffff
   );
-
   color: var(
     --gojuniors-text-color,
     #171717
   );
-
   border-color: var(
     --gojuniors-border-color,
     #dfe3e8
@@ -886,7 +884,6 @@ body.gojuniors-theme-active
     --gojuniors-accent-color,
     #d69e78
   );
-
   box-shadow: 0 0 0 3px
     color-mix(
       in srgb,
@@ -900,12 +897,10 @@ body.gojuniors-theme-active .admin-review-field input[type="file"] {
     --gojuniors-surface-color,
     #fafbfc
   );
-
   border-color: var(
     --gojuniors-border-color,
     #d7dce2
   );
-
   color: var(
     --gojuniors-muted-text-color,
     #4b5563
@@ -919,7 +914,6 @@ body.gojuniors-theme-active
     --gojuniors-primary-color,
     #1f2937
   );
-
   color: var(
     --gojuniors-button-text-color,
     #ffffff
@@ -945,12 +939,10 @@ body.gojuniors-theme-active .admin-review-save-button {
     --gojuniors-primary-color,
     #1f2937
   );
-
   border-color: var(
     --gojuniors-primary-color,
     #1f2937
   );
-
   color: var(
     --gojuniors-button-text-color,
     #ffffff
@@ -970,7 +962,6 @@ body.gojuniors-theme-active .admin-review-empty-icon {
     var(--gojuniors-accent-color, #d69e78) 12%,
     var(--gojuniors-background-color, #ffffff)
   );
-
   color: var(
     --gojuniors-accent-color,
     #d69e78

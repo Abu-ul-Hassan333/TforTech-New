@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar/Navbar";
 import Footer from "../components/Footer/Footer";
@@ -20,22 +21,26 @@ const API = `${BACKEND_URL}/api`;
 const categories = [
   {
     title: "Laptops",
-    description: "Reliable laptops for work, study and everyday use.",
+    description:
+      "Reliable laptops for work, study and everyday use.",
     icon: "💻",
   },
   {
     title: "Gaming Laptops",
-    description: "Powerful machines built for gaming and performance.",
+    description:
+      "Powerful machines built for gaming and performance.",
     icon: "🎮",
   },
   {
     title: "MacBooks",
-    description: "Premium Apple laptops for work and creativity.",
+    description:
+      "Premium Apple laptops for work and creativity.",
     icon: "",
   },
   {
     title: "Laptop Accessories",
-    description: "Everything you need to complete your setup.",
+    description:
+      "Everything you need to complete your setup.",
     icon: "🎒",
   },
 ];
@@ -91,6 +96,39 @@ const testimonials = [
 ];
 
 // ============================================================
+// DEFAULT HERO
+//
+// These values preserve the existing Hero content in case
+// the backend is temporarily unavailable.
+// ============================================================
+
+const DEFAULT_HERO = {
+  enabled: true,
+
+  badge: "PREMIUM LAPTOPS & ACCESSORIES",
+
+  title: "Technology That Fits Your World",
+
+  description:
+    "Discover reliable laptops, gaming machines and essential accessories for work, study, gaming and everyday life.",
+
+  primary_button_text: "View Products",
+  primary_button_link: "/products",
+
+  secondary_button_text: "Explore Categories",
+  secondary_button_link: "/categories",
+
+  image: "",
+
+  video_enabled: false,
+  video: "",
+
+  overlay_opacity: 0.78,
+
+  image_position: "center",
+};
+
+// ============================================================
 // HELPERS
 // ============================================================
 
@@ -120,7 +158,8 @@ const getImageUrl = (product) => {
 
   if (
     image.startsWith("http://") ||
-    image.startsWith("https://")
+    image.startsWith("https://") ||
+    image.startsWith("data:")
   ) {
     return image;
   }
@@ -128,6 +167,24 @@ const getImageUrl = (product) => {
   return `${BACKEND_URL}${
     image.startsWith("/") ? "" : "/"
   }${image}`;
+};
+
+const getHeroMediaUrl = (media) => {
+  if (!media) {
+    return "";
+  }
+
+  if (
+    media.startsWith("http://") ||
+    media.startsWith("https://") ||
+    media.startsWith("data:")
+  ) {
+    return media;
+  }
+
+  return `${BACKEND_URL}${
+    media.startsWith("/") ? "" : "/"
+  }${media}`;
 };
 
 const getDisplayedPrice = (product) => {
@@ -167,11 +224,308 @@ const getOriginalPrice = (product) => {
 };
 
 // ============================================================
+// HERO
+// ============================================================
+
+function HeroSection() {
+  const [hero, setHero] = useState({
+    ...DEFAULT_HERO,
+  });
+
+  const [heroLoading, setHeroLoading] =
+    useState(true);
+
+  const [heroMedia, setHeroMedia] =
+    useState("image");
+
+  const [heroVideoError, setHeroVideoError] =
+    useState(false);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchHero = async () => {
+      try {
+        setHeroLoading(true);
+
+        const response = await fetch(
+          `${API}/hero/public`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(
+            `Hero request failed with status ${response.status}`
+          );
+        }
+
+        const data = await response.json();
+
+        if (!isMounted) {
+          return;
+        }
+
+        const loadedHero = {
+          ...DEFAULT_HERO,
+          ...(data?.hero || {}),
+        };
+
+        setHero(loadedHero);
+        setHeroVideoError(false);
+
+        if (
+          loadedHero.video_enabled &&
+          loadedHero.video
+        ) {
+          setHeroMedia("video");
+        } else {
+          setHeroMedia("image");
+        }
+      } catch (error) {
+        console.error(
+          "Error loading Hero:",
+          error
+        );
+
+        if (isMounted) {
+          setHero({
+            ...DEFAULT_HERO,
+          });
+
+          setHeroMedia("image");
+        }
+      } finally {
+        if (isMounted) {
+          setHeroLoading(false);
+        }
+      }
+    };
+
+    fetchHero();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  // ==========================================================
+  // VIDEO ENDED
+  // ==========================================================
+
+  const handleHeroVideoEnded = () => {
+    /*
+      The Hero video plays only once.
+
+      Once it finishes, the same Hero automatically
+      switches to the selected image.
+    */
+
+    setHeroMedia("image");
+  };
+
+  // ==========================================================
+  // VIDEO ERROR
+  // ==========================================================
+
+  const handleHeroVideoError = () => {
+    /*
+      A broken/unavailable video must never break
+      the homepage.
+
+      Fall back to the Hero image.
+    */
+
+    setHeroVideoError(true);
+    setHeroMedia("image");
+  };
+
+  // ==========================================================
+  // HERO IMAGE
+  // ==========================================================
+
+  const heroImageUrl = getHeroMediaUrl(
+    hero.image
+  );
+
+  const heroVideoUrl = getHeroMediaUrl(
+    hero.video
+  );
+
+  // ==========================================================
+  // HERO ENABLE / HIDE
+  // ==========================================================
+
+  if (
+    !heroLoading &&
+    hero.enabled === false
+  ) {
+    return null;
+  }
+
+  // ==========================================================
+  // HERO MEDIA STYLE
+  // ==========================================================
+
+  const heroMediaStyle = {
+    objectPosition:
+      hero.image_position || "center",
+  };
+
+  const heroOverlayStyle = {
+    opacity:
+      Number.isFinite(
+        Number(hero.overlay_opacity)
+      )
+        ? Number(hero.overlay_opacity)
+        : 0.78,
+  };
+
+  // ==========================================================
+  // HERO
+  // ==========================================================
+
+  return (
+    <section className="hero-section">
+
+      {/* ====================================================
+          HERO VIDEO
+
+          Video plays first and only once.
+      ==================================================== */}
+
+      {heroMedia === "video" &&
+        heroVideoUrl &&
+        !heroVideoError && (
+          <video
+            className="hero-background-video"
+            src={heroVideoUrl}
+            autoPlay
+            muted
+            playsInline
+            preload="auto"
+            onEnded={
+              handleHeroVideoEnded
+            }
+            onError={
+              handleHeroVideoError
+            }
+          />
+        )}
+
+      {/* ====================================================
+          HERO IMAGE
+
+          Image appears after video finishes.
+      ==================================================== */}
+
+      {heroMedia === "image" &&
+        heroImageUrl && (
+          <img
+            className="hero-background-image"
+            src={heroImageUrl}
+            alt=""
+            style={heroMediaStyle}
+          />
+        )}
+
+      {/* ====================================================
+          HERO FALLBACK
+
+          Existing gradient remains available when
+          there is no image.
+      ==================================================== */}
+
+      {heroMedia === "image" &&
+        !heroImageUrl && (
+          <div className="hero-background-fallback" />
+        )}
+
+      {/* ====================================================
+          HERO OVERLAY
+
+          This stays above video/image but below text.
+      ==================================================== */}
+
+      <div
+        className="hero-background-overlay"
+        style={heroOverlayStyle}
+      />
+
+      {/* ====================================================
+          HERO CONTENT
+
+          Text stays above both video and image.
+      ==================================================== */}
+
+      <div className="hero-overlay">
+        <div className="hero-content">
+
+          {hero.badge && (
+            <span className="hero-badge">
+              {hero.badge}
+            </span>
+          )}
+
+          <h1>
+            {hero.title}
+          </h1>
+
+          <p>
+            {hero.description}
+          </p>
+
+          <div className="hero-buttons">
+
+            {hero.primary_button_text &&
+              hero.primary_button_link && (
+                <a
+                  href={
+                    hero.primary_button_link
+                  }
+                  className="primary-button"
+                >
+                  {
+                    hero.primary_button_text
+                  }
+                </a>
+              )}
+
+            {hero.secondary_button_text &&
+              hero.secondary_button_link && (
+                <a
+                  href={
+                    hero.secondary_button_link
+                  }
+                  className="secondary-button"
+                >
+                  {
+                    hero.secondary_button_text
+                  }
+                </a>
+              )}
+
+          </div>
+
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ============================================================
 // POPULAR PRODUCT IMAGE
 // ============================================================
 
-function PopularProductImage({ product }) {
-  const [imageError, setImageError] = useState(false);
+function PopularProductImage({
+  product,
+}) {
+  const [imageError, setImageError] =
+    useState(false);
 
   useEffect(() => {
     setImageError(false);
@@ -180,15 +534,24 @@ function PopularProductImage({ product }) {
     product?.image_urls,
   ]);
 
-  const imageUrl = getImageUrl(product);
+  const imageUrl =
+    getImageUrl(product);
 
-  if (imageUrl && !imageError) {
+  if (
+    imageUrl &&
+    !imageError
+  ) {
     return (
       <img
         src={imageUrl}
-        alt={product?.name || "Product"}
+        alt={
+          product?.name ||
+          "Product"
+        }
         className="product-card-image"
-        onError={() => setImageError(true)}
+        onError={() =>
+          setImageError(true)
+        }
       />
     );
   }
@@ -205,15 +568,20 @@ function PopularProductImage({ product }) {
 // ============================================================
 
 function Home() {
+
   // ==========================================================
   // POPULAR / FEATURED PRODUCTS FROM MONGODB
   // ==========================================================
 
-  const [popularProducts, setPopularProducts] =
-    useState([]);
+  const [
+    popularProducts,
+    setPopularProducts,
+  ] = useState([]);
 
-  const [popularProductsLoading, setPopularProductsLoading] =
-    useState(true);
+  const [
+    popularProductsLoading,
+    setPopularProductsLoading,
+  ] = useState(true);
 
   // ==========================================================
   // FETCH ADMIN-SELECTED POPULAR PRODUCTS
@@ -222,66 +590,71 @@ function Home() {
   useEffect(() => {
     let isMounted = true;
 
-    const fetchPopularProducts = async () => {
-      try {
-        const response = await fetch(
-          `${API}/products/featured`
-        );
-
-        if (!response.ok) {
-          throw new Error(
-            `Products request failed with status ${response.status}`
-          );
-        }
-
-        const data = await response.json();
-
-        if (!isMounted) {
-          return;
-        }
-
-        const productsFromApi = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.products)
-          ? data.products
-          : [];
-
-        /*
-          IMPORTANT:
-
-          Backend has a fallback that can return latest products
-          when no product is marked as featured.
-
-          We only want products that the admin explicitly selected
-          for the homepage.
-
-          Therefore we filter by is_featured === true.
-        */
-
-        const selectedPopularProducts =
-          productsFromApi.filter(
-            (product) =>
-              product?.is_featured === true
+    const fetchPopularProducts =
+      async () => {
+        try {
+          const response = await fetch(
+            `${API}/products/featured`
           );
 
-        setPopularProducts(
-          selectedPopularProducts
-        );
-      } catch (error) {
-        console.error(
-          "Error loading popular products:",
-          error
-        );
+          if (!response.ok) {
+            throw new Error(
+              `Products request failed with status ${response.status}`
+            );
+          }
 
-        if (isMounted) {
-          setPopularProducts([]);
+          const data =
+            await response.json();
+
+          if (!isMounted) {
+            return;
+          }
+
+          const productsFromApi =
+            Array.isArray(data)
+              ? data
+              : Array.isArray(
+                  data?.products
+                )
+              ? data.products
+              : [];
+
+          /*
+            Backend has a fallback that can return latest products
+            when no product is marked as featured.
+
+            We only want products that the admin explicitly selected
+            for the homepage.
+
+            Therefore we filter by is_featured === true.
+          */
+
+          const selectedPopularProducts =
+            productsFromApi.filter(
+              (product) =>
+                product?.is_featured === true
+            );
+
+          setPopularProducts(
+            selectedPopularProducts
+          );
+        } catch (error) {
+          console.error(
+            "Error loading popular products:",
+            error
+          );
+
+          if (isMounted) {
+            setPopularProducts([]);
+          }
+        } finally {
+          if (isMounted) {
+            setPopularProductsLoading(
+              false
+            );
+          }
         }
-      } finally {
-        if (isMounted) {
-          setPopularProductsLoading(false);
-        }
-      }
-    };
+      };
 
     fetchPopularProducts();
 
@@ -303,45 +676,7 @@ function Home() {
           HERO
       ====================================================== */}
 
-      <section className="hero-section">
-        <div className="hero-overlay">
-          <div className="hero-content">
-
-            <span className="hero-badge">
-              PREMIUM LAPTOPS & ACCESSORIES
-            </span>
-
-            <h1>
-              Technology That Fits Your World
-            </h1>
-
-            <p>
-              Discover reliable laptops,
-              gaming machines and essential
-              accessories for work, study,
-              gaming and everyday life.
-            </p>
-
-            <div className="hero-buttons">
-
-              <a
-                href="/products"
-                className="primary-button"
-              >
-                View Products
-              </a>
-
-              <a
-                href="/categories"
-                className="secondary-button"
-              >
-                Explore Categories
-              </a>
-
-            </div>
-          </div>
-        </div>
-      </section>
+      <HeroSection />
 
       {/* ======================================================
           CATEGORY SECTION
@@ -376,11 +711,15 @@ function Home() {
                   category.title
                 )}`}
                 className="category-card"
-                key={category.title}
+                key={
+                  category.title
+                }
               >
 
                 <div className="category-icon">
-                  {category.icon}
+                  {
+                    category.icon
+                  }
                 </div>
 
                 <h3>
@@ -388,7 +727,9 @@ function Home() {
                 </h3>
 
                 <p>
-                  {category.description}
+                  {
+                    category.description
+                  }
                 </p>
 
                 <span className="card-link">
@@ -400,14 +741,11 @@ function Home() {
           )}
 
         </div>
+
       </section>
 
       {/* ======================================================
           POPULAR PRODUCTS
-          
-          IMPORTANT:
-          Only admin-selected featured products from MongoDB
-          are displayed here.
       ====================================================== */}
 
       {!popularProductsLoading &&
@@ -437,7 +775,9 @@ function Home() {
                 (product) => {
 
                   const productId =
-                    getProductId(product);
+                    getProductId(
+                      product
+                    );
 
                   const displayedPrice =
                     getDisplayedPrice(
@@ -452,12 +792,14 @@ function Home() {
                   return (
                     <article
                       className="product-card"
-                      key={productId}
+                      key={
+                        productId
+                      }
                     >
 
-                      {/* ======================================
+                      {/* ==================================
                           PRODUCT IMAGE
-                      ====================================== */}
+                      ================================== */}
 
                       <div className="product-image">
 
@@ -478,9 +820,13 @@ function Home() {
                               "none",
                           }}
                         >
+
                           <PopularProductImage
-                            product={product}
+                            product={
+                              product
+                            }
                           />
+
                         </a>
 
                         <span className="product-badge">
@@ -489,15 +835,17 @@ function Home() {
 
                       </div>
 
-                      {/* ======================================
+                      {/* ==================================
                           PRODUCT INFO
-                      ====================================== */}
+                      ================================== */}
 
                       <div className="product-info">
 
                         <h3>
-                          {product?.name ||
-                            "Product"}
+                          {
+                            product?.name ||
+                            "Product"
+                          }
                         </h3>
 
                         <div className="product-rating">
@@ -506,10 +854,12 @@ function Home() {
 
                           <span>
                             (
-                            {Number(
-                              product?.review_count ||
-                                0
-                            )}
+                            {
+                              Number(
+                                product?.review_count ||
+                                  0
+                              )
+                            }
                             )
                           </span>
 
@@ -593,11 +943,15 @@ function Home() {
             (benefit) => (
               <div
                 className="benefit-card"
-                key={benefit.title}
+                key={
+                  benefit.title
+                }
               >
 
                 <div className="benefit-icon">
-                  {benefit.icon}
+                  {
+                    benefit.icon
+                  }
                 </div>
 
                 <h3>
@@ -605,7 +959,9 @@ function Home() {
                 </h3>
 
                 <p>
-                  {benefit.description}
+                  {
+                    benefit.description
+                  }
                 </p>
 
               </div>
@@ -679,13 +1035,17 @@ function Home() {
             (testimonial) => (
               <article
                 className="testimonial-card"
-                key={testimonial.name}
+                key={
+                  testimonial.name
+                }
               >
 
                 <div className="testimonial-stars">
-                  {"★".repeat(
-                    testimonial.rating
-                  )}
+                  {
+                    "★".repeat(
+                      testimonial.rating
+                    )
+                  }
                 </div>
 
                 <p>
@@ -693,7 +1053,9 @@ function Home() {
                 </p>
 
                 <strong>
-                  {testimonial.name}
+                  {
+                    testimonial.name
+                  }
                 </strong>
 
                 <span>

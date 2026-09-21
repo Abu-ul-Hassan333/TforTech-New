@@ -1,6 +1,17 @@
-from typing import Dict, List, Optional
+from typing import Dict, List, Literal, Optional
 
 from pydantic import BaseModel, EmailStr, Field
+
+
+# =========================================================
+# USER ROLES
+# =========================================================
+
+UserRole = Literal[
+    "customer",
+    "co_admin",
+    "admin",
+]
 
 
 # =========================================================
@@ -44,7 +55,7 @@ class UserResponse(BaseModel):
     full_name: str
     email: EmailStr
     phone: str
-    role: str
+    role: UserRole
     is_active: bool
 
 
@@ -72,6 +83,14 @@ class UserProfileUpdate(BaseModel):
         min_length=7,
         max_length=20,
     )
+
+
+# =========================================================
+# ADMIN USER MANAGEMENT
+# =========================================================
+
+class AdminUserRoleUpdate(BaseModel):
+    role: UserRole
 
 
 # =========================================================
@@ -232,11 +251,14 @@ class ProductResponse(BaseModel):
     rating: float
     reviews: int
     image: Optional[str] = None
+
     images: List[str] = Field(
         default_factory=list,
     )
+
     shortDescription: str
     description: str
+
     specifications: Dict[str, str] = Field(
         default_factory=dict,
     )
@@ -249,14 +271,17 @@ class ProductResponse(BaseModel):
 class OrderItem(BaseModel):
     product_id: str
     product_name: str
+
     quantity: int = Field(
         ...,
         ge=1,
     )
+
     price: float = Field(
         ...,
         ge=0,
     )
+
     image: Optional[str] = None
 
 

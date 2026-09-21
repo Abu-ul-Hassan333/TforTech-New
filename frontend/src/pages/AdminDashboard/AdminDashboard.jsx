@@ -87,7 +87,12 @@ const AdminDashboard = () => {
       return;
     }
 
-    if (role && role.toLowerCase() !== "admin") {
+    const normalizedRole =
+      String(role || "customer")
+        .toLowerCase()
+        .trim();
+
+    if (normalizedRole !== "admin") {
       navigate("/");
       return;
     }

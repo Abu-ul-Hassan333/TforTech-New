@@ -69,18 +69,27 @@ function AdminOrders() {
           ) === "true";
 
         const userRole =
-          localStorage.getItem(
-            "tfortech_user_role"
-          );
+          String(
+            localStorage.getItem(
+              "tfortech_user_role"
+            ) || "customer"
+          )
+            .toLowerCase()
+            .trim();
 
         if (!token || !loggedIn) {
           handleAuthenticationFailure();
           return;
         }
 
-        if (userRole !== "admin") {
+        const canManageOrders =
+          userRole === "super_admin" ||
+          userRole === "co_admin" ||
+          userRole === "admin";
+
+        if (!canManageOrders) {
           setError(
-            "Access denied. Only administrators can view all orders."
+            "Access denied. Only authorized administrators can view all orders."
           );
           setLoading(false);
           return;
@@ -104,7 +113,7 @@ function AdminOrders() {
 
         if (response.status === 403) {
           setError(
-            "Access denied. Only administrators can view all orders."
+            "Access denied. Only authorized administrators can view all orders."
           );
           return;
         }
@@ -204,7 +213,7 @@ function AdminOrders() {
 
       if (response.status === 403) {
         setError(
-          "Access denied. Only administrators can update orders."
+          "Access denied. Only authorized administrators can update orders."
         );
         return;
       }
@@ -333,7 +342,9 @@ function AdminOrders() {
             <div className="admin-orders-loading">
               <div className="admin-orders-spinner"></div>
 
-              <h2>Loading Orders</h2>
+              <h2>
+                Loading Orders
+              </h2>
 
               <p>
                 Please wait while we load

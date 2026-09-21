@@ -15,13 +15,11 @@ import {
 import AdminLayout from "../AdminLayout/AdminLayout";
 import "./AdminWhatsApp.css";
 
-
 // ============================================================
 // API
 // ============================================================
 
 const API_URL = "http://127.0.0.1:8000";
-
 
 // ============================================================
 // DEFAULT SETTINGS
@@ -42,6 +40,19 @@ const DEFAULT_SETTINGS = {
   floating_label: "Chat on WhatsApp",
 };
 
+// ============================================================
+// USER ROLE
+// ============================================================
+
+const getStoredUserRole = () => {
+  return String(
+    localStorage.getItem(
+      "tfortech_user_role"
+    ) || "customer"
+  )
+    .toLowerCase()
+    .trim();
+};
 
 // ============================================================
 // COMPONENT
@@ -60,7 +71,6 @@ const AdminWhatsApp = () => {
   const [successMessage, setSuccessMessage] =
     useState("");
 
-
   // ==========================================================
   // TOKEN
   // ==========================================================
@@ -70,7 +80,6 @@ const AdminWhatsApp = () => {
       "tfortech_access_token"
     );
   };
-
 
   // ==========================================================
   // AUTH FAILURE
@@ -116,7 +125,6 @@ const AdminWhatsApp = () => {
     window.location.href = "/login";
   };
 
-
   // ==========================================================
   // LOAD SETTINGS
   // ==========================================================
@@ -126,6 +134,14 @@ const AdminWhatsApp = () => {
       setLoading(true);
       setError("");
       setSuccessMessage("");
+
+      const currentRole =
+        getStoredUserRole();
+
+      if (currentRole !== "admin") {
+        window.location.href = "/";
+        return;
+      }
 
       const token = getToken();
 
@@ -201,7 +217,6 @@ const AdminWhatsApp = () => {
     }
   }, []);
 
-
   // ==========================================================
   // INITIAL LOAD
   // ==========================================================
@@ -209,7 +224,6 @@ const AdminWhatsApp = () => {
   useEffect(() => {
     fetchSettings();
   }, [fetchSettings]);
-
 
   // ==========================================================
   // INPUT HANDLER
@@ -235,7 +249,6 @@ const AdminWhatsApp = () => {
     setSuccessMessage("");
   };
 
-
   // ==========================================================
   // SAVE SETTINGS
   // ==========================================================
@@ -245,6 +258,13 @@ const AdminWhatsApp = () => {
 
     setError("");
     setSuccessMessage("");
+
+    if (
+      getStoredUserRole() !== "admin"
+    ) {
+      window.location.href = "/";
+      return;
+    }
 
     if (
       settings.order_enabled &&
@@ -350,12 +370,18 @@ const AdminWhatsApp = () => {
     }
   };
 
-
   // ==========================================================
   // RESET SETTINGS
   // ==========================================================
 
   const handleReset = async () => {
+    if (
+      getStoredUserRole() !== "admin"
+    ) {
+      window.location.href = "/";
+      return;
+    }
+
     const confirmed = window.confirm(
       "Are you sure you want to reset all WhatsApp settings to their default values?"
     );
@@ -451,7 +477,6 @@ const AdminWhatsApp = () => {
     }
   };
 
-
   // ==========================================================
   // LOADING SCREEN
   // ==========================================================
@@ -469,7 +494,6 @@ const AdminWhatsApp = () => {
       </AdminLayout>
     );
   }
-
 
   // ==========================================================
   // UI
@@ -510,7 +534,6 @@ const AdminWhatsApp = () => {
 
         </div>
 
-
         {/* ==================================================
             MESSAGES
         ================================================== */}
@@ -534,7 +557,6 @@ const AdminWhatsApp = () => {
             </span>
           </div>
         )}
-
 
         {/* ==================================================
             CONTENT
@@ -586,7 +608,6 @@ const AdminWhatsApp = () => {
 
             </div>
 
-
             <div className="admin-whatsapp-card-body">
 
               <div className="admin-whatsapp-form-group">
@@ -616,7 +637,6 @@ const AdminWhatsApp = () => {
                 </small>
 
               </div>
-
 
               <div className="admin-whatsapp-form-group">
 
@@ -650,7 +670,6 @@ const AdminWhatsApp = () => {
 
           </section>
 
-
           {/* =================================================
               PRODUCT WHATSAPP
           ================================================= */}
@@ -676,7 +695,6 @@ const AdminWhatsApp = () => {
               </div>
 
             </div>
-
 
             <div className="admin-whatsapp-card-body">
 
@@ -708,7 +726,6 @@ const AdminWhatsApp = () => {
             </div>
 
           </section>
-
 
           {/* =================================================
               FLOATING WHATSAPP
@@ -751,7 +768,6 @@ const AdminWhatsApp = () => {
 
             </div>
 
-
             <div className="admin-whatsapp-card-body">
 
               <div className="admin-whatsapp-two-column">
@@ -784,7 +800,6 @@ const AdminWhatsApp = () => {
 
                 </div>
 
-
                 <div className="admin-whatsapp-form-group">
 
                   <label htmlFor="floating_label">
@@ -814,7 +829,6 @@ const AdminWhatsApp = () => {
 
               </div>
 
-
               <div className="admin-whatsapp-form-group">
 
                 <label htmlFor="floating_message">
@@ -836,7 +850,6 @@ const AdminWhatsApp = () => {
                 />
 
               </div>
-
 
               <div className="admin-whatsapp-form-group">
 
@@ -875,7 +888,6 @@ const AdminWhatsApp = () => {
 
           </section>
 
-
           {/* =================================================
               PREVIEW
           ================================================= */}
@@ -901,7 +913,6 @@ const AdminWhatsApp = () => {
 
             </div>
 
-
             <div className="admin-whatsapp-preview">
 
               <div className="admin-whatsapp-preview-browser">
@@ -911,7 +922,6 @@ const AdminWhatsApp = () => {
                   <span />
                   <span />
                 </div>
-
 
                 <div className="admin-whatsapp-preview-body">
 
@@ -929,7 +939,6 @@ const AdminWhatsApp = () => {
 
                   </div>
 
-
                   <div className="admin-whatsapp-preview-order-button">
 
                     <FaWhatsapp />
@@ -939,7 +948,6 @@ const AdminWhatsApp = () => {
                     </span>
 
                   </div>
-
 
                   {settings.floating_enabled && (
                     <div
@@ -969,7 +977,6 @@ const AdminWhatsApp = () => {
 
           </section>
 
-
           {/* =================================================
               ACTIONS
           ================================================= */}
@@ -993,7 +1000,6 @@ const AdminWhatsApp = () => {
                   : "Reset"}
               </span>
             </button>
-
 
             <button
               type="submit"
@@ -1020,6 +1026,5 @@ const AdminWhatsApp = () => {
     </AdminLayout>
   );
 };
-
 
 export default AdminWhatsApp;

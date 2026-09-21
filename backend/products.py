@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 from datetime import datetime, timezone
@@ -6,6 +6,7 @@ from bson import ObjectId
 from pymongo.errors import PyMongoError
 
 from database import products_collection
+from auth import get_current_product_order_admin
 
 
 router = APIRouter(
@@ -27,8 +28,6 @@ def serialize_product(product: dict) -> dict:
     if "_id" in product:
         product["id"] = str(product.pop("_id"))
 
-    # Keep featured status consistent even for old products
-    # that were created before is_featured was added.
     product["is_featured"] = bool(
         product.get("is_featured", False)
     )
@@ -36,7 +35,9 @@ def serialize_product(product: dict) -> dict:
     return product
 
 
-def serialize_products(products: List[dict]) -> List[dict]:
+def serialize_products(
+    products: List[dict],
+) -> List[dict]:
     return [
         serialize_product(product)
         for product in products
@@ -48,28 +49,74 @@ def serialize_products(products: List[dict]) -> List[dict]:
 # ============================================================
 
 class ProductCreate(BaseModel):
-    name: str = Field(..., min_length=1)
-    price: float = Field(..., ge=0)
-    category: str = Field(..., min_length=1)
+    name: str = Field(
+        ...,
+        min_length=1,
+    )
+
+    price: float = Field(
+        ...,
+        ge=0,
+    )
+
+    category: str = Field(
+        ...,
+        min_length=1,
+    )
+
     image: Optional[str] = None
+
     shortDescription: Optional[str] = None
+
     description: Optional[str] = None
-    specifications: Optional[Dict[str, Any]] = None
-    stock: int = Field(0, ge=0)
+
+    specifications: Optional[
+        Dict[str, Any]
+    ] = None
+
+    stock: int = Field(
+        0,
+        ge=0,
+    )
+
     condition: Optional[str] = "New"
+
     is_featured: bool = False
 
 
 class ProductUpdate(BaseModel):
-    name: Optional[str] = Field(None, min_length=1)
-    price: Optional[float] = Field(None, ge=0)
-    category: Optional[str] = Field(None, min_length=1)
+    name: Optional[str] = Field(
+        None,
+        min_length=1,
+    )
+
+    price: Optional[float] = Field(
+        None,
+        ge=0,
+    )
+
+    category: Optional[str] = Field(
+        None,
+        min_length=1,
+    )
+
     image: Optional[str] = None
+
     shortDescription: Optional[str] = None
+
     description: Optional[str] = None
-    specifications: Optional[Dict[str, Any]] = None
-    stock: Optional[int] = Field(None, ge=0)
+
+    specifications: Optional[
+        Dict[str, Any]
+    ] = None
+
+    stock: Optional[int] = Field(
+        None,
+        ge=0,
+    )
+
     condition: Optional[str] = None
+
     is_featured: Optional[bool] = None
 
 
@@ -97,16 +144,23 @@ def get_products(
         products = list(
             products_collection
             .find()
-            .sort("createdAt", -1)
+            .sort(
+                "createdAt",
+                -1,
+            )
             .skip(skip)
             .limit(limit)
         )
 
-        total = products_collection.count_documents({})
+        total = products_collection.count_documents(
+            {}
+        )
 
         return {
             "success": True,
-            "products": serialize_products(products),
+            "products": serialize_products(
+                products
+            ),
             "pagination": {
                 "page": page,
                 "limit": limit,
@@ -120,7 +174,9 @@ def get_products(
         }
 
     except PyMongoError as error:
-        print(f"Error fetching products: {error}")
+        print(
+            f"Error fetching products: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -147,20 +203,29 @@ def get_featured_products(
 
         products = list(
             products_collection
-            .find({
-                "is_featured": True
-            })
-            .sort("createdAt", -1)
+            .find(
+                {
+                    "is_featured": True
+                }
+            )
+            .sort(
+                "createdAt",
+                -1,
+            )
             .limit(limit)
         )
 
         return {
             "success": True,
-            "products": serialize_products(products),
+            "products": serialize_products(
+                products
+            ),
         }
 
     except PyMongoError as error:
-        print(f"Error fetching featured products: {error}")
+        print(
+            f"Error fetching featured products: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -211,16 +276,23 @@ def search_products(
         products = list(
             products_collection
             .find(search_filter)
-            .sort("createdAt", -1)
+            .sort(
+                "createdAt",
+                -1,
+            )
         )
 
         return {
             "success": True,
-            "products": serialize_products(products),
+            "products": serialize_products(
+                products
+            ),
         }
 
     except PyMongoError as error:
-        print(f"Error searching products: {error}")
+        print(
+            f"Error searching products: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -235,7 +307,9 @@ def search_products(
 # ============================================================
 
 @router.get("/{product_id}")
-def get_product(product_id: str):
+def get_product(
+    product_id: str,
+):
     if not ObjectId.is_valid(product_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -244,7 +318,9 @@ def get_product(product_id: str):
 
     try:
         product = products_collection.find_one(
-            {"_id": ObjectId(product_id)}
+            {
+                "_id": ObjectId(product_id)
+            }
         )
 
         if not product:
@@ -255,14 +331,18 @@ def get_product(product_id: str):
 
         return {
             "success": True,
-            "product": serialize_product(product),
+            "product": serialize_product(
+                product
+            ),
         }
 
     except HTTPException:
         raise
 
     except PyMongoError as error:
-        print(f"Error fetching product: {error}")
+        print(
+            f"Error fetching product: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -272,25 +352,37 @@ def get_product(product_id: str):
 
 # ============================================================
 # CREATE PRODUCT
+# ADMIN + CO ADMIN
 # ============================================================
 
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
 )
-def create_product(product: ProductCreate):
+def create_product(
+    product: ProductCreate,
+    current_admin=Depends(
+        get_current_product_order_admin
+    ),
+):
     try:
         product_data = product.model_dump()
 
-        if product_data.get("specifications") is None:
+        if product_data.get(
+            "specifications"
+        ) is None:
             product_data["specifications"] = {}
 
-        # Make sure featured status always exists.
         product_data["is_featured"] = bool(
-            product_data.get("is_featured", False)
+            product_data.get(
+                "is_featured",
+                False,
+            )
         )
 
-        now = datetime.now(timezone.utc)
+        now = datetime.now(
+            timezone.utc
+        )
 
         product_data["createdAt"] = now
         product_data["updatedAt"] = now
@@ -299,8 +391,12 @@ def create_product(product: ProductCreate):
             product_data
         )
 
-        created_product = products_collection.find_one(
-            {"_id": result.inserted_id}
+        created_product = (
+            products_collection.find_one(
+                {
+                    "_id": result.inserted_id
+                }
+            )
         )
 
         return {
@@ -312,7 +408,9 @@ def create_product(product: ProductCreate):
         }
 
     except PyMongoError as error:
-        print(f"Error creating product: {error}")
+        print(
+            f"Error creating product: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -322,12 +420,16 @@ def create_product(product: ProductCreate):
 
 # ============================================================
 # UPDATE PRODUCT
+# ADMIN + CO ADMIN
 # ============================================================
 
 @router.put("/{product_id}")
 def update_product(
     product_id: str,
     product: ProductUpdate,
+    current_admin=Depends(
+        get_current_product_order_admin
+    ),
 ):
     if not ObjectId.is_valid(product_id):
         raise HTTPException(
@@ -346,7 +448,6 @@ def update_product(
                 detail="No fields provided for update.",
             )
 
-        # Normalize featured status when it is provided.
         if "is_featured" in update_data:
             update_data["is_featured"] = bool(
                 update_data["is_featured"]
@@ -357,8 +458,12 @@ def update_product(
         )
 
         result = products_collection.update_one(
-            {"_id": ObjectId(product_id)},
-            {"$set": update_data},
+            {
+                "_id": ObjectId(product_id)
+            },
+            {
+                "$set": update_data
+            },
         )
 
         if result.matched_count == 0:
@@ -367,8 +472,12 @@ def update_product(
                 detail="Product not found.",
             )
 
-        updated_product = products_collection.find_one(
-            {"_id": ObjectId(product_id)}
+        updated_product = (
+            products_collection.find_one(
+                {
+                    "_id": ObjectId(product_id)
+                }
+            )
         )
 
         return {
@@ -383,7 +492,9 @@ def update_product(
         raise
 
     except PyMongoError as error:
-        print(f"Error updating product: {error}")
+        print(
+            f"Error updating product: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -393,10 +504,16 @@ def update_product(
 
 # ============================================================
 # DELETE PRODUCT
+# ADMIN + CO ADMIN
 # ============================================================
 
 @router.delete("/{product_id}")
-def delete_product(product_id: str):
+def delete_product(
+    product_id: str,
+    current_admin=Depends(
+        get_current_product_order_admin
+    ),
+):
     if not ObjectId.is_valid(product_id):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -405,7 +522,9 @@ def delete_product(product_id: str):
 
     try:
         result = products_collection.delete_one(
-            {"_id": ObjectId(product_id)}
+            {
+                "_id": ObjectId(product_id)
+            }
         )
 
         if result.deleted_count == 0:
@@ -423,7 +542,9 @@ def delete_product(product_id: str):
         raise
 
     except PyMongoError as error:
-        print(f"Error deleting product: {error}")
+        print(
+            f"Error deleting product: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -433,12 +554,16 @@ def delete_product(product_id: str):
 
 # ============================================================
 # UPDATE PRODUCT STOCK
+# ADMIN + CO ADMIN
 # ============================================================
 
 @router.patch("/{product_id}/stock")
 def update_product_stock(
     product_id: str,
     stock: int,
+    current_admin=Depends(
+        get_current_product_order_admin
+    ),
 ):
     if not ObjectId.is_valid(product_id):
         raise HTTPException(
@@ -454,7 +579,9 @@ def update_product_stock(
 
     try:
         result = products_collection.update_one(
-            {"_id": ObjectId(product_id)},
+            {
+                "_id": ObjectId(product_id)
+            },
             {
                 "$set": {
                     "stock": stock,
@@ -471,8 +598,12 @@ def update_product_stock(
                 detail="Product not found.",
             )
 
-        updated_product = products_collection.find_one(
-            {"_id": ObjectId(product_id)}
+        updated_product = (
+            products_collection.find_one(
+                {
+                    "_id": ObjectId(product_id)
+                }
+            )
         )
 
         return {
@@ -487,7 +618,9 @@ def update_product_stock(
         raise
 
     except PyMongoError as error:
-        print(f"Error updating product stock: {error}")
+        print(
+            f"Error updating product stock: {error}"
+        )
 
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

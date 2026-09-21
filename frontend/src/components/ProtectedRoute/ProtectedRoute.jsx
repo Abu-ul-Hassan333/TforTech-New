@@ -1,52 +1,42 @@
 import React from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 
-const ProtectedRoute = ({ children, adminOnly = false }) => {
-  const location = useLocation();
-
+const ProtectedRoute = ({
+  children,
+  adminOnly = false,
+  allowedRoles = null,
+}) => {
   const isLoggedIn =
     localStorage.getItem("tfortech_logged_in") === "true";
 
-  const accessToken = localStorage.getItem(
-    "tfortech_access_token"
-  );
-
-  const userRole = localStorage.getItem(
-    "tfortech_user_role"
-  );
-
-  // ---------------------------------------------------------
-  // NOT LOGGED IN
-  // ---------------------------------------------------------
-
-  if (!isLoggedIn || !accessToken) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-        state={{
-          from: location.pathname,
-        }}
-      />
-    );
+  if (!isLoggedIn) {
+    return <Navigate to="/login" replace />;
   }
 
-  // ---------------------------------------------------------
-  // ADMIN-ONLY ROUTE
-  // ---------------------------------------------------------
+  const userRole =
+    String(
+      localStorage.getItem("tfortech_user_role") || "customer"
+    )
+      .toLowerCase()
+      .trim();
 
-  if (adminOnly && userRole !== "admin") {
-    return (
-      <Navigate
-        to="/"
-        replace
-      />
-    );
+  if (adminOnly) {
+    const hasAdminAccess =
+      userRole === "admin" ||
+      userRole === "co_admin";
+
+    if (!hasAdminAccess) {
+      return <Navigate to="/" replace />;
+    }
   }
 
-  // ---------------------------------------------------------
-  // ACCESS GRANTED
-  // ---------------------------------------------------------
+  if (
+    Array.isArray(allowedRoles) &&
+    allowedRoles.length > 0 &&
+    !allowedRoles.includes(userRole)
+  ) {
+    return <Navigate to="/" replace />;
+  }
 
   return children;
 };

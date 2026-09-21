@@ -224,6 +224,16 @@ const AdminTheme = () => {
      AUTH HELPERS
   ========================================================== */
 
+  const getUserRole = () => {
+    return String(
+      localStorage.getItem(
+        "tfortech_user_role"
+      ) || "customer"
+    )
+      .toLowerCase()
+      .trim();
+  };
+
   const getToken = () => {
     return localStorage.getItem(
       "tfortech_access_token"
@@ -281,6 +291,14 @@ const AdminTheme = () => {
       setError("");
 
       try {
+        const userRole =
+          getUserRole();
+
+        if (userRole !== "admin") {
+          navigate("/");
+          return;
+        }
+
         const token = getToken();
 
         if (!token) {
@@ -301,6 +319,13 @@ const AdminTheme = () => {
 
         if (response.status === 401) {
           handleAuthenticationFailure();
+          return;
+        }
+
+        if (response.status === 403) {
+          setError(
+            "Access denied. Admin access is required to manage theme settings."
+          );
           return;
         }
 
@@ -377,6 +402,11 @@ const AdminTheme = () => {
   ========================================================== */
 
   const handleSave = async () => {
+    if (getUserRole() !== "admin") {
+      navigate("/");
+      return;
+    }
+
     setSaving(true);
     setError("");
     setSuccess("");
@@ -405,6 +435,13 @@ const AdminTheme = () => {
 
       if (response.status === 401) {
         handleAuthenticationFailure();
+        return;
+      }
+
+      if (response.status === 403) {
+        setError(
+          "Access denied. Admin access is required to save theme settings."
+        );
         return;
       }
 
@@ -456,6 +493,11 @@ const AdminTheme = () => {
   ========================================================== */
 
   const handleReset = async () => {
+    if (getUserRole() !== "admin") {
+      navigate("/");
+      return;
+    }
+
     const confirmed =
       window.confirm(
         "Are you sure you want to reset the theme to default settings?"
@@ -490,6 +532,13 @@ const AdminTheme = () => {
 
       if (response.status === 401) {
         handleAuthenticationFailure();
+        return;
+      }
+
+      if (response.status === 403) {
+        setError(
+          "Access denied. Admin access is required to reset the theme."
+        );
         return;
       }
 

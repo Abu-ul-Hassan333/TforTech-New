@@ -216,7 +216,7 @@ function Products() {
         setLoadError("");
 
         const response = await axios.get(
-          `${API}/products?page=1&limit=5000`
+          `${API}/products/?page=1&limit=5000`
         );
 
         if (!isMounted) {

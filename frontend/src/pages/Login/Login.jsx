@@ -1,9 +1,35 @@
 import React, { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 import "./Login.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL =
+  "http://127.0.0.1:8000";
+
+const ALLOWED_ROLES = [
+  "customer",
+  "co_admin",
+  "admin",
+];
+
+const normalizeRole = (role) => {
+  const normalizedRole = String(
+    role || "customer"
+  )
+    .toLowerCase()
+    .trim();
+
+  if (
+    ALLOWED_ROLES.includes(
+      normalizedRole
+    )
+  ) {
+    return normalizedRole;
+  }
+
+  return "customer";
+};
 
 const Login = () => {
   const navigate = useNavigate();
@@ -13,68 +39,98 @@ const Login = () => {
     password: "",
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
+
+  const [rememberMe, setRememberMe] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [isLoading, setIsLoading] =
+    useState(false);
 
   const handleChange = (event) => {
-    const { name, value } = event.target;
+    const { name, value } =
+      event.target;
 
-    setFormData((previousData) => ({
-      ...previousData,
-      [name]: value,
-    }));
+    setFormData(
+      (previousData) => ({
+        ...previousData,
+        [name]: value,
+      })
+    );
 
     if (error) {
       setError("");
     }
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (
+    event
+  ) => {
     event.preventDefault();
 
-    const email = formData.email.trim().toLowerCase();
-    const password = formData.password;
+    const email =
+      formData.email
+        .trim()
+        .toLowerCase();
+
+    const password =
+      formData.password;
 
     setError("");
 
     if (!email || !password) {
-      setError("Please enter your email and password.");
+      setError(
+        "Please enter your email and password."
+      );
       return;
     }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(email)) {
-      setError("Please enter a valid email address.");
+      setError(
+        "Please enter a valid email address."
+      );
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must contain at least 6 characters.");
+      setError(
+        "Password must contain at least 6 characters."
+      );
       return;
     }
 
     try {
       setIsLoading(true);
 
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/api/auth/login`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+            Accept:
+              "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
 
       let data = null;
 
       try {
-        data = await response.json();
+        data =
+          await response.json();
       } catch (jsonError) {
         data = null;
       }
@@ -85,19 +141,29 @@ const Login = () => {
           data?.message ||
           "Unable to sign in. Please check your email and password.";
 
-        if (response.status === 401) {
-          setError("Invalid email or password.");
-        } else if (response.status === 403) {
+        if (
+          response.status === 401
+        ) {
+          setError(
+            "Invalid email or password."
+          );
+        } else if (
+          response.status === 403
+        ) {
           setError(
             backendMessage ||
               "Your account has been disabled."
           );
-        } else if (response.status === 422) {
+        } else if (
+          response.status === 422
+        ) {
           setError(
             "Please check your email and password and try again."
           );
         } else {
-          setError(backendMessage);
+          setError(
+            backendMessage
+          );
         }
 
         return;
@@ -117,10 +183,20 @@ const Login = () => {
       /*
         Save authentication information locally.
 
-        The JWT token will be used later when we connect
-        protected pages and admin functionality.
+        The backend is the source of truth for the
+        user's role. Only the supported application
+        roles are stored.
       */
-      localStorage.setItem("tfortech_logged_in", "true");
+
+      const userRole =
+        normalizeRole(
+          data.user.role
+        );
+
+      localStorage.setItem(
+        "tfortech_logged_in",
+        "true"
+      );
 
       localStorage.setItem(
         "tfortech_access_token",
@@ -129,7 +205,8 @@ const Login = () => {
 
       localStorage.setItem(
         "tfortech_token_type",
-        data.token_type || "bearer"
+        data.token_type ||
+          "bearer"
       );
 
       localStorage.setItem(
@@ -154,23 +231,31 @@ const Login = () => {
 
       localStorage.setItem(
         "tfortech_user_role",
-        data.user.role
+        userRole
       );
 
       /*
-        Remember Me is kept for future session handling.
+        Remember Me is kept for future
+        session handling.
 
-        For now, authentication information is stored in
-        localStorage so the current frontend can use it.
+        For now, authentication information
+        is stored in localStorage so the
+        current frontend can use it.
       */
+
       localStorage.setItem(
         "tfortech_remember_me",
-        rememberMe ? "true" : "false"
+        rememberMe
+          ? "true"
+          : "false"
       );
 
       navigate("/");
     } catch (requestError) {
-      console.error("Login request error:", requestError);
+      console.error(
+        "Login request error:",
+        requestError
+      );
 
       setError(
         "Unable to connect to the server. Please make sure the backend is running."
@@ -191,12 +276,18 @@ const Login = () => {
       <div className="login-container">
 
         {/* Left Side */}
+
         <div className="login-info">
-          <Link to="/" className="login-logo">
+
+          <Link
+            to="/"
+            className="login-logo"
+          >
             TFor Tech
           </Link>
 
           <div className="login-info-content">
+
             <span className="login-badge">
               Welcome Back
             </span>
@@ -204,7 +295,9 @@ const Login = () => {
             <h1>
               Your technology
               <br />
-              <span>starts here.</span>
+              <span>
+                starts here.
+              </span>
             </h1>
 
             <p>
@@ -214,56 +307,73 @@ const Login = () => {
             </p>
 
             <div className="login-benefits">
+
               <div className="login-benefit">
+
                 <span className="login-benefit-icon">
                   ✓
                 </span>
 
                 <div>
-                  <strong>Easy Shopping</strong>
+                  <strong>
+                    Easy Shopping
+                  </strong>
 
                   <p>
                     Quickly access your saved products and orders.
                   </p>
                 </div>
+
               </div>
 
               <div className="login-benefit">
+
                 <span className="login-benefit-icon">
                   ✓
                 </span>
 
                 <div>
-                  <strong>Wishlist</strong>
+                  <strong>
+                    Wishlist
+                  </strong>
 
                   <p>
                     Keep your favourite laptops and accessories saved.
                   </p>
                 </div>
+
               </div>
 
               <div className="login-benefit">
+
                 <span className="login-benefit-icon">
                   ✓
                 </span>
 
                 <div>
-                  <strong>Secure Account</strong>
+                  <strong>
+                    Secure Account
+                  </strong>
 
                   <p>
                     Your account information stays protected.
                   </p>
                 </div>
+
               </div>
+
             </div>
           </div>
         </div>
 
         {/* Right Side */}
+
         <div className="login-form-section">
+
           <div className="login-form-card">
 
             <div className="login-heading">
+
               <h2>
                 Sign in
               </h2>
@@ -274,6 +384,7 @@ const Login = () => {
                   Create one
                 </Link>
               </p>
+
             </div>
 
             {error && (
@@ -289,7 +400,9 @@ const Login = () => {
               onSubmit={handleSubmit}
               noValidate
             >
+
               <div className="login-form-group">
+
                 <label htmlFor="login-email">
                   Email Address
                 </label>
@@ -298,16 +411,25 @@ const Login = () => {
                   id="login-email"
                   type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={
+                    formData.email
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Enter your email"
                   autoComplete="email"
-                  disabled={isLoading}
+                  disabled={
+                    isLoading
+                  }
                 />
+
               </div>
 
               <div className="login-form-group">
+
                 <div className="login-password-label">
+
                   <label htmlFor="login-password">
                     Password
                   </label>
@@ -315,14 +437,20 @@ const Login = () => {
                   <button
                     type="button"
                     className="forgot-password-button"
-                    onClick={handleForgotPassword}
-                    disabled={isLoading}
+                    onClick={
+                      handleForgotPassword
+                    }
+                    disabled={
+                      isLoading
+                    }
                   >
                     Forgot password?
                   </button>
+
                 </div>
 
                 <div className="login-password-wrapper">
+
                   <input
                     id="login-password"
                     type={
@@ -331,11 +459,17 @@ const Login = () => {
                         : "password"
                     }
                     name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={
+                      formData.password
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Enter your password"
                     autoComplete="current-password"
-                    disabled={isLoading}
+                    disabled={
+                      isLoading
+                    }
                   />
 
                   <button
@@ -343,7 +477,8 @@ const Login = () => {
                     className="password-toggle"
                     onClick={() =>
                       setShowPassword(
-                        (previous) => !previous
+                        (previous) =>
+                          !previous
                       )
                     }
                     aria-label={
@@ -351,39 +486,54 @@ const Login = () => {
                         ? "Hide password"
                         : "Show password"
                     }
-                    disabled={isLoading}
+                    disabled={
+                      isLoading
+                    }
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword
+                      ? "Hide"
+                      : "Show"}
                   </button>
+
                 </div>
+
               </div>
 
               <label className="remember-me">
+
                 <input
                   type="checkbox"
-                  checked={rememberMe}
+                  checked={
+                    rememberMe
+                  }
                   onChange={(event) =>
                     setRememberMe(
                       event.target.checked
                     )
                   }
-                  disabled={isLoading}
+                  disabled={
+                    isLoading
+                  }
                 />
 
                 <span>
                   Remember me
                 </span>
+
               </label>
 
               <button
                 type="submit"
                 className="login-submit-button"
-                disabled={isLoading}
+                disabled={
+                  isLoading
+                }
               >
                 {isLoading
                   ? "Signing In..."
                   : "Sign In"}
               </button>
+
             </form>
 
             <div className="login-divider">
@@ -405,8 +555,8 @@ const Login = () => {
             </p>
 
           </div>
-        </div>
 
+        </div>
       </div>
     </div>
   );

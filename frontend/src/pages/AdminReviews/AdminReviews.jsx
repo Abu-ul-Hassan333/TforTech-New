@@ -4,6 +4,7 @@ import React, {
   useState,
 } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import AdminLayout from "../AdminLayout/AdminLayout";
 import "./AdminReviews.css";
 
@@ -20,7 +21,18 @@ const initialForm = {
   is_active: true,
 };
 
+const getStoredUserRole = () => {
+  return String(
+    localStorage.getItem("tfortech_user_role") ||
+      "customer"
+  )
+    .toLowerCase()
+    .trim();
+};
+
 export default function AdminReviews() {
+  const navigate = useNavigate();
+
   const [reviews, setReviews] = useState([]);
   const [formData, setFormData] =
     useState(initialForm);
@@ -42,19 +54,13 @@ export default function AdminReviews() {
   const [success, setSuccess] =
     useState("");
 
+  const [authorized, setAuthorized] =
+    useState(false);
+
   // ============================================================
   // GET CURRENT AUTH TOKEN
   // ============================================================
-  //
-  // Current ProtectedRoute.jsx uses:
-  //   tfortech_logged_in
-  //   tfortech_access_token
-  //   tfortech_user_role
-  //
-  // We use tfortech_access_token as the primary token.
-  // Legacy keys are kept as fallback so existing functionality
-  // is not unnecessarily broken.
-  //
+
   const getStoredToken = useCallback(() => {
     const currentToken =
       localStorage.getItem(
@@ -89,6 +95,10 @@ export default function AdminReviews() {
   // ============================================================
 
   const getValidToken = useCallback(async () => {
+    if (getStoredUserRole() !== "admin") {
+      return null;
+    }
+
     const token = getStoredToken();
 
     if (!token) {
@@ -96,7 +106,7 @@ export default function AdminReviews() {
     }
 
     try {
-      await axios.get(
+      const response = await axios.get(
         `${API}/auth/me`,
         {
           headers: {
@@ -104,6 +114,23 @@ export default function AdminReviews() {
               `Bearer ${token}`,
           },
         }
+      );
+
+      const userRole =
+        String(
+          response?.data?.role ||
+            getStoredUserRole()
+        )
+          .toLowerCase()
+          .trim();
+
+      if (userRole !== "admin") {
+        return null;
+      }
+
+      localStorage.setItem(
+        "tfortech_user_role",
+        userRole
       );
 
       return token;
@@ -123,6 +150,18 @@ export default function AdminReviews() {
 
   const getErrorMessage = useCallback(
     (err) => {
+      if (
+        err?.response?.status === 401
+      ) {
+        return "Your authentication session is missing or expired. Please log in again.";
+      }
+
+      if (
+        err?.response?.status === 403
+      ) {
+        return "Access denied. Admin access is required.";
+      }
+
       return (
         err?.response?.data?.detail ||
         err?.response?.data?.message ||
@@ -131,6 +170,31 @@ export default function AdminReviews() {
     },
     []
   );
+
+  // ============================================================
+  // AUTHENTICATION FAILURE
+  // ============================================================
+
+  const handleAuthenticationFailure =
+    useCallback(() => {
+      const authKeys = [
+        "tfortech_logged_in",
+        "tfortech_access_token",
+        "tfortech_token_type",
+        "tfortech_user_id",
+        "tfortech_user_name",
+        "tfortech_user_email",
+        "tfortech_user_phone",
+        "tfortech_user_role",
+        "tfortech_remember_me",
+      ];
+
+      authKeys.forEach((key) => {
+        localStorage.removeItem(key);
+      });
+
+      navigate("/login");
+    }, [navigate]);
 
   // ============================================================
   // FETCH ADMIN REVIEWS
@@ -142,18 +206,38 @@ export default function AdminReviews() {
       setError("");
 
       try {
+        const currentRole =
+          getStoredUserRole();
+
+        if (currentRole !== "admin") {
+          setAuthorized(false);
+          setReviews([]);
+          navigate("/");
+          return;
+        }
+
         const token =
           await getValidToken();
 
         if (!token) {
+          setAuthorized(false);
           setReviews([]);
 
-          setError(
-            "Your authentication session is missing or expired. Please log in again."
-          );
+          if (
+            getStoredUserRole() ===
+            "admin"
+          ) {
+            setError(
+              "Your authentication session is missing or expired. Please log in again."
+            );
+          } else {
+            navigate("/");
+          }
 
           return;
         }
+
+        setAuthorized(true);
 
         const response =
           await axios.get(
@@ -188,6 +272,24 @@ export default function AdminReviews() {
           err
         );
 
+        if (
+          err?.response?.status ===
+          401
+        ) {
+          handleAuthenticationFailure();
+          return;
+        }
+
+        if (
+          err?.response?.status ===
+          403
+        ) {
+          setAuthorized(false);
+          setReviews([]);
+          navigate("/");
+          return;
+        }
+
         setError(
           getErrorMessage(err)
         );
@@ -198,6 +300,8 @@ export default function AdminReviews() {
     [
       getErrorMessage,
       getValidToken,
+      handleAuthenticationFailure,
+      navigate,
     ]
   );
 
@@ -232,6 +336,9 @@ export default function AdminReviews() {
             : value,
       })
     );
+
+    setError("");
+    setSuccess("");
   };
 
   // ============================================================
@@ -286,6 +393,7 @@ export default function AdminReviews() {
     }
 
     setError("");
+    setSuccess("");
     setVideoFile(file);
   };
 
@@ -309,6 +417,9 @@ export default function AdminReviews() {
     if (input) {
       input.value = "";
     }
+
+    setError("");
+    setSuccess("");
   };
 
   // ============================================================
@@ -320,6 +431,14 @@ export default function AdminReviews() {
   ) => {
     event.preventDefault();
 
+    if (
+      getStoredUserRole() !==
+      "admin"
+    ) {
+      navigate("/");
+      return;
+    }
+
     setSaving(true);
     setError("");
     setSuccess("");
@@ -329,9 +448,16 @@ export default function AdminReviews() {
         await getValidToken();
 
       if (!token) {
-        setError(
-          "Your authentication session is missing or expired. Please log in again."
-        );
+        if (
+          getStoredUserRole() ===
+          "admin"
+        ) {
+          setError(
+            "Your authentication session is missing or expired. Please log in again."
+          );
+        } else {
+          navigate("/");
+        }
 
         return;
       }
@@ -433,6 +559,22 @@ export default function AdminReviews() {
         err
       );
 
+      if (
+        err?.response?.status ===
+        401
+      ) {
+        handleAuthenticationFailure();
+        return;
+      }
+
+      if (
+        err?.response?.status ===
+        403
+      ) {
+        navigate("/");
+        return;
+      }
+
       setError(
         getErrorMessage(err)
       );
@@ -448,6 +590,14 @@ export default function AdminReviews() {
   const handleEdit = (
     review
   ) => {
+    if (
+      getStoredUserRole() !==
+      "admin"
+    ) {
+      navigate("/");
+      return;
+    }
+
     setEditingReview(review);
 
     setFormData({
@@ -497,6 +647,14 @@ export default function AdminReviews() {
 
   const handleDelete =
     async (reviewId) => {
+      if (
+        getStoredUserRole() !==
+        "admin"
+      ) {
+        navigate("/");
+        return;
+      }
+
       const confirmed =
         window.confirm(
           "Are you sure you want to delete this customer review and its video?"
@@ -518,9 +676,16 @@ export default function AdminReviews() {
           await getValidToken();
 
         if (!token) {
-          setError(
-            "Your authentication session is missing or expired. Please log in again."
-          );
+          if (
+            getStoredUserRole() ===
+            "admin"
+          ) {
+            setError(
+              "Your authentication session is missing or expired. Please log in again."
+            );
+          } else {
+            navigate("/");
+          }
 
           return;
         }
@@ -552,6 +717,22 @@ export default function AdminReviews() {
           "Failed to delete customer review:",
           err
         );
+
+        if (
+          err?.response?.status ===
+          401
+        ) {
+          handleAuthenticationFailure();
+          return;
+        }
+
+        if (
+          err?.response?.status ===
+          403
+        ) {
+          navigate("/");
+          return;
+        }
 
         setError(
           getErrorMessage(err)
@@ -624,6 +805,19 @@ export default function AdminReviews() {
       }
     );
   };
+
+  // ============================================================
+  // ACCESS CHECK
+  // ============================================================
+
+  if (
+    !authorized &&
+    !loading &&
+    getStoredUserRole() !==
+      "admin"
+  ) {
+    return null;
+  }
 
   // ============================================================
   // PAGE

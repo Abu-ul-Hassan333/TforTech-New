@@ -29,6 +29,8 @@ import AdminProducts from "./pages/AdminProducts/AdminProducts";
 import AdminWhatsApp from "./pages/AdminWhatsApp/AdminWhatsApp";
 import AdminTheme from "./pages/AdminTheme/AdminTheme";
 import AdminReviews from "./pages/AdminReviews/AdminReviews";
+import AdminHero from "./pages/AdminHero/AdminHero";
+import AdminUsers from "./pages/AdminUsers/AdminUsers";
 
 import CustomerReviews from "./pages/CustomerReviews/CustomerReviews";
 
@@ -213,14 +215,19 @@ function App() {
               />
 
 
-              {/* =========================
+              {/* ==================================================
                   ADMIN DASHBOARD
-              ========================== */}
+                  ADMIN ONLY
+              ================================================== */}
 
               <Route
                 path="/admin"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
                     <AdminDashboard />
                   </ProtectedRoute>
                 }
@@ -229,78 +236,147 @@ function App() {
               <Route
                 path="/admin/dashboard"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
                     <AdminDashboard />
                   </ProtectedRoute>
                 }
               />
 
 
-              {/* =========================
+              {/* ==================================================
                   ADMIN PRODUCTS
-              ========================== */}
+                  ADMIN + CO ADMIN
+              ================================================== */}
 
               <Route
                 path="/admin/products"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                      "co_admin",
+                    ]}
+                  >
                     <AdminProducts />
                   </ProtectedRoute>
                 }
               />
 
 
-              {/* =========================
+              {/* ==================================================
+                  ADMIN HERO
+                  ADMIN ONLY
+              ================================================== */}
+
+              <Route
+                path="/admin/hero"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
+                    <AdminHero />
+                  </ProtectedRoute>
+                }
+              />
+
+
+              {/* ==================================================
                   ADMIN ORDERS
-              ========================== */}
+                  ADMIN + CO ADMIN
+              ================================================== */}
 
               <Route
                 path="/admin/orders"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                      "co_admin",
+                    ]}
+                  >
                     <AdminOrders />
                   </ProtectedRoute>
                 }
               />
 
 
-              {/* =========================
+              {/* ==================================================
                   ADMIN CUSTOMER REVIEWS
-              ========================== */}
+                  ADMIN ONLY
+              ================================================== */}
 
               <Route
                 path="/admin/reviews"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
                     <AdminReviews />
                   </ProtectedRoute>
                 }
               />
 
 
-              {/* =========================
+              {/* ==================================================
                   ADMIN WHATSAPP
-              ========================== */}
+                  ADMIN ONLY
+              ================================================== */}
 
               <Route
                 path="/admin/whatsapp"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
                     <AdminWhatsApp />
                   </ProtectedRoute>
                 }
               />
 
 
-              {/* =========================
+              {/* ==================================================
                   ADMIN THEME
-              ========================== */}
+                  ADMIN ONLY
+              ================================================== */}
 
               <Route
                 path="/admin/theme"
                 element={
-                  <ProtectedRoute adminOnly>
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
                     <AdminTheme />
+                  </ProtectedRoute>
+                }
+              />
+
+
+              {/* ==================================================
+                  ADMIN USERS / ADMIN MEMBERS
+                  ADMIN ONLY
+              ================================================== */}
+
+              <Route
+                path="/admin/users"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
+                    <AdminUsers />
                   </ProtectedRoute>
                 }
               />

@@ -286,19 +286,43 @@ function Navbar() {
       ) || "";
 
     const storedUserRole =
-      localStorage.getItem(
-        "tfortech_user_role"
-      ) || "";
+      String(
+        localStorage.getItem(
+          "tfortech_user_role"
+        ) || ""
+      )
+        .toLowerCase()
+        .trim();
 
     setIsLoggedIn(loggedIn);
     setUserName(storedUserName);
 
     setIsAdmin(
       loggedIn &&
-        storedUserRole.toLowerCase() ===
-          "admin"
+        (
+          storedUserRole === "admin" ||
+          storedUserRole === "co_admin"
+        )
     );
   }, [location.pathname]);
+
+  // ==========================================================
+  // ADMIN PANEL PATH
+  // ==========================================================
+
+  const storedUserRole =
+    String(
+      localStorage.getItem(
+        "tfortech_user_role"
+      ) || ""
+    )
+      .toLowerCase()
+      .trim();
+
+  const adminPanelPath =
+    storedUserRole === "co_admin"
+      ? "/admin/products"
+      : "/admin";
 
   // ==========================================================
   // CLOSE MENU
@@ -1077,7 +1101,7 @@ function Navbar() {
 
             {isAdmin && (
               <Link
-                to="/admin"
+                to={adminPanelPath}
                 className="navbar-mobile-admin"
                 onClick={closeMenu}
               >
@@ -1166,7 +1190,7 @@ function Navbar() {
 
                 {isAdmin && (
                   <Link
-                    to="/admin"
+                    to={adminPanelPath}
                     className="navbar-admin-button"
                     title="Open Admin Panel"
                     onClick={closeMenu}

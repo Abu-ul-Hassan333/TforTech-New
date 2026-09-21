@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from auth import router as auth_router
 from products import router as products_router
+from hero import router as hero_router
 from whatsapp import router as whatsapp_router
 from theme import router as theme_router
 from reviews import router as reviews_router
@@ -10,10 +11,6 @@ from reviews import router as reviews_router
 from config import APP_NAME, FRONTEND_URL, PORT
 from database import test_database_connection
 
-
-# ============================================================
-# GOJUNIORS FASTAPI APPLICATION
-# ============================================================
 
 app = FastAPI(
     title=APP_NAME,
@@ -25,9 +22,19 @@ app = FastAPI(
 # CORS
 # ============================================================
 
+allowed_origins = list(
+    dict.fromkeys(
+        [
+            FRONTEND_URL.rstrip("/"),
+            "http://localhost:3000",
+            "http://127.0.0.1:3000",
+        ]
+    )
+)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -43,6 +50,9 @@ app.include_router(auth_router)
 
 # Products
 app.include_router(products_router)
+
+# Hero
+app.include_router(hero_router)
 
 # WhatsApp
 app.include_router(whatsapp_router)

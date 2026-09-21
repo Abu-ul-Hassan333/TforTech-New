@@ -6,6 +6,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from database import orders_collection, users_collection
 
 from schemas import (
+    AdminUserRoleUpdate,
     AuthResponse,
     OrderCreate,
     OrderResponse,
@@ -98,25 +99,64 @@ def get_current_user(
 
 
 # =========================================================
-# ADMIN AUTHENTICATION
+# ROLE HELPERS
 # =========================================================
+
+def get_user_role(user):
+    """
+    Return the user's current role.
+
+    Supported roles:
+    - admin
+    - co_admin
+    - customer
+    """
+
+    return str(
+        user.get(
+            "role",
+            "customer",
+        )
+    ).lower().strip()
+
 
 def get_current_admin(
     current_user=Depends(get_current_user),
 ):
     """
-    Allow access only to users whose role is admin.
+    Allow access only to the main admin.
+
+    Admin has complete website and complete
+    Admin Dashboard access.
     """
 
-    user_role = current_user.get(
-        "role",
-        "customer",
-    )
-
-    if user_role != "admin":
+    if get_user_role(current_user) != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin access required.",
+        )
+
+    return current_user
+
+
+def get_current_product_order_admin(
+    current_user=Depends(get_current_user),
+):
+    """
+    Allow access to admin Products and admin Orders.
+
+    Both main admin and co admin can access these sections.
+    """
+
+    user_role = get_user_role(current_user)
+
+    if user_role not in {
+        "admin",
+        "co_admin",
+    }:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Product and Order admin access required.",
         )
 
     return current_user
@@ -131,9 +171,13 @@ def get_current_admin(
     response_model=AuthResponse,
     status_code=status.HTTP_201_CREATED,
 )
-def register_user(user: UserRegister):
+def register_user(
+    user: UserRegister,
+):
+    """
+    Register a new customer account.
+    """
 
-    # Check whether email already exists
     existing_user = users_collection.find_one(
         {
             "email": user.email.lower(),
@@ -146,7 +190,8 @@ def register_user(user: UserRegister):
             detail="An account with this email already exists.",
         )
 
-    # Create user document
+    now = datetime.now(timezone.utc)
+
     user_document = {
         "full_name": user.full_name.strip(),
         "email": user.email.lower(),
@@ -154,16 +199,14 @@ def register_user(user: UserRegister):
         "password": hash_password(user.password),
         "role": "customer",
         "is_active": True,
-        "created_at": datetime.now(timezone.utc),
-        "updated_at": datetime.now(timezone.utc),
+        "created_at": now,
+        "updated_at": now,
     }
 
-    # Save user
     result = users_collection.insert_one(
         user_document
     )
 
-    # Create JWT token
     access_token = create_access_token(
         {
             "sub": str(result.inserted_id),
@@ -197,9 +240,13 @@ def register_user(user: UserRegister):
     "/login",
     response_model=AuthResponse,
 )
-def login_user(user: UserLogin):
+def login_user(
+    user: UserLogin,
+):
+    """
+    Login an existing user.
+    """
 
-    # Find user by email
     existing_user = users_collection.find_one(
         {
             "email": user.email.lower(),
@@ -212,39 +259,66 @@ def login_user(user: UserLogin):
             detail="Invalid email or password.",
         )
 
-    # Check account status
-    if not existing_user.get("is_active", True):
+    if not existing_user.get(
+        "is_active",
+        True,
+    ):
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This account has been disabled.",
         )
 
-    # Verify password
+    password_hash = existing_user.get("password")
+
+    if not password_hash:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid email or password.",
+        )
+
     if not verify_password(
         user.password,
-        existing_user["password"],
+        password_hash,
     ):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid email or password.",
         )
 
-    # Create JWT token
+    current_role = get_user_role(
+        existing_user
+    )
+
     access_token = create_access_token(
         {
             "sub": str(existing_user["_id"]),
-            "email": existing_user["email"],
-            "role": existing_user.get("role", "customer"),
+            "email": existing_user.get(
+                "email",
+                "",
+            ),
+            "role": current_role,
         }
     )
 
     user_response = UserResponse(
         id=str(existing_user["_id"]),
-        full_name=existing_user["full_name"],
-        email=existing_user["email"],
-        phone=existing_user["phone"],
-        role=existing_user.get("role", "customer"),
-        is_active=existing_user.get("is_active", True),
+        full_name=existing_user.get(
+            "full_name",
+            "",
+        ),
+        email=existing_user.get(
+            "email",
+            "",
+        ),
+        phone=existing_user.get(
+            "phone",
+            "",
+        ),
+        role=current_role,
+        is_active=existing_user.get(
+            "is_active",
+            True,
+        ),
     )
 
     return AuthResponse(
@@ -273,11 +347,23 @@ def get_my_account(
 
     return UserResponse(
         id=str(current_user["_id"]),
-        full_name=current_user["full_name"],
-        email=current_user["email"],
-        phone=current_user["phone"],
-        role=current_user.get("role", "customer"),
-        is_active=current_user.get("is_active", True),
+        full_name=current_user.get(
+            "full_name",
+            "",
+        ),
+        email=current_user.get(
+            "email",
+            "",
+        ),
+        phone=current_user.get(
+            "phone",
+            "",
+        ),
+        role=get_user_role(current_user),
+        is_active=current_user.get(
+            "is_active",
+            True,
+        ),
     )
 
 
@@ -296,14 +382,13 @@ def update_my_account(
     """
     Update the currently authenticated user's profile.
 
-    Only full name and phone number can be changed here.
-    Email, password, role, and account status are not changed.
+    Only full name and phone number can be changed.
+    Email, password, role, and account status remain unchanged.
     """
 
     updated_full_name = profile.full_name.strip()
     updated_phone = profile.phone.strip()
 
-    # Update user in MongoDB
     users_collection.update_one(
         {
             "_id": current_user["_id"],
@@ -317,7 +402,6 @@ def update_my_account(
         },
     )
 
-    # Return the latest user information
     updated_user = users_collection.find_one(
         {
             "_id": current_user["_id"],
@@ -332,11 +416,23 @@ def update_my_account(
 
     return UserResponse(
         id=str(updated_user["_id"]),
-        full_name=updated_user["full_name"],
-        email=updated_user["email"],
-        phone=updated_user["phone"],
-        role=updated_user.get("role", "customer"),
-        is_active=updated_user.get("is_active", True),
+        full_name=updated_user.get(
+            "full_name",
+            "",
+        ),
+        email=updated_user.get(
+            "email",
+            "",
+        ),
+        phone=updated_user.get(
+            "phone",
+            "",
+        ),
+        role=get_user_role(updated_user),
+        is_active=updated_user.get(
+            "is_active",
+            True,
+        ),
     )
 
 
@@ -417,7 +513,9 @@ def get_my_orders(
     currently authenticated user.
     """
 
-    user_id = str(current_user["_id"])
+    user_id = str(
+        current_user["_id"]
+    )
 
     orders = orders_collection.find(
         {
@@ -432,12 +530,19 @@ def get_my_orders(
 
     for order in orders:
 
-        created_at = order.get("created_at")
+        created_at = order.get(
+            "created_at"
+        )
 
-        if isinstance(created_at, datetime):
+        if isinstance(
+            created_at,
+            datetime,
+        ):
             created_at_string = created_at.isoformat()
         else:
-            created_at_string = str(created_at)
+            created_at_string = str(
+                created_at
+            )
 
         response_orders.append(
             OrderResponse(
@@ -483,12 +588,16 @@ def get_my_orders(
     response_model=list[OrderResponse],
 )
 def get_all_orders(
-    current_admin=Depends(get_current_admin),
+    current_admin=Depends(
+        get_current_product_order_admin
+    ),
 ):
     """
     Return all customer orders.
 
-    Only authenticated admin users can access this endpoint.
+    Accessible by:
+    - admin
+    - co_admin
     """
 
     orders = orders_collection.find().sort(
@@ -499,13 +608,19 @@ def get_all_orders(
     response_orders = []
 
     for order in orders:
+        created_at = order.get(
+            "created_at"
+        )
 
-        created_at = order.get("created_at")
-
-        if isinstance(created_at, datetime):
+        if isinstance(
+            created_at,
+            datetime,
+        ):
             created_at_string = created_at.isoformat()
         else:
-            created_at_string = str(created_at)
+            created_at_string = str(
+                created_at
+            )
 
         response_orders.append(
             OrderResponse(
@@ -553,12 +668,16 @@ def get_all_orders(
 def update_order_status(
     order_id: str,
     new_status: str,
-    current_admin=Depends(get_current_admin),
+    current_admin=Depends(
+        get_current_product_order_admin
+    ),
 ):
     """
     Update the status of a customer order.
 
-    Only authenticated admin users can change order status.
+    Accessible by:
+    - admin
+    - co_admin
     """
 
     allowed_statuses = [
@@ -632,7 +751,10 @@ def update_order_status(
         "created_at"
     )
 
-    if isinstance(created_at, datetime):
+    if isinstance(
+        created_at,
+        datetime,
+    ):
         created_at_string = created_at.isoformat()
     else:
         created_at_string = str(created_at)
@@ -666,3 +788,302 @@ def update_order_status(
         ),
         created_at=created_at_string,
     )
+
+
+# =========================================================
+# ADMIN USERS - GET ALL USERS
+# =========================================================
+
+@router.get(
+    "/admin/users",
+)
+def get_all_users(
+    current_admin=Depends(get_current_admin),
+):
+    """
+    Return all registered users.
+
+    Only the main admin can manage admin members.
+
+    This endpoint intentionally does not use UserResponse
+    as its response model so legacy/malformed user records
+    with an empty or invalid email cannot crash the entire
+    Admin Users page.
+    """
+
+    users = users_collection.find().sort(
+        "created_at",
+        -1,
+    )
+
+    response_users = []
+
+    for user in users:
+        response_users.append(
+            {
+                "id": str(user["_id"]),
+                "full_name": str(
+                    user.get(
+                        "full_name",
+                        "",
+                    )
+                    or ""
+                ),
+                "email": str(
+                    user.get(
+                        "email",
+                        "",
+                    )
+                    or ""
+                ),
+                "phone": str(
+                    user.get(
+                        "phone",
+                        "",
+                    )
+                    or ""
+                ),
+                "role": get_user_role(user),
+                "is_active": bool(
+                    user.get(
+                        "is_active",
+                        True,
+                    )
+                ),
+            }
+        )
+
+    return response_users
+
+
+# =========================================================
+# ADMIN USERS - UPDATE ROLE
+# =========================================================
+
+@router.put(
+    "/admin/users/{user_id}/role",
+)
+def update_user_role(
+    user_id: str,
+    role_update: AdminUserRoleUpdate,
+    current_admin=Depends(get_current_admin),
+):
+    """
+    Update another user's role.
+
+    Only the main admin can change roles.
+
+    The endpoint returns a plain JSON object so legacy
+    malformed email values cannot cause a response-model
+    validation error after a successful role update.
+    """
+
+    try:
+        from bson import ObjectId
+
+        object_id = ObjectId(user_id)
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID.",
+        )
+
+    if object_id == current_admin["_id"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You cannot change your own role.",
+        )
+
+    new_role = str(
+        role_update.role
+    ).lower().strip()
+
+    if new_role not in {
+        "customer",
+        "co_admin",
+        "admin",
+    }:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user role.",
+        )
+
+    existing_user = users_collection.find_one(
+        {
+            "_id": object_id,
+        }
+    )
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found.",
+        )
+
+    users_collection.update_one(
+        {
+            "_id": object_id,
+        },
+        {
+            "$set": {
+                "role": new_role,
+                "updated_at": datetime.now(timezone.utc),
+            }
+        },
+    )
+
+    updated_user = users_collection.find_one(
+        {
+            "_id": object_id,
+        }
+    )
+
+    if not updated_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found after role update.",
+        )
+
+    return {
+        "id": str(updated_user["_id"]),
+        "full_name": str(
+            updated_user.get(
+                "full_name",
+                "",
+            )
+            or ""
+        ),
+        "email": str(
+            updated_user.get(
+                "email",
+                "",
+            )
+            or ""
+        ),
+        "phone": str(
+            updated_user.get(
+                "phone",
+                "",
+            )
+            or ""
+        ),
+        "role": get_user_role(updated_user),
+        "is_active": bool(
+            updated_user.get(
+                "is_active",
+                True,
+            )
+        ),
+    }
+
+
+# =========================================================
+# ADMIN USERS - UPDATE ACCOUNT STATUS
+# =========================================================
+
+@router.put(
+    "/admin/users/{user_id}/status",
+)
+def update_user_status(
+    user_id: str,
+    is_active: bool,
+    current_admin=Depends(get_current_admin),
+):
+    """
+    Enable or disable another user account.
+
+    Only the main admin can manage account status.
+
+    The endpoint returns a plain JSON object so legacy
+    malformed email values cannot cause a response-model
+    validation error after a successful status update.
+    """
+
+    try:
+        from bson import ObjectId
+
+        object_id = ObjectId(user_id)
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid user ID.",
+        )
+
+    if object_id == current_admin["_id"]:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "You cannot disable or change "
+                "your own account status."
+            ),
+        )
+
+    existing_user = users_collection.find_one(
+        {
+            "_id": object_id,
+        }
+    )
+
+    if not existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found.",
+        )
+
+    users_collection.update_one(
+        {
+            "_id": object_id,
+        },
+        {
+            "$set": {
+                "is_active": bool(is_active),
+                "updated_at": datetime.now(timezone.utc),
+            }
+        },
+    )
+
+    updated_user = users_collection.find_one(
+        {
+            "_id": object_id,
+        }
+    )
+
+    if not updated_user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found after status update.",
+        )
+
+    return {
+        "id": str(updated_user["_id"]),
+        "full_name": str(
+            updated_user.get(
+                "full_name",
+                "",
+            )
+            or ""
+        ),
+        "email": str(
+            updated_user.get(
+                "email",
+                "",
+            )
+            or ""
+        ),
+        "phone": str(
+            updated_user.get(
+                "phone",
+                "",
+            )
+            or ""
+        ),
+        "role": get_user_role(updated_user),
+        "is_active": bool(
+            updated_user.get(
+                "is_active",
+                True,
+            )
+        ),
+    }
