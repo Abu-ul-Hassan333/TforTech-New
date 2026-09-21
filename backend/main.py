@@ -7,6 +7,7 @@ from hero import router as hero_router
 from whatsapp import router as whatsapp_router
 from theme import router as theme_router
 from reviews import router as reviews_router
+from header_footer import router as header_footer_router
 
 from config import APP_NAME, FRONTEND_URL, PORT
 from database import test_database_connection
@@ -62,6 +63,9 @@ app.include_router(theme_router)
 
 # Customer Reviews / Video Testimonials
 app.include_router(reviews_router)
+
+# Header & Footer
+app.include_router(header_footer_router)
 
 
 # ============================================================

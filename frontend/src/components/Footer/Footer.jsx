@@ -1,4 +1,8 @@
-import React from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   Link,
   useLocation,
@@ -9,22 +13,400 @@ import { useTheme } from "../../context/ThemeContext";
 import "./Footer.css";
 
 
+const BACKEND_URL =
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000";
+
+const API_URL =
+  `${BACKEND_URL}/api`;
+
+
+const DEFAULT_FOOTER_SETTINGS = {
+  footer: {
+    site_name:
+      "GoJuniors",
+
+    description:
+      "Discover comfortable clothing, playful toys and accessories made for curious minds and growing hearts.",
+
+    social_links: {
+      instagram:
+        "https://instagram.com",
+
+      facebook:
+        "https://facebook.com",
+
+      tiktok:
+        "https://tiktok.com",
+    },
+
+    shop: {
+      title:
+        "Shop",
+
+      links: [
+        {
+          label:
+            "All Products",
+          url:
+            "/shop",
+        },
+        {
+          label:
+            "Categories",
+          url:
+            "/categories",
+        },
+        {
+          label:
+            "New Arrivals",
+          url:
+            "/shop",
+        },
+        {
+          label:
+            "Bestsellers",
+          url:
+            "/shop",
+        },
+        {
+          label:
+            "On Sale",
+          url:
+            "/shop",
+        },
+      ],
+    },
+
+    help: {
+      title:
+        "Help",
+
+      links: [
+        {
+          label:
+            "Shipping Information",
+          url:
+            "/shipping",
+        },
+        {
+          label:
+            "Returns & Exchanges",
+          url:
+            "/returns",
+        },
+        {
+          label:
+            "FAQs",
+          url:
+            "/faq",
+        },
+        {
+          label:
+            "Contact Us",
+          url:
+            "/contact",
+        },
+      ],
+    },
+
+    company: {
+      title:
+        "Company",
+
+      links: [
+        {
+          label:
+            "About Us",
+          url:
+            "/about",
+        },
+        {
+          label:
+            "Contact",
+          url:
+            "/contact",
+        },
+        {
+          label:
+            "Privacy Policy",
+          url:
+            "/privacy",
+        },
+        {
+          label:
+            "Terms & Conditions",
+          url:
+            "/terms",
+        },
+      ],
+    },
+
+    newsletter: {
+      title:
+        "Stay in the loop",
+
+      description:
+        "Subscribe for new arrivals, special offers and updates.",
+
+      input_placeholder:
+        "Your email address",
+
+      button_text:
+        "Subscribe",
+    },
+
+    delivery: {
+      items: [
+        {
+          icon:
+            "✓",
+
+          title:
+            "Quality Products",
+
+          description:
+            "Carefully selected for kids",
+        },
+        {
+          icon:
+            "🚚",
+
+          title:
+            "Free Shipping",
+
+          description:
+            "On orders over PKR 5,000",
+        },
+        {
+          icon:
+            "↩",
+
+          title:
+            "Easy Returns",
+
+          description:
+            "Simple return process",
+        },
+      ],
+    },
+
+    bottom: {
+      copyright_text:
+        "All rights reserved.",
+
+      privacy_label:
+        "Privacy",
+
+      privacy_url:
+        "/privacy",
+
+      terms_label:
+        "Terms",
+
+      terms_url:
+        "/terms",
+
+      contact_label:
+        "Contact",
+
+      contact_url:
+        "/contact",
+    },
+  },
+};
+
+
+const cloneDefaults = () => {
+  return JSON.parse(
+    JSON.stringify(
+      DEFAULT_FOOTER_SETTINGS
+    )
+  );
+};
+
+
+const normalizeFooterSettings = (
+  serverSettings
+) => {
+  if (!serverSettings) {
+    return cloneDefaults();
+  }
+
+  const defaults =
+    cloneDefaults();
+
+  return {
+    ...defaults,
+
+    ...serverSettings,
+
+    footer: {
+      ...defaults.footer,
+
+      ...(serverSettings.footer || {}),
+
+      social_links: {
+        ...defaults.footer
+          .social_links,
+
+        ...(serverSettings.footer
+          ?.social_links || {}),
+      },
+
+      shop: {
+        ...defaults.footer.shop,
+
+        ...(serverSettings.footer
+          ?.shop || {}),
+
+        links:
+          Array.isArray(
+            serverSettings.footer
+              ?.shop?.links
+          )
+            ? serverSettings.footer.shop.links
+            : defaults.footer.shop.links,
+      },
+
+      help: {
+        ...defaults.footer.help,
+
+        ...(serverSettings.footer
+          ?.help || {}),
+
+        links:
+          Array.isArray(
+            serverSettings.footer
+              ?.help?.links
+          )
+            ? serverSettings.footer.help.links
+            : defaults.footer.help.links,
+      },
+
+      company: {
+        ...defaults.footer.company,
+
+        ...(serverSettings.footer
+          ?.company || {}),
+
+        links:
+          Array.isArray(
+            serverSettings.footer
+              ?.company?.links
+          )
+            ? serverSettings.footer.company.links
+            : defaults.footer.company.links,
+      },
+
+      newsletter: {
+        ...defaults.footer.newsletter,
+
+        ...(serverSettings.footer
+          ?.newsletter || {}),
+      },
+
+      delivery: {
+        ...defaults.footer.delivery,
+
+        ...(serverSettings.footer
+          ?.delivery || {}),
+
+        items:
+          Array.isArray(
+            serverSettings.footer
+              ?.delivery?.items
+          )
+            ? serverSettings.footer.delivery.items
+            : defaults.footer.delivery.items,
+      },
+
+      bottom: {
+        ...defaults.footer.bottom,
+
+        ...(serverSettings.footer
+          ?.bottom || {}),
+      },
+    },
+  };
+};
+
+
+const isExternalUrl = (
+  url
+) => {
+  return (
+    typeof url === "string" &&
+    /^(https?:\/\/|mailto:|tel:)/i.test(
+      url.trim()
+    )
+  );
+};
+
+
+const FooterLink = ({
+  label,
+  url,
+}) => {
+  const safeLabel =
+    label || "";
+
+  const safeUrl =
+    url || "#";
+
+  if (
+    isExternalUrl(
+      safeUrl
+    )
+  ) {
+    return (
+      <a
+        href={safeUrl}
+        target="_blank"
+        rel="noreferrer"
+      >
+        {safeLabel}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={safeUrl}>
+      {safeLabel}
+    </Link>
+  );
+};
+
+
 function Footer() {
-  const location = useLocation();
+  const location =
+    useLocation();
 
   const {
     theme,
   } = useTheme();
 
 
-  const handleNewsletterSubmit = (event) => {
+  const [
+    footerSettings,
+    setFooterSettings,
+  ] = useState(
+    cloneDefaults()
+  );
+
+
+  const handleNewsletterSubmit = (
+    event
+  ) => {
     event.preventDefault();
   };
 
 
   const isAdminPage =
     location.pathname === "/admin" ||
-    location.pathname.startsWith("/admin/");
+    location.pathname.startsWith(
+      "/admin/"
+    );
 
 
   const showFooter =
@@ -32,9 +414,60 @@ function Footer() {
     theme.show_footer !== false;
 
 
-  const siteName =
-    theme.site_name ||
-    "GoJuniors";
+  const loadFooterSettings =
+    useCallback(
+      async () => {
+        try {
+          const response =
+            await fetch(
+              `${API_URL}/header-footer/public`,
+              {
+                method:
+                  "GET",
+
+                headers: {
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
+
+          if (
+            !response.ok
+          ) {
+            return;
+          }
+
+          const data =
+            await response.json();
+
+          if (
+            data?.settings
+          ) {
+            setFooterSettings(
+              normalizeFooterSettings(
+                data.settings
+              )
+            );
+          }
+        } catch (
+          error
+        ) {
+          console.error(
+            "Footer settings loading error:",
+            error
+          );
+        }
+      },
+      []
+    );
+
+
+  useEffect(() => {
+    loadFooterSettings();
+  }, [
+    loadFooterSettings,
+  ]);
 
 
   if (!showFooter) {
@@ -42,8 +475,20 @@ function Footer() {
   }
 
 
+  const footer =
+    footerSettings.footer ||
+    DEFAULT_FOOTER_SETTINGS.footer;
+
+
+  const siteName =
+    footer.site_name ||
+    theme.site_name ||
+    "GoJuniors";
+
+
   return (
     <footer className="site-footer">
+
       <div className="footer-container">
 
         {/* =====================================================
@@ -67,15 +512,17 @@ function Footer() {
 
 
             <p className="footer-description">
-              Discover comfortable clothing, playful toys and accessories
-              made for curious minds and growing hearts.
+              {footer.description}
             </p>
 
 
             <div className="footer-socials">
 
               <a
-                href="https://instagram.com"
+                href={
+                  footer.social_links
+                    .instagram
+                }
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Instagram"
@@ -85,7 +532,10 @@ function Footer() {
 
 
               <a
-                href="https://facebook.com"
+                href={
+                  footer.social_links
+                    .facebook
+                }
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Facebook"
@@ -95,7 +545,10 @@ function Footer() {
 
 
               <a
-                href="https://tiktok.com"
+                href={
+                  footer.social_links
+                    .tiktok
+                }
                 target="_blank"
                 rel="noreferrer"
                 aria-label="TikTok"
@@ -115,29 +568,26 @@ function Footer() {
           <div className="footer-column">
 
             <h3>
-              Shop
+              {footer.shop.title}
             </h3>
 
 
-            <Link to="/shop">
-              All Products
-            </Link>
-
-            <Link to="/categories">
-              Categories
-            </Link>
-
-            <Link to="/shop">
-              New Arrivals
-            </Link>
-
-            <Link to="/shop">
-              Bestsellers
-            </Link>
-
-            <Link to="/shop">
-              On Sale
-            </Link>
+            {footer.shop.links.map(
+              (
+                item,
+                index
+              ) => (
+                <FooterLink
+                  key={`shop-${index}`}
+                  label={
+                    item.label
+                  }
+                  url={
+                    item.url
+                  }
+                />
+              )
+            )}
 
           </div>
 
@@ -149,25 +599,26 @@ function Footer() {
           <div className="footer-column">
 
             <h3>
-              Help
+              {footer.help.title}
             </h3>
 
 
-            <Link to="/shipping">
-              Shipping Information
-            </Link>
-
-            <Link to="/returns">
-              Returns &amp; Exchanges
-            </Link>
-
-            <Link to="/faq">
-              FAQs
-            </Link>
-
-            <Link to="/contact">
-              Contact Us
-            </Link>
+            {footer.help.links.map(
+              (
+                item,
+                index
+              ) => (
+                <FooterLink
+                  key={`help-${index}`}
+                  label={
+                    item.label
+                  }
+                  url={
+                    item.url
+                  }
+                />
+              )
+            )}
 
           </div>
 
@@ -179,25 +630,26 @@ function Footer() {
           <div className="footer-column">
 
             <h3>
-              Company
+              {footer.company.title}
             </h3>
 
 
-            <Link to="/about">
-              About Us
-            </Link>
-
-            <Link to="/contact">
-              Contact
-            </Link>
-
-            <Link to="/privacy">
-              Privacy Policy
-            </Link>
-
-            <Link to="/terms">
-              Terms &amp; Conditions
-            </Link>
+            {footer.company.links.map(
+              (
+                item,
+                index
+              ) => (
+                <FooterLink
+                  key={`company-${index}`}
+                  label={
+                    item.label
+                  }
+                  url={
+                    item.url
+                  }
+                />
+              )
+            )}
 
           </div>
 
@@ -209,30 +661,54 @@ function Footer() {
           <div className="footer-newsletter">
 
             <h3>
-              Stay in the loop
+              {
+                footer
+                  .newsletter
+                  .title
+              }
             </h3>
 
 
             <p>
-              Subscribe for new arrivals, special offers and updates.
+              {
+                footer
+                  .newsletter
+                  .description
+              }
             </p>
 
 
             <form
               className="newsletter-form"
-              onSubmit={handleNewsletterSubmit}
+              onSubmit={
+                handleNewsletterSubmit
+              }
             >
 
               <input
                 type="email"
-                placeholder="Your email address"
-                aria-label="Your email address"
+                placeholder={
+                  footer
+                    .newsletter
+                    .input_placeholder
+                }
+                aria-label={
+                  footer
+                    .newsletter
+                    .input_placeholder
+                }
                 required
               />
 
 
-              <button type="submit">
-                Subscribe
+              <button
+                type="submit"
+              >
+                {
+                  footer
+                    .newsletter
+                    .button_text
+                }
               </button>
 
             </form>
@@ -248,61 +724,35 @@ function Footer() {
 
         <div className="footer-delivery">
 
-          <div className="footer-delivery-item">
+          {footer.delivery.items.map(
+            (
+              item,
+              index
+            ) => (
+              <div
+                className="footer-delivery-item"
+                key={`delivery-${index}`}
+              >
 
-            <span className="footer-delivery-icon">
-              ✓
-            </span>
+                <span className="footer-delivery-icon">
+                  {item.icon}
+                </span>
 
-            <div>
-              <strong>
-                Quality Products
-              </strong>
+                <div>
 
-              <span>
-                Carefully selected for kids
-              </span>
-            </div>
+                  <strong>
+                    {item.title}
+                  </strong>
 
-          </div>
+                  <span>
+                    {item.description}
+                  </span>
 
+                </div>
 
-          <div className="footer-delivery-item">
-
-            <span className="footer-delivery-icon">
-              🚚
-            </span>
-
-            <div>
-              <strong>
-                Free Shipping
-              </strong>
-
-              <span>
-                On orders over PKR 5,000
-              </span>
-            </div>
-
-          </div>
-
-
-          <div className="footer-delivery-item">
-
-            <span className="footer-delivery-icon">
-              ↩
-            </span>
-
-            <div>
-              <strong>
-                Easy Returns
-              </strong>
-
-              <span>
-                Simple return process
-              </span>
-            </div>
-
-          </div>
+              </div>
+            )
+          )}
 
         </div>
 
@@ -314,29 +764,64 @@ function Footer() {
         <div className="footer-bottom">
 
           <p>
-            © {new Date().getFullYear()} {siteName}. All rights reserved.
+            ©{" "}
+            {new Date().getFullYear()}{" "}
+            {siteName}.{" "}
+            {
+              footer
+                .bottom
+                .copyright_text
+            }
           </p>
 
 
           <div className="footer-legal-links">
 
-            <Link to="/privacy">
-              Privacy
-            </Link>
+            <FooterLink
+              label={
+                footer
+                  .bottom
+                  .privacy_label
+              }
+              url={
+                footer
+                  .bottom
+                  .privacy_url
+              }
+            />
 
-            <Link to="/terms">
-              Terms
-            </Link>
+            <FooterLink
+              label={
+                footer
+                  .bottom
+                  .terms_label
+              }
+              url={
+                footer
+                  .bottom
+                  .terms_url
+              }
+            />
 
-            <Link to="/contact">
-              Contact
-            </Link>
+            <FooterLink
+              label={
+                footer
+                  .bottom
+                  .contact_label
+              }
+              url={
+                footer
+                  .bottom
+                  .contact_url
+              }
+            />
 
           </div>
 
         </div>
 
       </div>
+
     </footer>
   );
 }

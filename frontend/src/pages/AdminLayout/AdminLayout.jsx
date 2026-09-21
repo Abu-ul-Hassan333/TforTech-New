@@ -13,6 +13,7 @@ import {
   FaStar,
   FaImage,
   FaUsers,
+  FaColumns,
 } from "react-icons/fa";
 
 import Navbar from "../../components/Navbar/Navbar";
@@ -233,6 +234,25 @@ const AdminLayout = ({ children }) => {
                   >
                     <FaPalette />
                     <span>Theme</span>
+                  </NavLink>
+                )}
+
+                {/* =================================================
+                    HEADER & FOOTER
+                    ADMIN ONLY
+                ================================================= */}
+
+                {isAdmin && (
+                  <NavLink
+                    to="/admin/header-footer"
+                    className={({ isActive }) =>
+                      `admin-nav-link ${
+                        isActive ? "active" : ""
+                      }`
+                    }
+                  >
+                    <FaColumns />
+                    <span>Header & Footer</span>
                   </NavLink>
                 )}
 

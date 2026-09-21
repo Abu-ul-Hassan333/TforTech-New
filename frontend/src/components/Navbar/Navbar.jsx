@@ -1,4 +1,8 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import {
   Link,
   useLocation,
@@ -19,6 +23,43 @@ const BACKEND_URL =
   "http://127.0.0.1:8000";
 
 const API = `${BACKEND_URL}/api`;
+
+// ============================================================
+// DEFAULT HEADER SETTINGS
+// ============================================================
+
+const DEFAULT_HEADER_SETTINGS = {
+  announcement_text_1:
+    "Free shipping on orders over PKR 5,000",
+
+  announcement_text_2:
+    "Pakistan & Middle East",
+
+  logo_text_main:
+    "T",
+
+  logo_text_secondary:
+    "For Tech",
+};
+
+// ============================================================
+// NORMALIZE HEADER SETTINGS
+// ============================================================
+
+const normalizeHeaderSettings = (
+  serverSettings
+) => {
+  if (!serverSettings) {
+    return {
+      ...DEFAULT_HEADER_SETTINGS,
+    };
+  }
+
+  return {
+    ...DEFAULT_HEADER_SETTINGS,
+    ...serverSettings,
+  };
+};
 
 // ============================================================
 // SEARCH HELPERS
@@ -246,6 +287,17 @@ function Navbar() {
     useState(false);
 
   // ==========================================================
+  // HEADER SETTINGS
+  // ==========================================================
+
+  const [
+    headerSettings,
+    setHeaderSettings,
+  ] = useState(
+    DEFAULT_HEADER_SETTINGS
+  );
+
+  // ==========================================================
   // SEARCH STATE
   // ==========================================================
 
@@ -264,11 +316,79 @@ function Navbar() {
   const [searchError, setSearchError] =
     useState("");
 
-  const navigate = useNavigate();
-  const location = useLocation();
+  const navigate =
+    useNavigate();
 
-  const { totalItems } = useCart();
-  const { wishlistCount } = useWishlist();
+  const location =
+    useLocation();
+
+  const { totalItems } =
+    useCart();
+
+  const { wishlistCount } =
+    useWishlist();
+
+  // ==========================================================
+  // LOAD HEADER SETTINGS
+  // ==========================================================
+
+  const fetchHeaderSettings =
+    useCallback(
+      async () => {
+        try {
+          const response =
+            await fetch(
+              `${API}/header-footer/public`,
+              {
+                method:
+                  "GET",
+
+                headers: {
+                  Accept:
+                    "application/json",
+                },
+              }
+            );
+
+          if (
+            !response.ok
+          ) {
+            return;
+          }
+
+          const data =
+            await response.json();
+
+          const loadedHeader =
+            normalizeHeaderSettings(
+              data?.settings
+                ?.header
+            );
+
+          setHeaderSettings(
+            loadedHeader
+          );
+        } catch (
+          error
+        ) {
+          console.error(
+            "Navbar header settings loading error:",
+            error
+          );
+
+          setHeaderSettings(
+            DEFAULT_HEADER_SETTINGS
+          );
+        }
+      },
+      []
+    );
+
+  useEffect(() => {
+    fetchHeaderSettings();
+  }, [
+    fetchHeaderSettings,
+  ]);
 
   // ==========================================================
   // AUTH STATE
@@ -294,8 +414,13 @@ function Navbar() {
         .toLowerCase()
         .trim();
 
-    setIsLoggedIn(loggedIn);
-    setUserName(storedUserName);
+    setIsLoggedIn(
+      loggedIn
+    );
+
+    setUserName(
+      storedUserName
+    );
 
     setIsAdmin(
       loggedIn &&
@@ -304,7 +429,9 @@ function Navbar() {
           storedUserRole === "co_admin"
         )
     );
-  }, [location.pathname]);
+  }, [
+    location.pathname,
+  ]);
 
   // ==========================================================
   // ADMIN PANEL PATH
@@ -350,27 +477,35 @@ function Navbar() {
     localStorage.removeItem(
       "tfortech_logged_in"
     );
+
     localStorage.removeItem(
       "tfortech_access_token"
     );
+
     localStorage.removeItem(
       "tfortech_token_type"
     );
+
     localStorage.removeItem(
       "tfortech_user_id"
     );
+
     localStorage.removeItem(
       "tfortech_user_name"
     );
+
     localStorage.removeItem(
       "tfortech_user_email"
     );
+
     localStorage.removeItem(
       "tfortech_user_phone"
     );
+
     localStorage.removeItem(
       "tfortech_user_role"
     );
+
     localStorage.removeItem(
       "tfortech_remember_me"
     );
@@ -389,55 +524,73 @@ function Navbar() {
   // FETCH PRODUCTS FOR SEARCH
   // ==========================================================
 
-  const fetchSearchProducts = async () => {
-    try {
-      setSearchLoading(true);
-      setSearchError("");
+  const fetchSearchProducts =
+    async () => {
+      try {
+        setSearchLoading(
+          true
+        );
 
-      const response = await fetch(
-        `${API}/products?page=1&limit=5000`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-          },
+        setSearchError("");
+
+        const response =
+          await fetch(
+            `${API}/products?page=1&limit=5000`,
+            {
+              method:
+                "GET",
+
+              headers: {
+                Accept:
+                  "application/json",
+              },
+            }
+          );
+
+        if (
+          !response.ok
+        ) {
+          throw new Error(
+            "Unable to load products."
+          );
         }
-      );
 
-      if (!response.ok) {
-        throw new Error(
-          "Unable to load products."
+        const data =
+          await response.json();
+
+        const receivedProducts =
+          Array.isArray(data)
+            ? data
+            : Array.isArray(
+                data?.products
+              )
+            ? data.products
+            : [];
+
+        setSearchProducts(
+          receivedProducts
+        );
+      } catch (
+        error
+      ) {
+        console.error(
+          "Navbar search products error:",
+          error
+        );
+
+        setSearchProducts(
+          []
+        );
+
+        setSearchError(
+          "Unable to load products right now. Please try again."
+        );
+      } finally {
+        setSearchLoading(
+          false
         );
       }
-
-      const data =
-        await response.json();
-
-      const receivedProducts =
-        Array.isArray(data)
-          ? data
-          : Array.isArray(data?.products)
-          ? data.products
-          : [];
-
-      setSearchProducts(
-        receivedProducts
-      );
-    } catch (error) {
-      console.error(
-        "Navbar search products error:",
-        error
-      );
-
-      setSearchProducts([]);
-
-      setSearchError(
-        "Unable to load products right now. Please try again."
-      );
-    } finally {
-      setSearchLoading(false);
-    }
-  };
+    };
 
   // ==========================================================
   // OPEN SEARCH
@@ -448,11 +601,6 @@ function Navbar() {
     setSearchOpen(true);
     setSearchError("");
 
-    /*
-      Always fetch the latest products when the
-      search window is opened so the search data
-      stays synchronized with the database.
-    */
     fetchSearchProducts();
   };
 
@@ -464,22 +612,31 @@ function Navbar() {
     if (!searchOpen) {
       document.body.style.overflow =
         "";
+
       return undefined;
     }
 
     document.body.style.overflow =
       "hidden";
 
-    const handleKeyDown = (event) => {
-      if (event.key === "Escape") {
+    const handleKeyDown = (
+      event
+    ) => {
+      if (
+        event.key === "Escape"
+      ) {
         closeSearch();
         return;
       }
 
       if (
         event.key === "/" &&
-        !["INPUT", "TEXTAREA"].includes(
-          document.activeElement?.tagName
+        ![
+          "INPUT",
+          "TEXTAREA",
+        ].includes(
+          document.activeElement
+            ?.tagName
         )
       ) {
         event.preventDefault();
@@ -500,38 +657,48 @@ function Navbar() {
         handleKeyDown
       );
     };
-  }, [searchOpen]);
+  }, [
+    searchOpen,
+  ]);
 
   // ==========================================================
   // SEARCH RESULTS
   // ==========================================================
 
-  const getSearchResults = () => {
-    const query =
-      searchQuery.trim().toLowerCase();
+  const getSearchResults =
+    () => {
+      const query =
+        searchQuery
+          .trim()
+          .toLowerCase();
 
-    if (!query) {
-      return [];
-    }
+      if (!query) {
+        return [];
+      }
 
-    const queryWords = query
-      .split(/\s+/)
-      .filter(Boolean);
+      const queryWords =
+        query
+          .split(/\s+/)
+          .filter(Boolean);
 
-    return searchProducts
-      .filter((product) => {
-        const searchableText =
-          getProductSearchText(
-            product
-          );
+      return searchProducts
+        .filter(
+          (product) => {
+            const searchableText =
+              getProductSearchText(
+                product
+              );
 
-        return queryWords.every(
-          (word) =>
-            searchableText.includes(word)
-        );
-      })
-      .slice(0, 8);
-  };
+            return queryWords.every(
+              (word) =>
+                searchableText.includes(
+                  word
+                )
+            );
+          }
+        )
+        .slice(0, 8);
+    };
 
   const searchResults =
     getSearchResults();
@@ -544,7 +711,9 @@ function Navbar() {
     product
   ) => {
     const productId =
-      getProductId(product);
+      getProductId(
+        product
+      );
 
     if (!productId) {
       return;
@@ -573,22 +742,15 @@ function Navbar() {
       return;
     }
 
-    /*
-      If an exact/matching product exists,
-      open the first matching product.
-    */
-    if (searchResults.length > 0) {
+    if (
+      searchResults.length > 0
+    ) {
       handleSearchResultClick(
         searchResults[0]
       );
+
       return;
     }
-
-    /*
-      No result:
-      keep the search window open so the
-      customer can see "No Results Found".
-    */
   };
 
   // ==========================================================
@@ -599,35 +761,49 @@ function Navbar() {
     product
   ) => {
     const image =
-      getProductImage(product);
+      getProductImage(
+        product
+      );
 
     if (!image) {
       return (
         <div className="navbar-search-result-placeholder">
-          <span>💻</span>
+          <span>
+            💻
+          </span>
         </div>
       );
     }
 
     const finalImageUrl =
-      image.startsWith("http://") ||
-      image.startsWith("https://")
+      image.startsWith(
+        "http://"
+      ) ||
+      image.startsWith(
+        "https://"
+      )
         ? image
         : `${BACKEND_URL}${
-            image.startsWith("/")
+            image.startsWith(
+              "/"
+            )
               ? ""
               : "/"
           }${image}`;
 
     return (
       <img
-        src={finalImageUrl}
+        src={
+          finalImageUrl
+        }
         alt={
           product?.name ||
           "Product"
         }
         className="navbar-search-result-image"
-        onError={(event) => {
+        onError={(
+          event
+        ) => {
           event.currentTarget.style.display =
             "none";
         }}
@@ -639,12 +815,16 @@ function Navbar() {
   // CURRENT PAGE DETECTION
   // ==========================================================
 
-  const isPathActive = (path) => {
+  const isPathActive = (
+    path
+  ) => {
     const currentPath =
       location.pathname;
 
     if (path === "/") {
-      return currentPath === "/";
+      return (
+        currentPath === "/"
+      );
     }
 
     return (
@@ -655,31 +835,47 @@ function Navbar() {
     );
   };
 
-  const isProductsActive = () => {
-    return isPathActive("/products");
-  };
+  const isProductsActive =
+    () => {
+      return isPathActive(
+        "/products"
+      );
+    };
 
-  const isBloggingActive = () => {
-    return isPathActive("/blogging");
-  };
+  const isBloggingActive =
+    () => {
+      return isPathActive(
+        "/blogging"
+      );
+    };
 
-  const isCategoriesActive = () => {
-    return isPathActive(
-      "/categories"
-    );
-  };
+  const isCategoriesActive =
+    () => {
+      return isPathActive(
+        "/categories"
+      );
+    };
 
-  const isAboutActive = () => {
-    return isPathActive("/about");
-  };
+  const isAboutActive =
+    () => {
+      return isPathActive(
+        "/about"
+      );
+    };
 
-  const isContactActive = () => {
-    return isPathActive("/contact");
-  };
+  const isContactActive =
+    () => {
+      return isPathActive(
+        "/contact"
+      );
+    };
 
-  const isReviewsActive = () => {
-    return isPathActive("/reviews");
-  };
+  const isReviewsActive =
+    () => {
+      return isPathActive(
+        "/reviews"
+      );
+    };
 
   // ==========================================================
   // ACTIVE NAV STYLE
@@ -709,13 +905,17 @@ function Navbar() {
     zIndex: 99999,
     background:
       "rgba(15, 23, 42, 0.58)",
-    backdropFilter: "blur(7px)",
-    WebkitBackdropFilter: "blur(7px)",
+    backdropFilter:
+      "blur(7px)",
+    WebkitBackdropFilter:
+      "blur(7px)",
     padding:
       "clamp(18px, 4vw, 50px)",
     display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    justifyContent:
+      "center",
+    alignItems:
+      "flex-start",
     overflowY: "auto",
   };
 
@@ -735,8 +935,10 @@ function Navbar() {
 
   const searchHeaderStyle = {
     display: "flex",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
+    alignItems:
+      "flex-start",
+    justifyContent:
+      "space-between",
     gap: "20px",
     padding:
       "24px 24px 18px",
@@ -757,15 +959,18 @@ function Navbar() {
     margin:
       "7px 0 0",
     color: "#6b7280",
-    fontSize: "13px",
+    fontSize:
+      "13px",
     lineHeight: 1.6,
   };
 
   const searchCloseStyle = {
     width: "40px",
     height: "40px",
-    flex: "0 0 40px",
-    border: "1px solid #e5e7eb",
+    flex:
+      "0 0 40px",
+    border:
+      "1px solid #e5e7eb",
     borderRadius: "50%",
     background: "#ffffff",
     color: "#374151",
@@ -773,8 +978,10 @@ function Navbar() {
     lineHeight: 1,
     cursor: "pointer",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    alignItems:
+      "center",
+    justifyContent:
+      "center",
   };
 
   const searchFormStyle = {
@@ -792,14 +999,16 @@ function Navbar() {
     minWidth: 0,
     height: "52px",
     display: "flex",
-    alignItems: "center",
+    alignItems:
+      "center",
     gap: "10px",
     padding:
       "0 15px",
     background: "#ffffff",
     border:
       "1px solid #dfe5ec",
-    borderRadius: "12px",
+    borderRadius:
+      "12px",
   };
 
   const searchInputStyle = {
@@ -807,7 +1016,8 @@ function Navbar() {
     minWidth: 0,
     border: "none",
     outline: "none",
-    background: "transparent",
+    background:
+      "transparent",
     color: "#111827",
     fontSize: "14px",
   };
@@ -817,7 +1027,8 @@ function Navbar() {
     padding:
       "0 22px",
     border: "none",
-    borderRadius: "12px",
+    borderRadius:
+      "12px",
     background: "#3b82f6",
     color: "#ffffff",
     fontSize: "14px",
@@ -830,7 +1041,8 @@ function Navbar() {
       searchQuery.trim()
         ? 1
         : 0.55,
-    whiteSpace: "nowrap",
+    whiteSpace:
+      "nowrap",
   };
 
   const searchContentStyle = {
@@ -843,25 +1055,35 @@ function Navbar() {
   const searchStateStyle = {
     minHeight: "300px",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    flexDirection: "column",
-    textAlign: "center",
-    padding: "35px 25px",
+    alignItems:
+      "center",
+    justifyContent:
+      "center",
+    flexDirection:
+      "column",
+    textAlign:
+      "center",
+    padding:
+      "35px 25px",
   };
 
   const stateIconStyle = {
     width: "58px",
     height: "58px",
-    borderRadius: "18px",
+    borderRadius:
+      "18px",
     background: "#f3f6fb",
     color: "#3b82f6",
     display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: "25px",
+    alignItems:
+      "center",
+    justifyContent:
+      "center",
+    fontSize:
+      "25px",
     fontWeight: 800,
-    marginBottom: "14px",
+    marginBottom:
+      "14px",
   };
 
   return (
@@ -871,8 +1093,12 @@ function Navbar() {
       ====================================================== */}
 
       <div className="announcement-bar">
+
         <span>
-          Free shipping on orders over PKR 5,000
+          {
+            headerSettings
+              .announcement_text_1
+          }
         </span>
 
         <span className="announcement-divider">
@@ -880,8 +1106,12 @@ function Navbar() {
         </span>
 
         <span>
-          Pakistan &amp; Middle East
+          {
+            headerSettings
+              .announcement_text_2
+          }
         </span>
+
       </div>
 
       {/* =====================================================
@@ -889,6 +1119,7 @@ function Navbar() {
       ====================================================== */}
 
       <header className="navbar">
+
         <div className="navbar-container">
 
           {/* =================================================
@@ -898,10 +1129,21 @@ function Navbar() {
           <Link
             to="/"
             className="navbar-logo"
-            onClick={closeMenu}
+            onClick={
+              closeMenu
+            }
           >
-            T
-            <span>For Tech</span>
+            {
+              headerSettings
+                .logo_text_main
+            }
+
+            <span>
+              {
+                headerSettings
+                  .logo_text_secondary
+              }
+            </span>
           </Link>
 
           {/* =================================================
@@ -915,16 +1157,21 @@ function Navbar() {
                 : ""
             }`}
           >
+
             {/* HOME */}
 
             <Link
               to="/"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
               style={getNavItemStyle(
-                location.pathname === "/"
+                location.pathname ===
+                  "/"
               )}
               aria-current={
-                location.pathname === "/"
+                location.pathname ===
+                "/"
                   ? "page"
                   : undefined
               }
@@ -936,7 +1183,9 @@ function Navbar() {
 
             <Link
               to="/products"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
               style={getNavItemStyle(
                 isProductsActive()
               )}
@@ -953,7 +1202,9 @@ function Navbar() {
 
             <Link
               to="/blogging"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
               style={getNavItemStyle(
                 isBloggingActive()
               )}
@@ -971,10 +1222,13 @@ function Navbar() {
             ================================================ */}
 
             <div className="navbar-category-dropdown">
+
               <Link
                 to="/categories"
                 className="navbar-category-link"
-                onClick={closeMenu}
+                onClick={
+                  closeMenu
+                }
                 style={getNavItemStyle(
                   isCategoriesActive()
                 )}
@@ -984,6 +1238,7 @@ function Navbar() {
                     : undefined
                 }
               >
+
                 <span>
                   Categories
                 </span>
@@ -991,44 +1246,58 @@ function Navbar() {
                 <span className="category-arrow">
                   ⌄
                 </span>
+
               </Link>
 
               <div className="navbar-category-menu">
+
                 <Link
                   to="/categories/hp"
-                  onClick={closeMenu}
+                  onClick={
+                    closeMenu
+                  }
                 >
                   HP
                 </Link>
 
                 <Link
                   to="/categories/dell"
-                  onClick={closeMenu}
+                  onClick={
+                    closeMenu
+                  }
                 >
                   Dell
                 </Link>
 
                 <Link
                   to="/categories/lenovo"
-                  onClick={closeMenu}
+                  onClick={
+                    closeMenu
+                  }
                 >
                   Lenovo
                 </Link>
 
                 <Link
                   to="/categories/macbook"
-                  onClick={closeMenu}
+                  onClick={
+                    closeMenu
+                  }
                 >
                   MacBook
                 </Link>
+
               </div>
+
             </div>
 
             {/* ABOUT */}
 
             <Link
               to="/about"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
               style={getNavItemStyle(
                 isAboutActive()
               )}
@@ -1045,7 +1314,9 @@ function Navbar() {
 
             <Link
               to="/contact"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
               style={getNavItemStyle(
                 isContactActive()
               )}
@@ -1064,7 +1335,9 @@ function Navbar() {
 
             <Link
               to="/reviews"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
               style={getNavItemStyle(
                 isReviewsActive()
               )}
@@ -1084,12 +1357,15 @@ function Navbar() {
             <button
               type="button"
               className="navbar-mobile-search-button"
-              onClick={openSearch}
+              onClick={
+                openSearch
+              }
               style={{
                 display: "none",
               }}
             >
               <SearchIcon />
+
               <span>
                 Search Products
               </span>
@@ -1101,9 +1377,13 @@ function Navbar() {
 
             {isAdmin && (
               <Link
-                to={adminPanelPath}
+                to={
+                  adminPanelPath
+                }
                 className="navbar-mobile-admin"
-                onClick={closeMenu}
+                onClick={
+                  closeMenu
+                }
               >
                 Admin Panel
               </Link>
@@ -1117,11 +1397,14 @@ function Navbar() {
               <button
                 type="button"
                 className="navbar-mobile-logout"
-                onClick={handleLogout}
+                onClick={
+                  handleLogout
+                }
               >
                 Logout
               </button>
             )}
+
           </nav>
 
           {/* =================================================
@@ -1142,7 +1425,9 @@ function Navbar() {
               className="navbar-icon-button navbar-search-button"
               aria-label="Search"
               title="Search"
-              onClick={openSearch}
+              onClick={
+                openSearch
+              }
             >
               <SearchIcon />
             </button>
@@ -1154,7 +1439,9 @@ function Navbar() {
               className="navbar-icon-button navbar-wishlist-button"
               aria-label={`Wishlist, ${wishlistCount} items`}
               title="Wishlist"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
             >
               <HeartIcon />
 
@@ -1170,7 +1457,9 @@ function Navbar() {
               className="navbar-icon-button navbar-cart-button"
               aria-label={`Shopping Cart, ${totalItems} items`}
               title="Shopping Cart"
-              onClick={closeMenu}
+              onClick={
+                closeMenu
+              }
             >
               <ShoppingCartIcon />
 
@@ -1190,10 +1479,14 @@ function Navbar() {
 
                 {isAdmin && (
                   <Link
-                    to={adminPanelPath}
+                    to={
+                      adminPanelPath
+                    }
                     className="navbar-admin-button"
                     title="Open Admin Panel"
-                    onClick={closeMenu}
+                    onClick={
+                      closeMenu
+                    }
                   >
                     Admin Panel
                   </Link>
@@ -1209,13 +1502,17 @@ function Navbar() {
                       ? `Open account for ${userName}`
                       : "Open Account"
                   }
-                  onClick={closeMenu}
+                  onClick={
+                    closeMenu
+                  }
                 >
                   <UserIcon />
 
                   <span className="navbar-user-name">
-                    {userName ||
-                      "Account"}
+                    {
+                      userName ||
+                      "Account"
+                    }
                   </span>
                 </Link>
 
@@ -1224,16 +1521,21 @@ function Navbar() {
                 <button
                   type="button"
                   className="navbar-logout-button"
-                  onClick={handleLogout}
+                  onClick={
+                    handleLogout
+                  }
                 >
                   Logout
                 </button>
+
               </div>
             ) : (
               <Link
                 to="/login"
                 className="navbar-login-button"
-                onClick={closeMenu}
+                onClick={
+                  closeMenu
+                }
               >
                 <UserIcon />
 
@@ -1242,6 +1544,7 @@ function Navbar() {
                 </span>
               </Link>
             )}
+
           </div>
 
           {/* =================================================
@@ -1258,13 +1561,17 @@ function Navbar() {
               )
             }
             aria-label="Toggle navigation menu"
-            aria-expanded={menuOpen}
+            aria-expanded={
+              menuOpen
+            }
           >
             <span></span>
             <span></span>
             <span></span>
           </button>
+
         </div>
+
       </header>
 
       {/* =====================================================
@@ -1273,8 +1580,12 @@ function Navbar() {
 
       {searchOpen && (
         <div
-          style={searchOverlayStyle}
-          onMouseDown={(event) => {
+          style={
+            searchOverlayStyle
+          }
+          onMouseDown={(
+            event
+          ) => {
             if (
               event.target ===
               event.currentTarget
@@ -1283,9 +1594,14 @@ function Navbar() {
             }
           }}
         >
+
           <div
-            style={searchPanelStyle}
-            onMouseDown={(event) => {
+            style={
+              searchPanelStyle
+            }
+            onMouseDown={(
+              event
+            ) => {
               event.stopPropagation();
             }}
           >
@@ -1295,16 +1611,22 @@ function Navbar() {
             ================================================== */}
 
             <div
-              style={searchHeaderStyle}
+              style={
+                searchHeaderStyle
+              }
             >
+
               <div>
+
                 <div
                   style={{
-                    fontSize: "10px",
+                    fontSize:
+                      "10px",
                     fontWeight: 800,
                     letterSpacing:
                       "0.12em",
-                    color: "#3b82f6",
+                    color:
+                      "#3b82f6",
                     marginBottom:
                       "7px",
                   }}
@@ -1330,11 +1652,14 @@ function Navbar() {
                   other products from
                   our store.
                 </p>
+
               </div>
 
               <button
                 type="button"
-                onClick={closeSearch}
+                onClick={
+                  closeSearch
+                }
                 aria-label="Close search"
                 title="Close search"
                 style={
@@ -1355,6 +1680,7 @@ function Navbar() {
               >
                 ×
               </button>
+
             </div>
 
             {/* =================================================
@@ -1365,19 +1691,27 @@ function Navbar() {
               onSubmit={
                 handleSearchSubmit
               }
-              style={searchFormStyle}
+              style={
+                searchFormStyle
+              }
             >
+
               <div
                 style={
                   searchInputContainerStyle
                 }
               >
+
                 <div
                   style={{
-                    width: "21px",
-                    height: "21px",
-                    flex: "0 0 21px",
-                    color: "#6b7280",
+                    width:
+                      "21px",
+                    height:
+                      "21px",
+                    flex:
+                      "0 0 21px",
+                    color:
+                      "#6b7280",
                   }}
                 >
                   <SearchIcon />
@@ -1385,8 +1719,12 @@ function Navbar() {
 
                 <input
                   type="search"
-                  value={searchQuery}
-                  onChange={(event) =>
+                  value={
+                    searchQuery
+                  }
+                  onChange={(
+                    event
+                  ) =>
                     setSearchQuery(
                       event.target.value
                     )
@@ -1394,23 +1732,32 @@ function Navbar() {
                   placeholder="Search product name, category, brand, SKU..."
                   autoFocus
                   aria-label="Search products"
-                  style={searchInputStyle}
+                  style={
+                    searchInputStyle
+                  }
                 />
 
                 {searchQuery && (
                   <button
                     type="button"
                     onClick={() =>
-                      setSearchQuery("")
+                      setSearchQuery(
+                        ""
+                      )
                     }
                     aria-label="Clear search"
                     title="Clear search"
                     style={{
-                      width: "28px",
-                      height: "28px",
-                      flex: "0 0 28px",
-                      border: "none",
-                      borderRadius: "50%",
+                      width:
+                        "28px",
+                      height:
+                        "28px",
+                      flex:
+                        "0 0 28px",
+                      border:
+                        "none",
+                      borderRadius:
+                        "50%",
                       background:
                         "#eef2f7",
                       color:
@@ -1419,7 +1766,8 @@ function Navbar() {
                         "pointer",
                       fontSize:
                         "18px",
-                      display: "flex",
+                      display:
+                        "flex",
                       alignItems:
                         "center",
                       justifyContent:
@@ -1429,6 +1777,7 @@ function Navbar() {
                     ×
                   </button>
                 )}
+
               </div>
 
               <button
@@ -1442,6 +1791,7 @@ function Navbar() {
               >
                 Search
               </button>
+
             </form>
 
             {/* =================================================
@@ -1462,15 +1812,19 @@ function Navbar() {
                     searchStateStyle
                   }
                 >
+
                   <div
                     style={{
-                      width: "38px",
-                      height: "38px",
+                      width:
+                        "38px",
+                      height:
+                        "38px",
                       border:
                         "3px solid #e5e7eb",
                       borderTopColor:
                         "#3b82f6",
-                      borderRadius: "50%",
+                      borderRadius:
+                        "50%",
                       animation:
                         "tfortechSearchSpin 0.8s linear infinite",
                       marginBottom:
@@ -1493,7 +1847,8 @@ function Navbar() {
 
                   <p
                     style={{
-                      margin: 0,
+                      margin:
+                        0,
                       color:
                         "#6b7280",
                       fontSize:
@@ -1504,6 +1859,7 @@ function Navbar() {
                     products from
                     your store.
                   </p>
+
                 </div>
               )}
 
@@ -1516,6 +1872,7 @@ function Navbar() {
                       searchStateStyle
                     }
                   >
+
                     <div
                       style={{
                         ...stateIconStyle,
@@ -1564,7 +1921,8 @@ function Navbar() {
                         fetchSearchProducts
                       }
                       style={{
-                        border: "none",
+                        border:
+                          "none",
                         background:
                           "#3b82f6",
                         color:
@@ -1583,6 +1941,7 @@ function Navbar() {
                     >
                       Try Again
                     </button>
+
                   </div>
                 )}
 
@@ -1596,6 +1955,7 @@ function Navbar() {
                       searchStateStyle
                     }
                   >
+
                     <div
                       style={
                         stateIconStyle
@@ -1642,11 +2002,13 @@ function Navbar() {
                           "center",
                         flexWrap:
                           "wrap",
-                        gap: "8px",
+                        gap:
+                          "8px",
                         fontSize:
                           "12px",
                       }}
                     >
+
                       <span
                         style={{
                           color:
@@ -1665,10 +2027,14 @@ function Navbar() {
                         "Gaming",
                         "MacBook",
                       ].map(
-                        (term) => (
+                        (
+                          term
+                        ) => (
                           <button
                             type="button"
-                            key={term}
+                            key={
+                              term
+                            }
                             onClick={() =>
                               setSearchQuery(
                                 term
@@ -1693,11 +2059,15 @@ function Navbar() {
                                 "pointer",
                             }}
                           >
-                            {term}
+                            {
+                              term
+                            }
                           </button>
                         )
                       )}
+
                     </div>
+
                   </div>
                 )}
 
@@ -1709,6 +2079,7 @@ function Navbar() {
                 searchResults.length >
                   0 && (
                   <div>
+
                     <div
                       style={{
                         display:
@@ -1717,22 +2088,26 @@ function Navbar() {
                           "center",
                         justifyContent:
                           "space-between",
-                        gap: "12px",
+                        gap:
+                          "12px",
                         padding:
                           "16px 24px 12px",
                         borderBottom:
                           "1px solid #eef1f5",
                       }}
                     >
+
                       <div
                         style={{
                           display:
                             "flex",
                           alignItems:
                             "center",
-                          gap: "8px",
+                          gap:
+                            "8px",
                         }}
                       >
+
                         <span
                           style={{
                             color:
@@ -1776,6 +2151,7 @@ function Navbar() {
                             searchResults.length
                           }
                         </span>
+
                       </div>
 
                       <span
@@ -1788,6 +2164,7 @@ function Navbar() {
                       >
                         Matching products
                       </span>
+
                     </div>
 
                     <div
@@ -1796,8 +2173,11 @@ function Navbar() {
                           "8px 14px 14px",
                       }}
                     >
+
                       {searchResults.map(
-                        (product) => {
+                        (
+                          product
+                        ) => {
                           const productId =
                             getProductId(
                               product
@@ -1829,7 +2209,8 @@ function Navbar() {
                                   "grid",
                                 gridTemplateColumns:
                                   "62px minmax(0, 1fr) auto",
-                                gap: "14px",
+                                gap:
+                                  "14px",
                                 alignItems:
                                   "center",
                                 padding:
@@ -1866,7 +2247,6 @@ function Navbar() {
                                   "transparent";
                               }}
                             >
-                              {/* IMAGE */}
 
                               <div
                                 style={{
@@ -1890,12 +2270,12 @@ function Navbar() {
                                     "center",
                                 }}
                               >
-                                {renderSearchImage(
-                                  product
-                                )}
+                                {
+                                  renderSearchImage(
+                                    product
+                                  )
+                                }
                               </div>
-
-                              {/* INFO */}
 
                               <div
                                 style={{
@@ -1905,9 +2285,11 @@ function Navbar() {
                                     "flex",
                                   flexDirection:
                                     "column",
-                                  gap: "4px",
+                                  gap:
+                                    "4px",
                                 }}
                               >
+
                                 <span
                                   style={{
                                     color:
@@ -1922,8 +2304,10 @@ function Navbar() {
                                       "uppercase",
                                   }}
                                 >
-                                  {product?.category ||
-                                    "Product"}
+                                  {
+                                    product?.category ||
+                                    "Product"
+                                  }
                                 </span>
 
                                 <strong
@@ -1942,8 +2326,10 @@ function Navbar() {
                                       "nowrap",
                                   }}
                                 >
-                                  {product?.name ||
-                                    "Unnamed Product"}
+                                  {
+                                    product?.name ||
+                                    "Unnamed Product"
+                                  }
                                 </strong>
 
                                 {description && (
@@ -1965,19 +2351,20 @@ function Navbar() {
                                         "hidden",
                                     }}
                                   >
-                                    {description.slice(
-                                      0,
-                                      115
-                                    )}
+                                    {
+                                      description.slice(
+                                        0,
+                                        115
+                                      )
+                                    }
                                     {description.length >
                                     115
                                       ? "..."
                                       : ""}
                                   </span>
                                 )}
-                              </div>
 
-                              {/* PRICE */}
+                              </div>
 
                               <div
                                 style={{
@@ -1987,11 +2374,13 @@ function Navbar() {
                                     "column",
                                   alignItems:
                                     "flex-end",
-                                  gap: "5px",
+                                  gap:
+                                    "5px",
                                   whiteSpace:
                                     "nowrap",
                                 }}
                               >
+
                                 <strong
                                   style={{
                                     color:
@@ -2000,11 +2389,13 @@ function Navbar() {
                                       "13px",
                                   }}
                                 >
-                                  {formatPrice(
-                                    getProductPrice(
-                                      product
+                                  {
+                                    formatPrice(
+                                      getProductPrice(
+                                        product
+                                      )
                                     )
-                                  )}
+                                  }
                                 </strong>
 
                                 <span
@@ -2019,14 +2410,15 @@ function Navbar() {
                                 >
                                   View →
                                 </span>
+
                               </div>
+
                             </button>
                           );
                         }
                       )}
-                    </div>
 
-                    {/* RESULT FOOTER */}
+                    </div>
 
                     <div
                       style={{
@@ -2040,11 +2432,13 @@ function Navbar() {
                           "space-between",
                         alignItems:
                           "center",
-                        gap: "12px",
+                        gap:
+                          "12px",
                         flexWrap:
                           "wrap",
                       }}
                     >
+
                       <span
                         style={{
                           color:
@@ -2073,7 +2467,8 @@ function Navbar() {
                           }
                         }}
                         style={{
-                          border: "none",
+                          border:
+                            "none",
                           background:
                             "#eef5ff",
                           color:
@@ -2092,7 +2487,9 @@ function Navbar() {
                       >
                         Open First Result →
                       </button>
+
                     </div>
+
                   </div>
                 )}
 
@@ -2108,6 +2505,7 @@ function Navbar() {
                       searchStateStyle
                     }
                   >
+
                     <div
                       style={{
                         ...stateIconStyle,
@@ -2135,7 +2533,8 @@ function Navbar() {
 
                     <p
                       style={{
-                        margin: 0,
+                        margin:
+                          0,
                         maxWidth:
                           "430px",
                         color:
@@ -2174,9 +2573,11 @@ function Navbar() {
                           "wrap",
                         justifyContent:
                           "center",
-                        gap: "7px",
+                        gap:
+                          "7px",
                       }}
                     >
+
                       <span
                         style={{
                           color:
@@ -2238,9 +2639,12 @@ function Navbar() {
                       >
                         product brand
                       </span>
+
                     </div>
+
                   </div>
                 )}
+
             </div>
 
             {/* =================================================
@@ -2261,11 +2665,13 @@ function Navbar() {
                   "space-between",
                 alignItems:
                   "center",
-                gap: "12px",
+                gap:
+                  "12px",
                 flexWrap:
                   "wrap",
               }}
             >
+
               <span
                 style={{
                   color:
@@ -2289,10 +2695,12 @@ function Navbar() {
                     "inline-flex",
                   alignItems:
                     "center",
-                  gap: "5px",
+                  gap:
+                    "5px",
                 }}
               >
                 Press
+
                 <kbd
                   style={{
                     padding:
@@ -2315,9 +2723,12 @@ function Navbar() {
                 >
                   ESC
                 </kbd>
+
                 to close
               </span>
+
             </div>
+
           </div>
 
           {/* =================================================
@@ -2370,6 +2781,7 @@ function Navbar() {
               }
             `}
           </style>
+
         </div>
       )}
     </>

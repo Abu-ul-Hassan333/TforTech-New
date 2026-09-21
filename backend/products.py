@@ -32,6 +32,27 @@ def serialize_product(product: dict) -> dict:
         product.get("is_featured", False)
     )
 
+    existing_images = product.get("images")
+
+    if isinstance(existing_images, list):
+        product["images"] = [
+            str(image)
+            for image in existing_images
+            if image
+        ]
+    else:
+        primary_image = product.get("image")
+
+        if primary_image:
+            product["images"] = [
+                str(primary_image)
+            ]
+        else:
+            product["images"] = []
+
+    if not product.get("image") and product["images"]:
+        product["image"] = product["images"][0]
+
     return product
 
 
@@ -65,6 +86,10 @@ class ProductCreate(BaseModel):
     )
 
     image: Optional[str] = None
+
+    images: Optional[
+        List[str]
+    ] = None
 
     shortDescription: Optional[str] = None
 
@@ -102,6 +127,10 @@ class ProductUpdate(BaseModel):
 
     image: Optional[str] = None
 
+    images: Optional[
+        List[str]
+    ] = None
+
     shortDescription: Optional[str] = None
 
     description: Optional[str] = None
@@ -118,6 +147,49 @@ class ProductUpdate(BaseModel):
     condition: Optional[str] = None
 
     is_featured: Optional[bool] = None
+
+
+# ============================================================
+# IMAGE HELPERS
+# ============================================================
+
+def normalize_images(
+    image: Optional[str],
+    images: Optional[List[str]],
+) -> List[str]:
+    normalized_images = []
+
+    if isinstance(images, list):
+        for current_image in images:
+            if current_image is None:
+                continue
+
+            image_value = str(
+                current_image
+            ).strip()
+
+            if image_value and image_value not in normalized_images:
+                normalized_images.append(
+                    image_value
+                )
+
+    primary_image = (
+        str(image).strip()
+        if image is not None
+        else ""
+    )
+
+    if primary_image:
+        normalized_images = [
+            primary_image,
+            *[
+                current_image
+                for current_image in normalized_images
+                if current_image != primary_image
+            ],
+        ]
+
+    return normalized_images
 
 
 # ============================================================
@@ -380,6 +452,18 @@ def create_product(
             )
         )
 
+        product_data["images"] = normalize_images(
+            product_data.get("image"),
+            product_data.get("images"),
+        )
+
+        if product_data["images"]:
+            product_data["image"] = (
+                product_data["images"][0]
+            )
+        else:
+            product_data["image"] = None
+
         now = datetime.now(
             timezone.utc
         )
@@ -453,8 +537,61 @@ def update_product(
                 update_data["is_featured"]
             )
 
-        update_data["updatedAt"] = datetime.now(
-            timezone.utc
+        if (
+            "images" in update_data
+            or "image" in update_data
+        ):
+            existing_product = (
+                products_collection.find_one(
+                    {
+                        "_id": ObjectId(
+                            product_id
+                        )
+                    }
+                )
+            )
+
+            if not existing_product:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="Product not found.",
+                )
+
+            current_primary_image = (
+                update_data.get(
+                    "image",
+                    existing_product.get(
+                        "image"
+                    ),
+                )
+            )
+
+            current_images = update_data.get(
+                "images",
+                existing_product.get(
+                    "images"
+                ),
+            )
+
+            normalized_images = normalize_images(
+                current_primary_image,
+                current_images,
+            )
+
+            update_data["images"] = (
+                normalized_images
+            )
+
+            update_data["image"] = (
+                normalized_images[0]
+                if normalized_images
+                else None
+            )
+
+        update_data["updatedAt"] = (
+            datetime.now(
+                timezone.utc
+            )
         )
 
         result = products_collection.update_one(

@@ -31,6 +31,7 @@ import AdminTheme from "./pages/AdminTheme/AdminTheme";
 import AdminReviews from "./pages/AdminReviews/AdminReviews";
 import AdminHero from "./pages/AdminHero/AdminHero";
 import AdminUsers from "./pages/AdminUsers/AdminUsers";
+import AdminHeaderFooter from "./pages/AdminHeaderFooter/AdminHeaderFooter";
 
 import CustomerReviews from "./pages/CustomerReviews/CustomerReviews";
 
@@ -377,6 +378,25 @@ function App() {
                     ]}
                   >
                     <AdminUsers />
+                  </ProtectedRoute>
+                }
+              />
+
+
+              {/* ==================================================
+                  ADMIN HEADER & FOOTER
+                  ADMIN ONLY
+              ================================================== */}
+
+              <Route
+                path="/admin/header-footer"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
+                    <AdminHeaderFooter />
                   </ProtectedRoute>
                 }
               />
