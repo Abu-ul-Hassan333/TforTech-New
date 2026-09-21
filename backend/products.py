@@ -14,6 +14,10 @@ router = APIRouter(
 )
 
 
+# ============================================================
+# SERIALIZATION
+# ============================================================
+
 def serialize_product(product: dict) -> dict:
     if not product:
         return product
@@ -22,6 +26,12 @@ def serialize_product(product: dict) -> dict:
 
     if "_id" in product:
         product["id"] = str(product.pop("_id"))
+
+    # Keep featured status consistent even for old products
+    # that were created before is_featured was added.
+    product["is_featured"] = bool(
+        product.get("is_featured", False)
+    )
 
     return product
 
@@ -33,6 +43,10 @@ def serialize_products(products: List[dict]) -> List[dict]:
     ]
 
 
+# ============================================================
+# PRODUCT SCHEMAS
+# ============================================================
+
 class ProductCreate(BaseModel):
     name: str = Field(..., min_length=1)
     price: float = Field(..., ge=0)
@@ -43,6 +57,7 @@ class ProductCreate(BaseModel):
     specifications: Optional[Dict[str, Any]] = None
     stock: int = Field(0, ge=0)
     condition: Optional[str] = "New"
+    is_featured: bool = False
 
 
 class ProductUpdate(BaseModel):
@@ -55,20 +70,53 @@ class ProductUpdate(BaseModel):
     specifications: Optional[Dict[str, Any]] = None
     stock: Optional[int] = Field(None, ge=0)
     condition: Optional[str] = None
+    is_featured: Optional[bool] = None
 
+
+# ============================================================
+# GET ALL PRODUCTS
+# ============================================================
 
 @router.get("/")
-def get_products():
+def get_products(
+    page: int = 1,
+    limit: int = 5000,
+):
     try:
+        if page < 1:
+            page = 1
+
+        if limit < 1:
+            limit = 5000
+
+        if limit > 5000:
+            limit = 5000
+
+        skip = (page - 1) * limit
+
         products = list(
             products_collection
             .find()
             .sort("createdAt", -1)
+            .skip(skip)
+            .limit(limit)
         )
+
+        total = products_collection.count_documents({})
 
         return {
             "success": True,
             "products": serialize_products(products),
+            "pagination": {
+                "page": page,
+                "limit": limit,
+                "total": total,
+                "pages": (
+                    (total + limit - 1) // limit
+                    if limit > 0
+                    else 0
+                ),
+            },
         }
 
     except PyMongoError as error:
@@ -79,6 +127,50 @@ def get_products():
             detail="Unable to fetch products.",
         )
 
+
+# ============================================================
+# FEATURED PRODUCTS
+# IMPORTANT:
+# This route MUST come before /{product_id}
+# ============================================================
+
+@router.get("/featured")
+def get_featured_products(
+    limit: int = 8,
+):
+    try:
+        if limit < 1:
+            limit = 8
+
+        if limit > 50:
+            limit = 50
+
+        products = list(
+            products_collection
+            .find({
+                "is_featured": True
+            })
+            .sort("createdAt", -1)
+            .limit(limit)
+        )
+
+        return {
+            "success": True,
+            "products": serialize_products(products),
+        }
+
+    except PyMongoError as error:
+        print(f"Error fetching featured products: {error}")
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Unable to fetch featured products.",
+        )
+
+
+# ============================================================
+# SEARCH PRODUCTS
+# ============================================================
 
 @router.get("/search/")
 def search_products(
@@ -136,6 +228,12 @@ def search_products(
         )
 
 
+# ============================================================
+# GET SINGLE PRODUCT
+# IMPORTANT:
+# This dynamic route comes AFTER /featured and /search/
+# ============================================================
+
 @router.get("/{product_id}")
 def get_product(product_id: str):
     if not ObjectId.is_valid(product_id):
@@ -172,6 +270,10 @@ def get_product(product_id: str):
         )
 
 
+# ============================================================
+# CREATE PRODUCT
+# ============================================================
+
 @router.post(
     "/",
     status_code=status.HTTP_201_CREATED,
@@ -182,6 +284,11 @@ def create_product(product: ProductCreate):
 
         if product_data.get("specifications") is None:
             product_data["specifications"] = {}
+
+        # Make sure featured status always exists.
+        product_data["is_featured"] = bool(
+            product_data.get("is_featured", False)
+        )
 
         now = datetime.now(timezone.utc)
 
@@ -213,6 +320,10 @@ def create_product(product: ProductCreate):
         )
 
 
+# ============================================================
+# UPDATE PRODUCT
+# ============================================================
+
 @router.put("/{product_id}")
 def update_product(
     product_id: str,
@@ -233,6 +344,12 @@ def update_product(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No fields provided for update.",
+            )
+
+        # Normalize featured status when it is provided.
+        if "is_featured" in update_data:
+            update_data["is_featured"] = bool(
+                update_data["is_featured"]
             )
 
         update_data["updatedAt"] = datetime.now(
@@ -274,6 +391,10 @@ def update_product(
         )
 
 
+# ============================================================
+# DELETE PRODUCT
+# ============================================================
+
 @router.delete("/{product_id}")
 def delete_product(product_id: str):
     if not ObjectId.is_valid(product_id):
@@ -309,6 +430,10 @@ def delete_product(product_id: str):
             detail="Unable to delete product.",
         )
 
+
+# ============================================================
+# UPDATE PRODUCT STOCK
+# ============================================================
 
 @router.patch("/{product_id}/stock")
 def update_product_stock(
