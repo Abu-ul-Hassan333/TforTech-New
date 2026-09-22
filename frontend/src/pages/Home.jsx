@@ -1,22 +1,13 @@
-
 import React, { useEffect, useState } from "react";
 import Navbar from "../components/Navbar/Navbar";
 import Footer from "../components/Footer/Footer";
 import "./Home.css";
-
-// ============================================================
-// BACKEND
-// ============================================================
 
 const BACKEND_URL =
   process.env.REACT_APP_BACKEND_URL ||
   "http://127.0.0.1:8000";
 
 const API = `${BACKEND_URL}/api`;
-
-// ============================================================
-// CATEGORIES
-// ============================================================
 
 const categories = [
   {
@@ -45,10 +36,6 @@ const categories = [
   },
 ];
 
-// ============================================================
-// BENEFITS
-// ============================================================
-
 const benefits = [
   {
     icon: "✓",
@@ -69,10 +56,6 @@ const benefits = [
       "Get your products delivered safely and conveniently across Pakistan.",
   },
 ];
-
-// ============================================================
-// TESTIMONIALS
-// ============================================================
 
 const testimonials = [
   {
@@ -95,42 +78,22 @@ const testimonials = [
   },
 ];
 
-// ============================================================
-// DEFAULT HERO
-//
-// These values preserve the existing Hero content in case
-// the backend is temporarily unavailable.
-// ============================================================
-
 const DEFAULT_HERO = {
   enabled: true,
-
   badge: "PREMIUM LAPTOPS & ACCESSORIES",
-
   title: "Technology That Fits Your World",
-
   description:
     "Discover reliable laptops, gaming machines and essential accessories for work, study, gaming and everyday life.",
-
   primary_button_text: "View Products",
   primary_button_link: "/products",
-
   secondary_button_text: "Explore Categories",
   secondary_button_link: "/categories",
-
   image: "",
-
   video_enabled: false,
   video: "",
-
   overlay_opacity: 0.78,
-
   image_position: "center",
 };
-
-// ============================================================
-// HELPERS
-// ============================================================
 
 const formatPrice = (price) => {
   return `PKR ${Number(price || 0).toLocaleString("en-PK")}`;
@@ -145,28 +108,62 @@ const getProductId = (product) => {
   );
 };
 
+const getProductImages = (product) => {
+  if (
+    Array.isArray(product?.images) &&
+    product.images.length > 0
+  ) {
+    return product.images.filter(Boolean);
+  }
+
+  if (
+    Array.isArray(product?.image_urls) &&
+    product.image_urls.length > 0
+  ) {
+    return product.image_urls.filter(Boolean);
+  }
+
+  if (product?.image) {
+    return [product.image];
+  }
+
+  if (product?.image_url) {
+    return [product.image_url];
+  }
+
+  return [];
+};
+
 const getImageUrl = (product) => {
+  const images =
+    getProductImages(product);
+
   const image =
-    product?.image_url ||
-    (Array.isArray(product?.image_urls)
-      ? product.image_urls[0]
-      : "");
+    images.length > 0
+      ? images[0]
+      : "";
 
   if (!image) {
     return "";
   }
 
+  const imageString =
+    String(image).trim();
+
   if (
-    image.startsWith("http://") ||
-    image.startsWith("https://") ||
-    image.startsWith("data:")
+    imageString.startsWith("http://") ||
+    imageString.startsWith("https://") ||
+    imageString.startsWith("data:") ||
+    imageString.startsWith("blob:")
   ) {
-    return image;
+    return imageString;
   }
 
   return `${BACKEND_URL}${
-    image.startsWith("/") ? "" : "/"
-  }${image}`;
+    imageString.startsWith("/")
+      ? ""
+      : "/"
+  }${imageString}`;
 };
 
 const getHeroMediaUrl = (media) => {
@@ -174,17 +171,23 @@ const getHeroMediaUrl = (media) => {
     return "";
   }
 
+  const mediaString =
+    String(media).trim();
+
   if (
-    media.startsWith("http://") ||
-    media.startsWith("https://") ||
-    media.startsWith("data:")
+    mediaString.startsWith("http://") ||
+    mediaString.startsWith("https://") ||
+    mediaString.startsWith("data:") ||
+    mediaString.startsWith("blob:")
   ) {
-    return media;
+    return mediaString;
   }
 
   return `${BACKEND_URL}${
-    media.startsWith("/") ? "" : "/"
-  }${media}`;
+    mediaString.startsWith("/")
+      ? ""
+      : "/"
+  }${mediaString}`;
 };
 
 const getDisplayedPrice = (product) => {
@@ -223,10 +226,6 @@ const getOriginalPrice = (product) => {
   return null;
 };
 
-// ============================================================
-// HERO
-// ============================================================
-
 function HeroSection() {
   const [hero, setHero] = useState({
     ...DEFAULT_HERO,
@@ -253,7 +252,8 @@ function HeroSection() {
           {
             method: "GET",
             headers: {
-              Accept: "application/json",
+              Accept:
+                "application/json",
             },
           }
         );
@@ -264,7 +264,8 @@ function HeroSection() {
           );
         }
 
-        const data = await response.json();
+        const data =
+          await response.json();
 
         if (!isMounted) {
           return;
@@ -313,52 +314,24 @@ function HeroSection() {
     };
   }, []);
 
-  // ==========================================================
-  // VIDEO ENDED
-  // ==========================================================
-
   const handleHeroVideoEnded = () => {
-    /*
-      The Hero video plays only once.
-
-      Once it finishes, the same Hero automatically
-      switches to the selected image.
-    */
-
     setHeroMedia("image");
   };
 
-  // ==========================================================
-  // VIDEO ERROR
-  // ==========================================================
-
   const handleHeroVideoError = () => {
-    /*
-      A broken/unavailable video must never break
-      the homepage.
-
-      Fall back to the Hero image.
-    */
-
     setHeroVideoError(true);
     setHeroMedia("image");
   };
 
-  // ==========================================================
-  // HERO IMAGE
-  // ==========================================================
+  const heroImageUrl =
+    getHeroMediaUrl(
+      hero.image
+    );
 
-  const heroImageUrl = getHeroMediaUrl(
-    hero.image
-  );
-
-  const heroVideoUrl = getHeroMediaUrl(
-    hero.video
-  );
-
-  // ==========================================================
-  // HERO ENABLE / HIDE
-  // ==========================================================
+  const heroVideoUrl =
+    getHeroMediaUrl(
+      hero.video
+    );
 
   if (
     !heroLoading &&
@@ -366,10 +339,6 @@ function HeroSection() {
   ) {
     return null;
   }
-
-  // ==========================================================
-  // HERO MEDIA STYLE
-  // ==========================================================
 
   const heroMediaStyle = {
     objectPosition:
@@ -379,25 +348,18 @@ function HeroSection() {
   const heroOverlayStyle = {
     opacity:
       Number.isFinite(
-        Number(hero.overlay_opacity)
+        Number(
+          hero.overlay_opacity
+        )
       )
-        ? Number(hero.overlay_opacity)
+        ? Number(
+            hero.overlay_opacity
+          )
         : 0.78,
   };
 
-  // ==========================================================
-  // HERO
-  // ==========================================================
-
   return (
     <section className="hero-section">
-
-      {/* ====================================================
-          HERO VIDEO
-
-          Video plays first and only once.
-      ==================================================== */}
-
       {heroMedia === "video" &&
         heroVideoUrl &&
         !heroVideoError && (
@@ -417,54 +379,32 @@ function HeroSection() {
           />
         )}
 
-      {/* ====================================================
-          HERO IMAGE
-
-          Image appears after video finishes.
-      ==================================================== */}
-
       {heroMedia === "image" &&
         heroImageUrl && (
           <img
             className="hero-background-image"
             src={heroImageUrl}
             alt=""
-            style={heroMediaStyle}
+            style={
+              heroMediaStyle
+            }
           />
         )}
-
-      {/* ====================================================
-          HERO FALLBACK
-
-          Existing gradient remains available when
-          there is no image.
-      ==================================================== */}
 
       {heroMedia === "image" &&
         !heroImageUrl && (
           <div className="hero-background-fallback" />
         )}
 
-      {/* ====================================================
-          HERO OVERLAY
-
-          This stays above video/image but below text.
-      ==================================================== */}
-
       <div
         className="hero-background-overlay"
-        style={heroOverlayStyle}
+        style={
+          heroOverlayStyle
+        }
       />
-
-      {/* ====================================================
-          HERO CONTENT
-
-          Text stays above both video and image.
-      ==================================================== */}
 
       <div className="hero-overlay">
         <div className="hero-content">
-
           {hero.badge && (
             <span className="hero-badge">
               {hero.badge}
@@ -480,7 +420,6 @@ function HeroSection() {
           </p>
 
           <div className="hero-buttons">
-
             {hero.primary_button_text &&
               hero.primary_button_link && (
                 <a
@@ -508,18 +447,12 @@ function HeroSection() {
                   }
                 </a>
               )}
-
           </div>
-
         </div>
       </div>
     </section>
   );
 }
-
-// ============================================================
-// POPULAR PRODUCT IMAGE
-// ============================================================
 
 function PopularProductImage({
   product,
@@ -527,15 +460,12 @@ function PopularProductImage({
   const [imageError, setImageError] =
     useState(false);
 
-  useEffect(() => {
-    setImageError(false);
-  }, [
-    product?.image_url,
-    product?.image_urls,
-  ]);
-
   const imageUrl =
     getImageUrl(product);
+
+  useEffect(() => {
+    setImageError(false);
+  }, [imageUrl]);
 
   if (
     imageUrl &&
@@ -563,16 +493,7 @@ function PopularProductImage({
   );
 }
 
-// ============================================================
-// HOME
-// ============================================================
-
 function Home() {
-
-  // ==========================================================
-  // POPULAR / FEATURED PRODUCTS FROM MONGODB
-  // ==========================================================
-
   const [
     popularProducts,
     setPopularProducts,
@@ -583,19 +504,16 @@ function Home() {
     setPopularProductsLoading,
   ] = useState(true);
 
-  // ==========================================================
-  // FETCH ADMIN-SELECTED POPULAR PRODUCTS
-  // ==========================================================
-
   useEffect(() => {
     let isMounted = true;
 
     const fetchPopularProducts =
       async () => {
         try {
-          const response = await fetch(
-            `${API}/products/featured`
-          );
+          const response =
+            await fetch(
+              `${API}/products/featured`
+            );
 
           if (!response.ok) {
             throw new Error(
@@ -619,20 +537,11 @@ function Home() {
               ? data.products
               : [];
 
-          /*
-            Backend has a fallback that can return latest products
-            when no product is marked as featured.
-
-            We only want products that the admin explicitly selected
-            for the homepage.
-
-            Therefore we filter by is_featured === true.
-          */
-
           const selectedPopularProducts =
             productsFromApi.filter(
               (product) =>
-                product?.is_featured === true
+                product?.is_featured ===
+                true
             );
 
           setPopularProducts(
@@ -665,27 +574,12 @@ function Home() {
 
   return (
     <main className="home-page">
-
-      {/* ======================================================
-          NAVBAR
-      ====================================================== */}
-
       <Navbar />
-
-      {/* ======================================================
-          HERO
-      ====================================================== */}
 
       <HeroSection />
 
-      {/* ======================================================
-          CATEGORY SECTION
-      ====================================================== */}
-
       <section className="section category-section">
-
         <div className="section-heading">
-
           <span className="section-label">
             SHOP BY CATEGORY
           </span>
@@ -699,11 +593,9 @@ function Home() {
             selected for different needs and
             budgets.
           </p>
-
         </div>
 
         <div className="category-grid">
-
           {categories.map(
             (category) => (
               <a
@@ -715,7 +607,6 @@ function Home() {
                   category.title
                 }
               >
-
                 <div className="category-icon">
                   {
                     category.icon
@@ -735,25 +626,17 @@ function Home() {
                 <span className="card-link">
                   View Products →
                 </span>
-
               </a>
             )
           )}
-
         </div>
-
       </section>
 
-      {/* ======================================================
-          POPULAR PRODUCTS
-      ====================================================== */}
-
       {!popularProductsLoading &&
-        popularProducts.length > 0 && (
+        popularProducts.length >
+          0 && (
           <section className="section products-section">
-
             <div className="section-heading">
-
               <span className="section-label">
                 FEATURED PRODUCTS
               </span>
@@ -766,14 +649,11 @@ function Home() {
                 Explore some of the products
                 selected by our admin.
               </p>
-
             </div>
 
             <div className="product-grid">
-
               {popularProducts.map(
                 (product) => {
-
                   const productId =
                     getProductId(
                       product
@@ -796,13 +676,7 @@ function Home() {
                         productId
                       }
                     >
-
-                      {/* ==================================
-                          PRODUCT IMAGE
-                      ================================== */}
-
                       <div className="product-image">
-
                         <a
                           href={`/products/${productId}`}
                           style={{
@@ -820,27 +694,19 @@ function Home() {
                               "none",
                           }}
                         >
-
                           <PopularProductImage
                             product={
                               product
                             }
                           />
-
                         </a>
 
                         <span className="product-badge">
                           Featured
                         </span>
-
                       </div>
 
-                      {/* ==================================
-                          PRODUCT INFO
-                      ================================== */}
-
                       <div className="product-info">
-
                         <h3>
                           {
                             product?.name ||
@@ -849,7 +715,6 @@ function Home() {
                         </h3>
 
                         <div className="product-rating">
-
                           {"★★★★★"}
 
                           <span>
@@ -857,16 +722,15 @@ function Home() {
                             {
                               Number(
                                 product?.review_count ||
+                                  product?.reviews ||
                                   0
                               )
                             }
                             )
                           </span>
-
                         </div>
 
                         <div className="product-price">
-
                           <strong>
                             {formatPrice(
                               displayedPrice
@@ -880,7 +744,6 @@ function Home() {
                               )}
                             </del>
                           )}
-
                         </div>
 
                         <a
@@ -889,38 +752,26 @@ function Home() {
                         >
                           View Description
                         </a>
-
                       </div>
-
                     </article>
                   );
                 }
               )}
-
             </div>
 
             <div className="center-button">
-
               <a
                 href="/products"
                 className="outline-button"
               >
                 View All Products
               </a>
-
             </div>
-
           </section>
         )}
 
-      {/* ======================================================
-          WHY CHOOSE US
-      ====================================================== */}
-
       <section className="benefits-section">
-
         <div className="section-heading">
-
           <span className="section-label">
             WHY CHOOSE US
           </span>
@@ -934,11 +785,9 @@ function Home() {
             products and a smooth shopping
             experience.
           </p>
-
         </div>
 
         <div className="benefits-grid">
-
           {benefits.map(
             (benefit) => (
               <div
@@ -947,7 +796,6 @@ function Home() {
                   benefit.title
                 }
               >
-
                 <div className="benefit-icon">
                   {
                     benefit.icon
@@ -963,23 +811,14 @@ function Home() {
                     benefit.description
                   }
                 </p>
-
               </div>
             )
           )}
-
         </div>
-
       </section>
 
-      {/* ======================================================
-          DEALS CTA
-      ====================================================== */}
-
       <section className="delivery-section">
-
         <div className="delivery-content">
-
           <span className="section-label">
             LATEST DEALS
           </span>
@@ -1001,19 +840,11 @@ function Home() {
           >
             Browse Products
           </a>
-
         </div>
-
       </section>
 
-      {/* ======================================================
-          TESTIMONIALS
-      ====================================================== */}
-
       <section className="section testimonials-section">
-
         <div className="section-heading">
-
           <span className="section-label">
             CUSTOMER REVIEWS
           </span>
@@ -1026,11 +857,9 @@ function Home() {
             Real experiences from customers
             who shop with us.
           </p>
-
         </div>
 
         <div className="testimonial-grid">
-
           {testimonials.map(
             (testimonial) => (
               <article
@@ -1039,7 +868,6 @@ function Home() {
                   testimonial.name
                 }
               >
-
                 <div className="testimonial-stars">
                   {
                     "★".repeat(
@@ -1061,23 +889,14 @@ function Home() {
                 <span>
                   Verified Customer
                 </span>
-
               </article>
             )
           )}
-
         </div>
-
       </section>
 
-      {/* ======================================================
-          COMMUNITY / SOCIAL
-      ====================================================== */}
-
       <section className="section community-section">
-
         <div className="section-heading">
-
           <span className="section-label">
             OUR STORE
           </span>
@@ -1092,11 +911,9 @@ function Home() {
             everything you need in one
             place.
           </p>
-
         </div>
 
         <div className="community-grid">
-
           <div className="community-box">
             💻
           </div>
@@ -1112,17 +929,10 @@ function Home() {
           <div className="community-box">
             🎧
           </div>
-
         </div>
-
       </section>
 
-      {/* ======================================================
-          FOOTER
-      ====================================================== */}
-
       <Footer />
-
     </main>
   );
 }

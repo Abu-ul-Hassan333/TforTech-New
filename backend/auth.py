@@ -791,6 +791,67 @@ def update_order_status(
 
 
 # =========================================================
+# ADMIN - DELETE ORDER
+# =========================================================
+
+@router.delete(
+    "/admin/orders/{order_id}",
+)
+def delete_order(
+    order_id: str,
+    current_admin=Depends(get_current_admin),
+):
+    """
+    Delete a customer order.
+
+    Only the main admin can delete orders.
+    Co admin can view orders and update order status,
+    but cannot delete orders.
+    """
+
+    try:
+        from bson import ObjectId
+
+        object_id = ObjectId(order_id)
+
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid order ID.",
+        )
+
+    existing_order = orders_collection.find_one(
+        {
+            "_id": object_id,
+        }
+    )
+
+    if not existing_order:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order not found.",
+        )
+
+    result = orders_collection.delete_one(
+        {
+            "_id": object_id,
+        }
+    )
+
+    if result.deleted_count != 1:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Order could not be deleted.",
+        )
+
+    return {
+        "success": True,
+        "message": "Order deleted successfully.",
+        "order_id": order_id,
+    }
+
+
+# =========================================================
 # ADMIN USERS - GET ALL USERS
 # =========================================================
 

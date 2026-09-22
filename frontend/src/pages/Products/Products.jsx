@@ -11,19 +11,11 @@ import { useCart } from "../../context/CartContext";
 import { useWishlist } from "../../context/WishlistContext";
 import "./Products.css";
 
-// ============================================================
-// BACKEND
-// ============================================================
-
 const BACKEND_URL =
   process.env.REACT_APP_BACKEND_URL ||
   "http://127.0.0.1:8000";
 
 const API = `${BACKEND_URL}/api`;
-
-// ============================================================
-// CATEGORY LIST
-// ============================================================
 
 const categories = [
   "All Categories",
@@ -40,10 +32,6 @@ const categories = [
   "Storage",
   "RAM",
 ];
-
-// ============================================================
-// HELPERS
-// ============================================================
 
 const formatPrice = (price) => {
   return `PKR ${Number(price || 0).toLocaleString("en-PK")}`;
@@ -74,43 +62,96 @@ const getProductId = (product) => {
   );
 };
 
-// ============================================================
-// PRODUCT IMAGE
-// ============================================================
+const getProductImages = (product) => {
+  if (
+    Array.isArray(product?.images) &&
+    product.images.length > 0
+  ) {
+    return product.images.filter(Boolean);
+  }
+
+  if (
+    Array.isArray(product?.image_urls) &&
+    product.image_urls.length > 0
+  ) {
+    return product.image_urls.filter(Boolean);
+  }
+
+  if (product?.image) {
+    return [product.image];
+  }
+
+  if (product?.image_url) {
+    return [product.image_url];
+  }
+
+  return [];
+};
+
+const getFinalImageUrl = (image) => {
+  if (!image) {
+    return "";
+  }
+
+  const imageString = String(image).trim();
+
+  if (
+    imageString.startsWith("http://") ||
+    imageString.startsWith("https://") ||
+    imageString.startsWith("data:") ||
+    imageString.startsWith("blob:")
+  ) {
+    return imageString;
+  }
+
+  return `${BACKEND_URL}${
+    imageString.startsWith("/") ? "" : "/"
+  }${imageString}`;
+};
 
 function ProductImage({ product }) {
   const [imageError, setImageError] = useState(false);
 
-  useEffect(() => {
-    setImageError(false);
-  }, [product?.image_url, product?.image_urls]);
+  const productImages =
+    getProductImages(product);
 
   const imageUrl =
-    product?.image_url ||
-    (Array.isArray(product?.image_urls)
-      ? product.image_urls[0]
-      : "");
+    productImages.length > 0
+      ? productImages[0]
+      : "";
 
-  if (imageUrl && !imageError) {
+  useEffect(() => {
+    setImageError(false);
+  }, [imageUrl]);
+
+  if (
+    imageUrl &&
+    !imageError
+  ) {
     const finalImageUrl =
-      imageUrl.startsWith("http://") ||
-      imageUrl.startsWith("https://")
-        ? imageUrl
-        : `${BACKEND_URL}${imageUrl.startsWith("/") ? "" : "/"}${imageUrl}`;
+      getFinalImageUrl(imageUrl);
 
     return (
       <img
         src={finalImageUrl}
-        alt={product?.name || "Product"}
+        alt={
+          product?.name ||
+          "Product"
+        }
         className="product-card-image"
-        onError={() => setImageError(true)}
+        onError={() =>
+          setImageError(true)
+        }
       />
     );
   }
 
   return (
     <div className="product-image-placeholder">
-      <span className="placeholder-laptop-icon">💻</span>
+      <span className="placeholder-laptop-icon">
+        💻
+      </span>
+
       <span className="placeholder-text">
         Product Image
       </span>
@@ -118,17 +159,15 @@ function ProductImage({ product }) {
   );
 }
 
-// ============================================================
-// STAR RATING
-// ============================================================
-
 function StarRating({ rating, reviews }) {
   return (
     <div
       className="product-rating"
       aria-label={`${rating || 0} out of 5 stars`}
     >
-      <span className="stars">★★★★★</span>
+      <span className="stars">
+        ★★★★★
+      </span>
 
       <span className="rating-number">
         {Number(rating || 0).toFixed(1)}
@@ -141,71 +180,72 @@ function StarRating({ rating, reviews }) {
   );
 }
 
-// ============================================================
-// PRODUCTS PAGE
-// ============================================================
-
 function Products() {
-  const [searchParams, setSearchParams] = useSearchParams();
-
-  // ----------------------------------------------------------
-  // CART CONTEXT
-  // ----------------------------------------------------------
+  const [
+    searchParams,
+    setSearchParams,
+  ] = useSearchParams();
 
   const {
     addToCart,
     totalItems,
   } = useCart();
 
-  // ----------------------------------------------------------
-  // WISHLIST CONTEXT
-  // ----------------------------------------------------------
-
   const {
     toggleWishlist,
     isInWishlist,
   } = useWishlist();
 
-  // ----------------------------------------------------------
-  // URL CATEGORY
-  // ----------------------------------------------------------
-
   const initialCategory =
     searchParams.get("category") ||
     "All Categories";
 
-  // ----------------------------------------------------------
-  // MONGODB PRODUCTS
-  // ----------------------------------------------------------
+  const [
+    products,
+    setProducts,
+  ] = useState([]);
 
-  const [products, setProducts] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState("");
+  const [
+    loading,
+    setLoading,
+  ] = useState(true);
 
-  // ----------------------------------------------------------
-  // FILTER STATE
-  // ----------------------------------------------------------
+  const [
+    loadError,
+    setLoadError,
+  ] = useState("");
 
-  const [searchTerm, setSearchTerm] = useState("");
+  const [
+    searchTerm,
+    setSearchTerm,
+  ] = useState("");
 
-  const [selectedCategory, setSelectedCategory] =
-    useState(initialCategory);
+  const [
+    selectedCategory,
+    setSelectedCategory,
+  ] = useState(
+    initialCategory
+  );
 
-  const [priceFilter, setPriceFilter] =
-    useState("all");
+  const [
+    priceFilter,
+    setPriceFilter,
+  ] = useState("all");
 
-  const [availability, setAvailability] =
-    useState("all");
+  const [
+    availability,
+    setAvailability,
+  ] = useState("all");
 
-  const [sortBy, setSortBy] =
-    useState("featured");
+  const [
+    sortBy,
+    setSortBy,
+  ] = useState("featured");
 
-  const [showFilters, setShowFilters] =
-    useState(false);
-
-  // ==========================================================
-  // LOAD PRODUCTS FROM MONGODB
-  // ==========================================================
+  const [
+    showFilters,
+    setShowFilters,
+  ] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -215,30 +255,34 @@ function Products() {
         setLoading(true);
         setLoadError("");
 
-        const response = await axios.get(
-          `${API}/products/?page=1&limit=5000`
-        );
+        const response =
+          await axios.get(
+            `${API}/products/?page=1&limit=5000`
+          );
 
         if (!isMounted) {
           return;
         }
 
-        const data = response?.data;
+        const data =
+          response?.data;
 
-        const databaseProducts = Array.isArray(data)
-          ? data
-          : Array.isArray(data?.products)
-          ? data.products
-          : [];
+        const databaseProducts =
+          Array.isArray(data)
+            ? data
+            : Array.isArray(
+                data?.products
+              )
+            ? data.products
+            : Array.isArray(
+                data?.items
+              )
+            ? data.items
+            : [];
 
-        /*
-          IMPORTANT:
-          No demo/static products are added here.
-
-          Only products returned by MongoDB are placed into
-          the Products page.
-        */
-        setProducts(databaseProducts);
+        setProducts(
+          databaseProducts
+        );
       } catch (error) {
         console.error(
           "Error fetching products from MongoDB:",
@@ -268,291 +312,404 @@ function Products() {
     };
   }, []);
 
-  // ----------------------------------------------------------
-  // CATEGORY CHANGE
-  // ----------------------------------------------------------
-
-  const handleCategoryChange = (category) => {
-    setSelectedCategory(category);
+  const handleCategoryChange = (
+    category
+  ) => {
+    setSelectedCategory(
+      category
+    );
 
     const nextParams =
-      new URLSearchParams(searchParams);
+      new URLSearchParams(
+        searchParams
+      );
 
-    if (category === "All Categories") {
-      nextParams.delete("category");
+    if (
+      category ===
+      "All Categories"
+    ) {
+      nextParams.delete(
+        "category"
+      );
     } else {
-      nextParams.set("category", category);
+      nextParams.set(
+        "category",
+        category
+      );
     }
 
-    setSearchParams(nextParams);
+    setSearchParams(
+      nextParams
+    );
   };
 
-  // ----------------------------------------------------------
-  // WISHLIST
-  // ----------------------------------------------------------
-
-  const handleWishlistToggle = (product) => {
+  const handleWishlistToggle = (
+    product
+  ) => {
     if (!product) {
       return;
     }
 
-    toggleWishlist(product);
+    toggleWishlist(
+      product
+    );
   };
 
-  // ----------------------------------------------------------
-  // ADD TO CART
-  // ----------------------------------------------------------
-
-  const handleAddToCart = (product) => {
+  const handleAddToCart = (
+    product
+  ) => {
     if (!product) {
       return;
     }
 
-    const stock = Number(product.stock || 0);
+    const stock = Number(
+      product.stock || 0
+    );
 
-    if (stock <= 0 || product.is_sold_out) {
+    if (
+      stock <= 0 ||
+      product.is_sold_out
+    ) {
       return;
     }
 
-    addToCart(product, 1);
+    addToCart(
+      product,
+      1
+    );
   };
 
-  // ==========================================================
-  // FILTER + SORT
-  // ==========================================================
-
-  const filteredProducts = useMemo(() => {
-    let result = [...products];
-
-    // --------------------------------------------------------
-    // SEARCH
-    // --------------------------------------------------------
-
-    if (searchTerm.trim()) {
-      const search =
-        searchTerm
-          .trim()
-          .toLowerCase();
-
-      result = result.filter((product) => {
-        const name =
-          String(product?.name || "")
-            .toLowerCase();
-
-        const category =
-          String(product?.category || "")
-            .toLowerCase();
-
-        const description =
-          String(product?.description || "")
-            .replace(/<[^>]*>/g, " ")
-            .toLowerCase();
-
-        const brand =
-          String(product?.brand || "")
-            .toLowerCase();
-
-        const sku =
-          String(product?.sku || "")
-            .toLowerCase();
-
-        return (
-          name.includes(search) ||
-          category.includes(search) ||
-          description.includes(search) ||
-          brand.includes(search) ||
-          sku.includes(search)
-        );
-      });
-    }
-
-    // --------------------------------------------------------
-    // CATEGORY
-    // --------------------------------------------------------
-
-    if (selectedCategory !== "All Categories") {
-      result = result.filter((product) => {
-        return (
-          String(product?.category || "")
-            .toLowerCase() ===
-          String(selectedCategory)
-            .toLowerCase()
-        );
-      });
-    }
-
-    // --------------------------------------------------------
-    // PRICE
-    // --------------------------------------------------------
-
-    const getCurrentPrice = (product) => {
-      const discountPrice =
-        Number(product?.discount_price);
-
-      const originalPrice =
-        Number(product?.price || 0);
+  const filteredProducts =
+    useMemo(() => {
+      let result = [
+        ...products,
+      ];
 
       if (
-        Number.isFinite(discountPrice) &&
-        discountPrice > 0 &&
-        discountPrice < originalPrice
+        searchTerm.trim()
       ) {
-        return discountPrice;
+        const search =
+          searchTerm
+            .trim()
+            .toLowerCase();
+
+        result =
+          result.filter(
+            (product) => {
+              const name =
+                String(
+                  product?.name ||
+                    ""
+                ).toLowerCase();
+
+              const category =
+                String(
+                  product?.category ||
+                    ""
+                ).toLowerCase();
+
+              const description =
+                String(
+                  product?.description ||
+                    ""
+                )
+                  .replace(
+                    /<[^>]*>/g,
+                    " "
+                  )
+                  .toLowerCase();
+
+              const brand =
+                String(
+                  product?.brand ||
+                    ""
+                ).toLowerCase();
+
+              const sku =
+                String(
+                  product?.sku ||
+                    ""
+                ).toLowerCase();
+
+              return (
+                name.includes(
+                  search
+                ) ||
+                category.includes(
+                  search
+                ) ||
+                description.includes(
+                  search
+                ) ||
+                brand.includes(
+                  search
+                ) ||
+                sku.includes(
+                  search
+                )
+              );
+            }
+          );
       }
-
-      return originalPrice;
-    };
-
-    if (priceFilter === "under-50000") {
-      result = result.filter(
-        (product) =>
-          getCurrentPrice(product) < 50000
-      );
-    }
-
-    if (priceFilter === "50000-100000") {
-      result = result.filter(
-        (product) => {
-          const price =
-            getCurrentPrice(product);
-
-          return (
-            price >= 50000 &&
-            price <= 100000
-          );
-        }
-      );
-    }
-
-    if (priceFilter === "100000-200000") {
-      result = result.filter(
-        (product) => {
-          const price =
-            getCurrentPrice(product);
-
-          return (
-            price > 100000 &&
-            price <= 200000
-          );
-        }
-      );
-    }
-
-    if (priceFilter === "over-200000") {
-      result = result.filter(
-        (product) =>
-          getCurrentPrice(product) > 200000
-      );
-    }
-
-    // --------------------------------------------------------
-    // AVAILABILITY
-    // --------------------------------------------------------
-
-    if (availability === "in-stock") {
-      result = result.filter(
-        (product) =>
-          Number(product?.stock || 0) > 0 &&
-          !product?.is_sold_out
-      );
-    }
-
-    if (availability === "out-of-stock") {
-      result = result.filter(
-        (product) =>
-          Number(product?.stock || 0) <= 0 ||
-          product?.is_sold_out
-      );
-    }
-
-    // --------------------------------------------------------
-    // SORTING
-    // --------------------------------------------------------
-
-    const getCurrentPriceForSort = (product) => {
-      const discountPrice =
-        Number(product?.discount_price);
-
-      const originalPrice =
-        Number(product?.price || 0);
 
       if (
-        Number.isFinite(discountPrice) &&
-        discountPrice > 0 &&
-        discountPrice < originalPrice
+        selectedCategory !==
+        "All Categories"
       ) {
-        return discountPrice;
+        result =
+          result.filter(
+            (product) => {
+              return (
+                String(
+                  product?.category ||
+                    ""
+                )
+                  .toLowerCase() ===
+                String(
+                  selectedCategory
+                ).toLowerCase()
+              );
+            }
+          );
       }
 
-      return originalPrice;
-    };
+      const getCurrentPrice =
+        (product) => {
+          const discountPrice =
+            Number(
+              product?.discount_price
+            );
 
-    if (sortBy === "price-low") {
-      result.sort(
-        (a, b) =>
-          getCurrentPriceForSort(a) -
-          getCurrentPriceForSort(b)
-      );
-    }
+          const originalPrice =
+            Number(
+              product?.price ||
+                0
+            );
 
-    if (sortBy === "price-high") {
-      result.sort(
-        (a, b) =>
-          getCurrentPriceForSort(b) -
-          getCurrentPriceForSort(a)
-      );
-    }
+          if (
+            Number.isFinite(
+              discountPrice
+            ) &&
+            discountPrice >
+              0 &&
+            discountPrice <
+              originalPrice
+          ) {
+            return discountPrice;
+          }
 
-    if (sortBy === "rating") {
-      result.sort(
-        (a, b) =>
-          Number(b?.rating || 0) -
-          Number(a?.rating || 0)
-      );
-    }
+          return originalPrice;
+        };
 
-    if (sortBy === "name") {
-      result.sort((a, b) =>
-        String(a?.name || "").localeCompare(
-          String(b?.name || "")
-        )
-      );
-    }
+      if (
+        priceFilter ===
+        "under-50000"
+      ) {
+        result =
+          result.filter(
+            (product) =>
+              getCurrentPrice(
+                product
+              ) < 50000
+          );
+      }
 
-    return result;
-  }, [
-    products,
-    searchTerm,
-    selectedCategory,
-    priceFilter,
-    availability,
-    sortBy,
-  ]);
+      if (
+        priceFilter ===
+        "50000-100000"
+      ) {
+        result =
+          result.filter(
+            (product) => {
+              const price =
+                getCurrentPrice(
+                  product
+                );
 
-  // ==========================================================
-  // RESET FILTERS
-  // ==========================================================
+              return (
+                price >= 50000 &&
+                price <= 100000
+              );
+            }
+          );
+      }
+
+      if (
+        priceFilter ===
+        "100000-200000"
+      ) {
+        result =
+          result.filter(
+            (product) => {
+              const price =
+                getCurrentPrice(
+                  product
+                );
+
+              return (
+                price > 100000 &&
+                price <= 200000
+              );
+            }
+          );
+      }
+
+      if (
+        priceFilter ===
+        "over-200000"
+      ) {
+        result =
+          result.filter(
+            (product) =>
+              getCurrentPrice(
+                product
+              ) > 200000
+          );
+      }
+
+      if (
+        availability ===
+        "in-stock"
+      ) {
+        result =
+          result.filter(
+            (product) =>
+              Number(
+                product?.stock ||
+                  0
+              ) > 0 &&
+              !product?.is_sold_out
+          );
+      }
+
+      if (
+        availability ===
+        "out-of-stock"
+      ) {
+        result =
+          result.filter(
+            (product) =>
+              Number(
+                product?.stock ||
+                  0
+              ) <= 0 ||
+              product?.is_sold_out
+          );
+      }
+
+      const getCurrentPriceForSort =
+        (product) => {
+          const discountPrice =
+            Number(
+              product?.discount_price
+            );
+
+          const originalPrice =
+            Number(
+              product?.price ||
+                0
+            );
+
+          if (
+            Number.isFinite(
+              discountPrice
+            ) &&
+            discountPrice >
+              0 &&
+            discountPrice <
+              originalPrice
+          ) {
+            return discountPrice;
+          }
+
+          return originalPrice;
+        };
+
+      if (
+        sortBy ===
+        "price-low"
+      ) {
+        result.sort(
+          (a, b) =>
+            getCurrentPriceForSort(
+              a
+            ) -
+            getCurrentPriceForSort(
+              b
+            )
+        );
+      }
+
+      if (
+        sortBy ===
+        "price-high"
+      ) {
+        result.sort(
+          (a, b) =>
+            getCurrentPriceForSort(
+              b
+            ) -
+            getCurrentPriceForSort(
+              a
+            )
+        );
+      }
+
+      if (
+        sortBy ===
+        "rating"
+      ) {
+        result.sort(
+          (a, b) =>
+            Number(
+              b?.rating || 0
+            ) -
+            Number(
+              a?.rating || 0
+            )
+        );
+      }
+
+      if (
+        sortBy ===
+        "name"
+      ) {
+        result.sort(
+          (a, b) =>
+            String(
+              a?.name || ""
+            ).localeCompare(
+              String(
+                b?.name || ""
+              )
+            )
+        );
+      }
+
+      return result;
+    }, [
+      products,
+      searchTerm,
+      selectedCategory,
+      priceFilter,
+      availability,
+      sortBy,
+    ]);
 
   const resetFilters = () => {
     setSearchTerm("");
-    setSelectedCategory("All Categories");
+    setSelectedCategory(
+      "All Categories"
+    );
     setPriceFilter("all");
     setAvailability("all");
     setSortBy("featured");
     setSearchParams({});
   };
 
-  // ==========================================================
-  // PAGE
-  // ==========================================================
-
   return (
     <div className="products-page">
       <Navbar />
-
-      {/* ======================================================
-          PAGE HEADER
-      ====================================================== */}
 
       <section className="products-hero">
         <div className="products-hero-content">
@@ -560,7 +717,9 @@ function Products() {
             LAPTOPS &amp; ACCESSORIES
           </span>
 
-          <h1>Find the Right Technology</h1>
+          <h1>
+            Find the Right Technology
+          </h1>
 
           <p>
             Explore laptops, gaming machines and accessories
@@ -568,26 +727,24 @@ function Products() {
           </p>
 
           <div className="products-breadcrumb">
-            <Link to="/">Home</Link>
-            <span>/</span>
-            <span>Products</span>
+            <Link to="/">
+              Home
+            </Link>
+
+            <span>
+              /
+            </span>
+
+            <span>
+              Products
+            </span>
           </div>
         </div>
       </section>
 
-      {/* ======================================================
-          PRODUCTS CONTENT
-      ====================================================== */}
-
       <section className="products-main">
         <div className="products-container">
-
-          {/* --------------------------------------------------
-              TOP TOOLBAR
-          -------------------------------------------------- */}
-
           <div className="products-toolbar">
-
             <div className="products-result-count">
               <strong>
                 {loading
@@ -596,7 +753,8 @@ function Products() {
               </strong>
 
               <span>
-                {filteredProducts.length === 1
+                {filteredProducts.length ===
+                1
                   ? " product"
                   : " products"}
               </span>
@@ -606,7 +764,9 @@ function Products() {
               type="button"
               className="mobile-filter-button"
               onClick={() =>
-                setShowFilters(!showFilters)
+                setShowFilters(
+                  !showFilters
+                )
               }
             >
               ☰ Filters
@@ -620,8 +780,12 @@ function Products() {
               <select
                 id="sort-products"
                 value={sortBy}
-                onChange={(event) =>
-                  setSortBy(event.target.value)
+                onChange={(
+                  event
+                ) =>
+                  setSortBy(
+                    event.target.value
+                  )
                 }
               >
                 <option value="featured">
@@ -647,16 +811,7 @@ function Products() {
             </div>
           </div>
 
-          {/* --------------------------------------------------
-              PRODUCTS LAYOUT
-          -------------------------------------------------- */}
-
           <div className="products-layout">
-
-            {/* =================================================
-                SIDEBAR FILTERS
-            ================================================= */}
-
             <aside
               className={`products-sidebar ${
                 showFilters
@@ -665,17 +820,19 @@ function Products() {
               }`}
             >
               <div className="sidebar-header">
-                <h2>Filters</h2>
+                <h2>
+                  Filters
+                </h2>
 
                 <button
                   type="button"
-                  onClick={resetFilters}
+                  onClick={
+                    resetFilters
+                  }
                 >
                   Clear All
                 </button>
               </div>
-
-              {/* SEARCH */}
 
               <div className="filter-group">
                 <label htmlFor="product-search">
@@ -683,33 +840,44 @@ function Products() {
                 </label>
 
                 <div className="search-box">
-                  <span>⌕</span>
+                  <span>
+                    ⌕
+                  </span>
 
                   <input
                     id="product-search"
                     type="text"
                     placeholder="Search laptops..."
-                    value={searchTerm}
-                    onChange={(event) =>
+                    value={
+                      searchTerm
+                    }
+                    onChange={(
+                      event
+                    ) =>
                       setSearchTerm(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
                 </div>
               </div>
 
-              {/* CATEGORY */}
-
               <div className="filter-group">
-                <h3>Category</h3>
+                <h3>
+                  Category
+                </h3>
 
                 <div className="category-filter-list">
                   {categories.map(
-                    (category) => (
+                    (
+                      category
+                    ) => (
                       <button
                         type="button"
-                        key={category}
+                        key={
+                          category
+                        }
                         className={
                           selectedCategory ===
                           category
@@ -723,12 +891,16 @@ function Products() {
                         }
                       >
                         <span>
-                          {category}
+                          {
+                            category
+                          }
                         </span>
 
                         {selectedCategory ===
                           category && (
-                          <span>✓</span>
+                          <span>
+                            ✓
+                          </span>
                         )}
                       </button>
                     )
@@ -736,10 +908,10 @@ function Products() {
                 </div>
               </div>
 
-              {/* PRICE */}
-
               <div className="filter-group">
-                <h3>Price Range</h3>
+                <h3>
+                  Price Range
+                </h3>
 
                 <label className="radio-option">
                   <input
@@ -750,9 +922,12 @@ function Products() {
                       priceFilter ===
                       "all"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setPriceFilter(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -771,9 +946,12 @@ function Products() {
                       priceFilter ===
                       "under-50000"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setPriceFilter(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -792,9 +970,12 @@ function Products() {
                       priceFilter ===
                       "50000-100000"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setPriceFilter(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -813,9 +994,12 @@ function Products() {
                       priceFilter ===
                       "100000-200000"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setPriceFilter(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -834,9 +1018,12 @@ function Products() {
                       priceFilter ===
                       "over-200000"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setPriceFilter(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -847,10 +1034,10 @@ function Products() {
                 </label>
               </div>
 
-              {/* AVAILABILITY */}
-
               <div className="filter-group">
-                <h3>Availability</h3>
+                <h3>
+                  Availability
+                </h3>
 
                 <label className="radio-option">
                   <input
@@ -861,9 +1048,12 @@ function Products() {
                       availability ===
                       "all"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setAvailability(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -882,9 +1072,12 @@ function Products() {
                       availability ===
                       "in-stock"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setAvailability(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -903,9 +1096,12 @@ function Products() {
                       availability ===
                       "out-of-stock"
                     }
-                    onChange={(event) =>
+                    onChange={(
+                      event
+                    ) =>
                       setAvailability(
-                        event.target.value
+                        event.target
+                          .value
                       )
                     }
                   />
@@ -920,26 +1116,18 @@ function Products() {
                 type="button"
                 className="mobile-close-filter"
                 onClick={() =>
-                  setShowFilters(false)
+                  setShowFilters(
+                    false
+                  )
                 }
               >
                 Apply Filters
               </button>
             </aside>
 
-            {/* =================================================
-                PRODUCT GRID
-            ================================================= */}
-
             <div className="products-content">
-
-              {/* =================================================
-                  LOADING
-              ================================================= */}
-
               {loading ? (
                 <div className="products-empty-state">
-
                   <div className="empty-icon">
                     ⟳
                   </div>
@@ -952,16 +1140,9 @@ function Products() {
                     Loading products from
                     MongoDB...
                   </p>
-
                 </div>
               ) : loadError ? (
-
-                /* ===============================================
-                   DATABASE ERROR
-                =============================================== */
-
                 <div className="products-empty-state">
-
                   <div className="empty-icon">
                     !
                   </div>
@@ -983,25 +1164,23 @@ function Products() {
                   >
                     Retry
                   </button>
-
                 </div>
-              ) : filteredProducts.length > 0 ? (
-
-                /* ===============================================
-                   PRODUCT GRID
-                =============================================== */
-
+              ) : filteredProducts.length >
+                0 ? (
                 <div className="products-grid">
-
                   {filteredProducts.map(
-                    (product) => {
-
+                    (
+                      product
+                    ) => {
                       const productId =
-                        getProductId(product);
+                        getProductId(
+                          product
+                        );
 
                       const originalPrice =
                         Number(
-                          product?.price || 0
+                          product?.price ||
+                            0
                         );
 
                       const discountPrice =
@@ -1013,7 +1192,8 @@ function Products() {
                         Number.isFinite(
                           discountPrice
                         ) &&
-                        discountPrice > 0 &&
+                        discountPrice >
+                          0 &&
                         discountPrice <
                           originalPrice;
 
@@ -1037,25 +1217,28 @@ function Products() {
 
                       const stock =
                         Number(
-                          product?.stock || 0
+                          product?.stock ||
+                            0
                         );
 
                       const isOutOfStock =
-                        stock <= 0 ||
+                        stock <=
+                          0 ||
                         Boolean(
                           product?.is_sold_out
                         );
 
                       const condition =
                         product?.condition ||
-                        product?.device_specs
+                        product
+                          ?.device_specs
                           ?.condition ||
                         "";
 
                       const descriptionText =
                         String(
                           product?.description ||
-                          ""
+                            ""
                         )
                           .replace(
                             /<[^>]*>/g,
@@ -1081,15 +1264,11 @@ function Products() {
                       return (
                         <article
                           className="product-card"
-                          key={productId}
+                          key={
+                            productId
+                          }
                         >
-
-                          {/* =====================================
-                              PRODUCT IMAGE
-                          ===================================== */}
-
                           <div className="product-card-image-wrapper">
-
                             <Link
                               to={`/products/${productId}`}
                               className="product-image-link"
@@ -1104,7 +1283,9 @@ function Products() {
                             {discount && (
                               <span className="discount-badge">
                                 -
-                                {discount}
+                                {
+                                  discount
+                                }
                                 %
                               </span>
                             )}
@@ -1149,18 +1330,14 @@ function Products() {
                                     : ""
                                 }`}
                               >
-                                {condition}
+                                {
+                                  condition
+                                }
                               </span>
                             )}
-
                           </div>
 
-                          {/* =====================================
-                              PRODUCT INFO
-                          ===================================== */}
-
                           <div className="product-card-info">
-
                             <span className="product-category">
                               {product?.category ||
                                 "Uncategorized"}
@@ -1187,12 +1364,12 @@ function Products() {
                               }
                               reviews={
                                 product?.review_count ||
+                                product?.reviews ||
                                 0
                               }
                             />
 
                             <div className="product-price-row">
-
                               <strong>
                                 {formatPrice(
                                   displayPrice
@@ -1206,16 +1383,15 @@ function Products() {
                                   )}
                                 </del>
                               )}
-
                             </div>
 
                             <div className="stock-status">
-
                               {!isOutOfStock ? (
                                 <>
                                   <span className="stock-dot"></span>
 
-                                  {stock <= 5
+                                  {stock <=
+                                  5
                                     ? `Only ${stock} left`
                                     : "In Stock"}
                                 </>
@@ -1224,15 +1400,9 @@ function Products() {
                                   Out of Stock
                                 </span>
                               )}
-
                             </div>
 
-                            {/* =================================
-                                BUTTONS
-                            ================================= */}
-
                             <div className="product-actions">
-
                               <Link
                                 to={`/products/${productId}`}
                                 className="view-description-button"
@@ -1256,25 +1426,15 @@ function Products() {
                                   ? "Add to Cart"
                                   : "Out of Stock"}
                               </button>
-
                             </div>
-
                           </div>
-
                         </article>
                       );
                     }
                   )}
-
                 </div>
               ) : (
-
-                /* ===============================================
-                   EMPTY STATE
-                =============================================== */
-
                 <div className="products-empty-state">
-
                   <div className="empty-icon">
                     ⌕
                   </div>
@@ -1291,27 +1451,23 @@ function Products() {
 
                   <button
                     type="button"
-                    onClick={resetFilters}
+                    onClick={
+                      resetFilters
+                    }
                     className="reset-products-button"
                   >
                     Clear Filters
                   </button>
-
                 </div>
               )}
 
-              {/* =================================================
-                  CART SUMMARY
-              ================================================= */}
-
               {totalItems > 0 && (
                 <div className="cart-floating-summary">
-
                   <div>
-
                     <strong>
                       {totalItems}{" "}
-                      {totalItems === 1
+                      {totalItems ===
+                      1
                         ? "item"
                         : "items"}{" "}
                       in cart
@@ -1320,7 +1476,6 @@ function Products() {
                     <span>
                       Cart is ready for checkout
                     </span>
-
                   </div>
 
                   <Link
@@ -1329,18 +1484,12 @@ function Products() {
                   >
                     View Cart
                   </Link>
-
                 </div>
               )}
-
             </div>
           </div>
         </div>
       </section>
-
-      {/* ======================================================
-          FOOTER
-      ====================================================== */}
 
       <Footer />
     </div>
