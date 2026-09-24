@@ -8,6 +8,7 @@ from whatsapp import router as whatsapp_router
 from theme import router as theme_router
 from reviews import router as reviews_router
 from header_footer import router as header_footer_router
+from blogs import router as blogs_router
 
 from config import APP_NAME, FRONTEND_URL, PORT
 from database import test_database_connection
@@ -67,6 +68,9 @@ app.include_router(reviews_router)
 # Header & Footer
 app.include_router(header_footer_router)
 
+# Blogging
+app.include_router(blogs_router)
+
 
 # ============================================================
 # ROOT
@@ -108,7 +112,7 @@ if __name__ == "__main__":
 
     uvicorn.run(
         "main:app",
-        host="127.0.0.1",
+        host="0.0.0.0",
         port=PORT,
         reload=True,
     )

@@ -328,3 +328,107 @@ class OrderResponse(BaseModel):
     payment_method: str
     status: str
     created_at: str
+
+
+# =========================================================
+# BLOG SCHEMAS
+# =========================================================
+
+class BlogCreate(BaseModel):
+    title: str = Field(
+        ...,
+        min_length=2,
+        max_length=200,
+    )
+
+    slug: Optional[str] = Field(
+        default=None,
+        max_length=250,
+    )
+
+    excerpt: str = Field(
+        default="",
+        max_length=1000,
+    )
+
+    content: str = Field(
+        ...,
+        min_length=2,
+        max_length=50000,
+    )
+
+    author: str = Field(
+        default="GoJuniors",
+        max_length=100,
+    )
+
+    image: Optional[str] = None
+
+    category: str = Field(
+        default="Technology",
+        max_length=100,
+    )
+
+    tags: List[str] = Field(
+        default_factory=list,
+    )
+
+    is_published: bool = False
+
+
+class BlogUpdate(BaseModel):
+    title: Optional[str] = Field(
+        default=None,
+        min_length=2,
+        max_length=200,
+    )
+
+    slug: Optional[str] = Field(
+        default=None,
+        max_length=250,
+    )
+
+    excerpt: Optional[str] = Field(
+        default=None,
+        max_length=1000,
+    )
+
+    content: Optional[str] = Field(
+        default=None,
+        min_length=2,
+        max_length=50000,
+    )
+
+    author: Optional[str] = Field(
+        default=None,
+        max_length=100,
+    )
+
+    image: Optional[str] = None
+
+    category: Optional[str] = Field(
+        default=None,
+        max_length=100,
+    )
+
+    tags: Optional[List[str]] = None
+
+    is_published: Optional[bool] = None
+
+
+class BlogResponse(BaseModel):
+    id: str
+    title: str
+    slug: str
+    excerpt: str
+    content: str
+    author: str
+    image: Optional[str] = None
+    category: str
+    tags: List[str] = Field(
+        default_factory=list,
+    )
+    is_published: bool
+    published_at: Optional[str] = None
+    created_at: Optional[str] = None
+    updated_at: Optional[str] = None

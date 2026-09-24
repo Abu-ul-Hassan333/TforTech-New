@@ -14,6 +14,7 @@ import {
   FaImage,
   FaUsers,
   FaColumns,
+  FaEdit,
 } from "react-icons/fa";
 
 import Navbar from "../../components/Navbar/Navbar";
@@ -253,6 +254,25 @@ const AdminLayout = ({ children }) => {
                   >
                     <FaColumns />
                     <span>Header & Footer</span>
+                  </NavLink>
+                )}
+
+                {/* =================================================
+                    BLOGGING
+                    ADMIN ONLY
+                ================================================= */}
+
+                {isAdmin && (
+                  <NavLink
+                    to="/admin/blogging"
+                    className={({ isActive }) =>
+                      `admin-nav-link ${
+                        isActive ? "active" : ""
+                      }`
+                    }
+                  >
+                    <FaEdit />
+                    <span>Blogging</span>
                   </NavLink>
                 )}
 

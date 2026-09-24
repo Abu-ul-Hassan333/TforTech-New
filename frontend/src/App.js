@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import Products from "./pages/Products/Products";
 import ProductDetails from "./pages/ProductDetails/ProductDetails";
 import Blogging from "./pages/Blogging/Blogging";
+import BlogDetails from "./pages/BlogDetails/BlogDetails";
 import Categories from "./pages/Categories/Categories";
 import About from "./pages/About/About";
 import Contact from "./pages/Contact/Contact";
@@ -32,6 +33,7 @@ import AdminReviews from "./pages/AdminReviews/AdminReviews";
 import AdminHero from "./pages/AdminHero/AdminHero";
 import AdminUsers from "./pages/AdminUsers/AdminUsers";
 import AdminHeaderFooter from "./pages/AdminHeaderFooter/AdminHeaderFooter";
+import AdminBlogging from "./pages/AdminBlogging/AdminBlogging";
 
 import CustomerReviews from "./pages/CustomerReviews/CustomerReviews";
 
@@ -75,6 +77,11 @@ function App() {
               <Route
                 path="/blogging"
                 element={<Blogging />}
+              />
+
+              <Route
+                path="/blogging/:id"
+                element={<BlogDetails />}
               />
 
 
@@ -397,6 +404,25 @@ function App() {
                     ]}
                   >
                     <AdminHeaderFooter />
+                  </ProtectedRoute>
+                }
+              />
+
+
+              {/* ==================================================
+                  ADMIN BLOGGING
+                  ADMIN ONLY
+              ================================================== */}
+
+              <Route
+                path="/admin/blogging"
+                element={
+                  <ProtectedRoute
+                    allowedRoles={[
+                      "admin",
+                    ]}
+                  >
+                    <AdminBlogging />
                   </ProtectedRoute>
                 }
               />
