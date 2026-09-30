@@ -10,7 +10,7 @@ from reviews import router as reviews_router
 from header_footer import router as header_footer_router
 from blogs import router as blogs_router
 
-from config import APP_NAME, FRONTEND_URL, PORT
+from config import APP_NAME, FRONTEND_URL, FRONTEND_URLS, PORT
 from database import test_database_connection
 
 
@@ -24,9 +24,12 @@ app = FastAPI(
 # CORS
 # ============================================================
 
+# Start with the configured frontend URLs.
+# FRONTEND_URL is also retained for backward compatibility.
 allowed_origins = list(
     dict.fromkeys(
         [
+            *(url.rstrip("/") for url in FRONTEND_URLS),
             FRONTEND_URL.rstrip("/"),
             "http://localhost:3000",
             "http://127.0.0.1:3000",

@@ -58,7 +58,20 @@ JWT_ACCESS_TOKEN_EXPIRE_MINUTES = int(
 
 
 # Frontend settings
+# Kept for backward compatibility with existing code.
 FRONTEND_URL = os.getenv(
     "FRONTEND_URL",
     "http://localhost:3000",
 )
+
+
+# Multiple frontend origins for CORS.
+# Supports both local development and production website.
+FRONTEND_URLS = [
+    url.strip()
+    for url in os.getenv(
+        "FRONTEND_URLS",
+        "http://localhost:3000,https://tfortech.store",
+    ).split(",")
+    if url.strip()
+]
