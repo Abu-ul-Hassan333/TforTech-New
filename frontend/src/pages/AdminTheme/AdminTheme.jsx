@@ -20,7 +20,10 @@ import { useTheme } from "../../context/ThemeContext";
 
 import "./AdminTheme.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 /* ============================================================
    ORIGINAL GOJUNIORS DEFAULT THEME

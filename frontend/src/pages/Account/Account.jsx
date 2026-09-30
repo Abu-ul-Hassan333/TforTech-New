@@ -6,13 +6,13 @@ import Footer from "../../components/Footer/Footer";
 
 import "./Account.css";
 
-
-const API_URL = "http://localhost:8000";
-
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const Account = () => {
   const navigate = useNavigate();
-
 
   const [user, setUser] = useState(null);
 
@@ -30,7 +30,6 @@ const Account = () => {
   const [error, setError] = useState("");
 
   const [successMessage, setSuccessMessage] = useState("");
-
 
   // ==========================================
   // LOGOUT / AUTHENTICATION FAILURE
@@ -50,7 +49,6 @@ const Account = () => {
     navigate("/login");
   };
 
-
   // ==========================================
   // FETCH CURRENT USER
   // ==========================================
@@ -62,12 +60,10 @@ const Account = () => {
           "tfortech_access_token"
         );
 
-
         if (!token) {
           navigate("/login");
           return;
         }
-
 
         const response = await fetch(
           `${API_URL}/api/auth/me`,
@@ -80,12 +76,10 @@ const Account = () => {
           }
         );
 
-
         if (response.status === 401) {
           handleAuthenticationFailure();
           return;
         }
-
 
         if (!response.ok) {
           throw new Error(
@@ -93,18 +87,14 @@ const Account = () => {
           );
         }
 
-
         const data = await response.json();
 
-
         setUser(data);
-
 
         setFormData({
           full_name: data.full_name || "",
           phone: data.phone || "",
         });
-
 
         // Keep Navbar user information synchronized.
         localStorage.setItem(
@@ -136,7 +126,6 @@ const Account = () => {
           "tfortech_logged_in",
           "true"
         );
-
       } catch (fetchError) {
         console.error(
           "Account information error:",
@@ -151,14 +140,12 @@ const Account = () => {
       }
     };
 
-
     fetchCurrentUser();
 
     // handleAuthenticationFailure is intentionally
     // kept stable for this page's authentication flow.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigate]);
-
 
   // ==========================================
   // HANDLE INPUT CHANGE
@@ -167,18 +154,15 @@ const Account = () => {
   const handleChange = (event) => {
     const { name, value } = event.target;
 
-
     setFormData((previousData) => ({
       ...previousData,
       [name]: value,
     }));
 
-
     setError("");
 
     setSuccessMessage("");
   };
-
 
   // ==========================================
   // EDIT PROFILE
@@ -189,12 +173,10 @@ const Account = () => {
       return;
     }
 
-
     setFormData({
       full_name: user.full_name || "",
       phone: user.phone || "",
     });
-
 
     setIsEditing(true);
 
@@ -202,7 +184,6 @@ const Account = () => {
 
     setSuccessMessage("");
   };
-
 
   // ==========================================
   // CANCEL EDIT
@@ -216,14 +197,12 @@ const Account = () => {
       });
     }
 
-
     setIsEditing(false);
 
     setError("");
 
     setSuccessMessage("");
   };
-
 
   // ==========================================
   // SAVE PROFILE
@@ -232,22 +211,18 @@ const Account = () => {
   const handleSave = async (event) => {
     event.preventDefault();
 
-
     const fullName = formData.full_name.trim();
 
     const phone = formData.phone.trim();
-
 
     setError("");
 
     setSuccessMessage("");
 
-
     if (!fullName) {
       setError("Please enter your full name.");
       return;
     }
-
 
     if (fullName.length < 2) {
       setError(
@@ -256,12 +231,10 @@ const Account = () => {
       return;
     }
 
-
     if (!phone) {
       setError("Please enter your phone number.");
       return;
     }
-
 
     if (phone.length < 7) {
       setError(
@@ -270,21 +243,17 @@ const Account = () => {
       return;
     }
 
-
     try {
       setIsSaving(true);
-
 
       const token = localStorage.getItem(
         "tfortech_access_token"
       );
 
-
       if (!token) {
         handleAuthenticationFailure();
         return;
       }
-
 
       const response = await fetch(
         `${API_URL}/api/auth/me`,
@@ -304,15 +273,12 @@ const Account = () => {
         }
       );
 
-
       if (response.status === 401) {
         handleAuthenticationFailure();
         return;
       }
 
-
       const data = await response.json();
-
 
       if (!response.ok) {
         throw new Error(
@@ -321,15 +287,12 @@ const Account = () => {
         );
       }
 
-
       setUser(data);
-
 
       setFormData({
         full_name: data.full_name || "",
         phone: data.phone || "",
       });
-
 
       // Update Navbar information immediately.
       localStorage.setItem(
@@ -342,31 +305,25 @@ const Account = () => {
         data.phone
       );
 
-
       setIsEditing(false);
-
 
       setSuccessMessage(
         "Your profile has been updated successfully."
       );
-
     } catch (saveError) {
       console.error(
         "Profile update error:",
         saveError
       );
 
-
       setError(
         saveError.message ||
           "Unable to update your profile. Please try again."
       );
-
     } finally {
       setIsSaving(false);
     }
   };
-
 
   // ==========================================
   // LOGOUT
@@ -385,7 +342,6 @@ const Account = () => {
 
     navigate("/login");
   };
-
 
   // ==========================================
   // LOADING
@@ -415,7 +371,6 @@ const Account = () => {
     );
   }
 
-
   // ==========================================
   // ACCOUNT LOAD ERROR
   // ==========================================
@@ -435,7 +390,6 @@ const Account = () => {
                 {error}
               </p>
             </div>
-
 
             <div className="account-logout-card">
 
@@ -457,7 +411,6 @@ const Account = () => {
     );
   }
 
-
   // ==========================================
   // ACCOUNT DATA
   // ==========================================
@@ -465,18 +418,14 @@ const Account = () => {
   const userName =
     user?.full_name || "Customer";
 
-
   const userEmail =
     user?.email || "Email not available";
-
 
   const userPhone =
     user?.phone || "Phone not available";
 
-
   const accountStatus =
     user?.is_active ? "Active" : "Inactive";
-
 
   // ==========================================
   // MAIN ACCOUNT PAGE
@@ -489,7 +438,6 @@ const Account = () => {
       ======================================== */}
 
       <Navbar />
-
 
       {/* ========================================
           ACCOUNT CONTENT
@@ -516,7 +464,6 @@ const Account = () => {
 
           </div>
 
-
           {/* ======================================
               ACCOUNT INFORMATION
           ====================================== */}
@@ -537,7 +484,6 @@ const Account = () => {
 
               </div>
 
-
               {!isEditing && (
                 <button
                   type="button"
@@ -550,7 +496,6 @@ const Account = () => {
 
             </div>
 
-
             {/* SUCCESS MESSAGE */}
 
             {successMessage && (
@@ -562,7 +507,6 @@ const Account = () => {
               </div>
             )}
 
-
             {/* ERROR MESSAGE */}
 
             {error && (
@@ -573,7 +517,6 @@ const Account = () => {
                 {error}
               </div>
             )}
-
 
             {/* ==================================
                 VIEW PROFILE
@@ -594,7 +537,6 @@ const Account = () => {
 
                 </div>
 
-
                 <div className="account-info-item">
 
                   <div className="account-info-label">
@@ -607,7 +549,6 @@ const Account = () => {
 
                 </div>
 
-
                 <div className="account-info-item">
 
                   <div className="account-info-label">
@@ -619,7 +560,6 @@ const Account = () => {
                   </div>
 
                 </div>
-
 
                 <div className="account-info-item">
 
@@ -664,7 +604,6 @@ const Account = () => {
 
                 </div>
 
-
                 <div className="account-form-group">
 
                   <label htmlFor="account-email">
@@ -685,7 +624,6 @@ const Account = () => {
 
                 </div>
 
-
                 <div className="account-form-group">
 
                   <label htmlFor="account-phone">
@@ -705,7 +643,6 @@ const Account = () => {
 
                 </div>
 
-
                 <div className="account-edit-actions">
 
                   <button
@@ -716,7 +653,6 @@ const Account = () => {
                   >
                     Cancel
                   </button>
-
 
                   <button
                     type="submit"
@@ -735,7 +671,6 @@ const Account = () => {
 
           </div>
 
-
           {/* ======================================
               ACCOUNT ACTIVITIES
           ====================================== */}
@@ -745,7 +680,6 @@ const Account = () => {
             <h2 className="account-card-title">
               Account Activities
             </h2>
-
 
             <div className="account-activities">
 
@@ -770,7 +704,6 @@ const Account = () => {
                 </span>
 
               </button>
-
 
               {/* ORDERS */}
 
@@ -798,7 +731,6 @@ const Account = () => {
 
           </div>
 
-
           {/* ======================================
               LOGOUT
           ====================================== */}
@@ -819,7 +751,6 @@ const Account = () => {
 
       </main>
 
-
       {/* ========================================
           FOOTER
       ======================================== */}
@@ -828,6 +759,5 @@ const Account = () => {
     </>
   );
 };
-
 
 export default Account;

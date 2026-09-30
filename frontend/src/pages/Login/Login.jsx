@@ -4,8 +4,10 @@ import { Link, useNavigate } from "react-router-dom";
 
 import "./Login.css";
 
-const API_URL =
-  "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const ALLOWED_ROLES = [
   "customer",
@@ -182,7 +184,6 @@ const Login = () => {
 
       /*
         Save authentication information locally.
-
         The backend is the source of truth for the
         user's role. Only the supported application
         roles are stored.
@@ -237,7 +238,6 @@ const Login = () => {
       /*
         Remember Me is kept for future
         session handling.
-
         For now, authentication information
         is stored in localStorage so the
         current frontend can use it.
@@ -278,7 +278,6 @@ const Login = () => {
         {/* Left Side */}
 
         <div className="login-info">
-
           <Link
             to="/"
             className="login-logo"
@@ -287,7 +286,6 @@ const Login = () => {
           </Link>
 
           <div className="login-info-content">
-
             <span className="login-badge">
               Welcome Back
             </span>
@@ -309,7 +307,6 @@ const Login = () => {
             <div className="login-benefits">
 
               <div className="login-benefit">
-
                 <span className="login-benefit-icon">
                   ✓
                 </span>
@@ -323,11 +320,9 @@ const Login = () => {
                     Quickly access your saved products and orders.
                   </p>
                 </div>
-
               </div>
 
               <div className="login-benefit">
-
                 <span className="login-benefit-icon">
                   ✓
                 </span>
@@ -341,11 +336,9 @@ const Login = () => {
                     Keep your favourite laptops and accessories saved.
                   </p>
                 </div>
-
               </div>
 
               <div className="login-benefit">
-
                 <span className="login-benefit-icon">
                   ✓
                 </span>
@@ -359,7 +352,6 @@ const Login = () => {
                     Your account information stays protected.
                   </p>
                 </div>
-
               </div>
 
             </div>
@@ -369,11 +361,9 @@ const Login = () => {
         {/* Right Side */}
 
         <div className="login-form-section">
-
           <div className="login-form-card">
 
             <div className="login-heading">
-
               <h2>
                 Sign in
               </h2>
@@ -384,7 +374,6 @@ const Login = () => {
                   Create one
                 </Link>
               </p>
-
             </div>
 
             {error && (
@@ -402,7 +391,6 @@ const Login = () => {
             >
 
               <div className="login-form-group">
-
                 <label htmlFor="login-email">
                   Email Address
                 </label>
@@ -423,13 +411,11 @@ const Login = () => {
                     isLoading
                   }
                 />
-
               </div>
 
               <div className="login-form-group">
 
                 <div className="login-password-label">
-
                   <label htmlFor="login-password">
                     Password
                   </label>
@@ -446,7 +432,6 @@ const Login = () => {
                   >
                     Forgot password?
                   </button>
-
                 </div>
 
                 <div className="login-password-wrapper">
@@ -496,11 +481,9 @@ const Login = () => {
                   </button>
 
                 </div>
-
               </div>
 
               <label className="remember-me">
-
                 <input
                   type="checkbox"
                   checked={
@@ -519,7 +502,6 @@ const Login = () => {
                 <span>
                   Remember me
                 </span>
-
               </label>
 
               <button
@@ -555,8 +537,8 @@ const Login = () => {
             </p>
 
           </div>
-
         </div>
+
       </div>
     </div>
   );

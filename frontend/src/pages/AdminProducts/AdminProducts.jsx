@@ -9,8 +9,10 @@ import AdminLayout from "../AdminLayout/AdminLayout";
 
 import "./AdminProducts.css";
 
-const API_URL =
-  "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const MAX_IMAGE_SIZE =
   5 * 1024 * 1024;

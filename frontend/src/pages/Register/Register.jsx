@@ -1,9 +1,13 @@
 import React, { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 import "./Register.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const Register = () => {
   const navigate = useNavigate();
@@ -16,12 +20,20 @@ const Register = () => {
     confirmPassword: "",
   });
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [showPassword, setShowPassword] =
+    useState(false);
 
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState(false);
+
+  const [agreeTerms, setAgreeTerms] =
+    useState(false);
+
+  const [error, setError] =
+    useState("");
+
+  const [isLoading, setIsLoading] =
+    useState(false);
 
   const handleChange = (event) => {
     const { name, value } = event.target;
@@ -39,11 +51,20 @@ const Register = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    const fullName = formData.fullName.trim();
-    const email = formData.email.trim().toLowerCase();
-    const phone = formData.phone.trim();
-    const password = formData.password;
-    const confirmPassword = formData.confirmPassword;
+    const fullName =
+      formData.fullName.trim();
+
+    const email =
+      formData.email.trim().toLowerCase();
+
+    const phone =
+      formData.phone.trim();
+
+    const password =
+      formData.password;
+
+    const confirmPassword =
+      formData.confirmPassword;
 
     setError("");
 
@@ -54,24 +75,33 @@ const Register = () => {
       !password ||
       !confirmPassword
     ) {
-      setError("Please fill in all required fields.");
+      setError(
+        "Please fill in all required fields."
+      );
       return;
     }
 
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailPattern =
+      /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!emailPattern.test(email)) {
-      setError("Please enter a valid email address.");
+      setError(
+        "Please enter a valid email address."
+      );
       return;
     }
 
     if (password.length < 6) {
-      setError("Password must contain at least 6 characters.");
+      setError(
+        "Password must contain at least 6 characters."
+      );
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match.");
+      setError(
+        "Passwords do not match."
+      );
       return;
     }
 
@@ -85,24 +115,30 @@ const Register = () => {
     try {
       setIsLoading(true);
 
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-        body: JSON.stringify({
-          full_name: fullName,
-          email,
-          phone,
-          password,
-        }),
-      });
+      const response = await fetch(
+        `${API_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type":
+              "application/json",
+            Accept:
+              "application/json",
+          },
+          body: JSON.stringify({
+            full_name: fullName,
+            email,
+            phone,
+            password,
+          }),
+        }
+      );
 
       let data = null;
 
       try {
-        data = await response.json();
+        data =
+          await response.json();
       } catch (jsonError) {
         data = null;
       }
@@ -113,9 +149,13 @@ const Register = () => {
           data?.message ||
           "Unable to create your account. Please try again.";
 
-        if (response.status === 400) {
+        if (
+          response.status === 400
+        ) {
           setError(backendMessage);
-        } else if (response.status === 422) {
+        } else if (
+          response.status === 422
+        ) {
           setError(
             "Please check your information and make sure all fields are valid."
           );
@@ -126,7 +166,11 @@ const Register = () => {
         return;
       }
 
-      if (!data?.success || !data?.access_token || !data?.user) {
+      if (
+        !data?.success ||
+        !data?.access_token ||
+        !data?.user
+      ) {
         setError(
           "Account creation completed, but the server returned an invalid response."
         );
@@ -137,28 +181,42 @@ const Register = () => {
         Save the real authentication information returned
         by the FastAPI backend.
       */
-      localStorage.setItem("tfortech_logged_in", "true");
-      localStorage.setItem("tfortech_access_token", data.access_token);
+
+      localStorage.setItem(
+        "tfortech_logged_in",
+        "true"
+      );
+
+      localStorage.setItem(
+        "tfortech_access_token",
+        data.access_token
+      );
+
       localStorage.setItem(
         "tfortech_token_type",
         data.token_type || "bearer"
       );
+
       localStorage.setItem(
         "tfortech_user_id",
         data.user.id
       );
+
       localStorage.setItem(
         "tfortech_user_name",
         data.user.full_name
       );
+
       localStorage.setItem(
         "tfortech_user_email",
         data.user.email
       );
+
       localStorage.setItem(
         "tfortech_user_phone",
         data.user.phone
       );
+
       localStorage.setItem(
         "tfortech_user_role",
         data.user.role
@@ -166,7 +224,10 @@ const Register = () => {
 
       navigate("/");
     } catch (requestError) {
-      console.error("Registration request error:", requestError);
+      console.error(
+        "Registration request error:",
+        requestError
+      );
 
       setError(
         "Unable to connect to the server. Please make sure the backend is running."
@@ -179,16 +240,22 @@ const Register = () => {
   return (
     <div className="register-page">
       <div className="register-container">
+
         {/* =========================
             LEFT INFORMATION SECTION
         ========================== */}
 
         <div className="register-info">
-          <Link to="/" className="register-logo">
+
+          <Link
+            to="/"
+            className="register-logo"
+          >
             TFor Tech
           </Link>
 
           <div className="register-info-content">
+
             <span className="register-badge">
               Create Your Account
             </span>
@@ -196,7 +263,9 @@ const Register = () => {
             <h1>
               Start your
               <br />
-              <span>tech journey.</span>
+              <span>
+                tech journey.
+              </span>
             </h1>
 
             <p>
@@ -206,11 +275,16 @@ const Register = () => {
             </p>
 
             <div className="register-benefits">
+
               <div className="register-benefit">
-                <span className="register-benefit-icon">✓</span>
+                <span className="register-benefit-icon">
+                  ✓
+                </span>
 
                 <div>
-                  <strong>Save Your Favorites</strong>
+                  <strong>
+                    Save Your Favorites
+                  </strong>
 
                   <p>
                     Add laptops and accessories to your wishlist.
@@ -219,10 +293,14 @@ const Register = () => {
               </div>
 
               <div className="register-benefit">
-                <span className="register-benefit-icon">✓</span>
+                <span className="register-benefit-icon">
+                  ✓
+                </span>
 
                 <div>
-                  <strong>Easy Checkout</strong>
+                  <strong>
+                    Easy Checkout
+                  </strong>
 
                   <p>
                     Keep your details ready for a faster checkout.
@@ -231,16 +309,21 @@ const Register = () => {
               </div>
 
               <div className="register-benefit">
-                <span className="register-benefit-icon">✓</span>
+                <span className="register-benefit-icon">
+                  ✓
+                </span>
 
                 <div>
-                  <strong>Better Shopping</strong>
+                  <strong>
+                    Better Shopping
+                  </strong>
 
                   <p>
                     Get a smoother and more personalized experience.
                   </p>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -251,22 +334,36 @@ const Register = () => {
 
         <div className="register-form-section">
           <div className="register-form-card">
+
             <div className="register-heading">
-              <h2>Create account</h2>
+
+              <h2>
+                Create account
+              </h2>
 
               <p>
                 Already have an account?{" "}
-                <Link to="/login">Sign in</Link>
+                <Link to="/login">
+                  Sign in
+                </Link>
               </p>
+
             </div>
 
             {error && (
-              <div className="register-error" role="alert">
+              <div
+                className="register-error"
+                role="alert"
+              >
                 {error}
               </div>
             )}
 
-            <form onSubmit={handleSubmit} noValidate>
+            <form
+              onSubmit={handleSubmit}
+              noValidate
+            >
+
               {/* Full Name */}
 
               <div className="register-form-group">
@@ -278,11 +375,17 @@ const Register = () => {
                   id="register-full-name"
                   type="text"
                   name="fullName"
-                  value={formData.fullName}
-                  onChange={handleChange}
+                  value={
+                    formData.fullName
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Enter your full name"
                   autoComplete="name"
-                  disabled={isLoading}
+                  disabled={
+                    isLoading
+                  }
                 />
               </div>
 
@@ -297,11 +400,17 @@ const Register = () => {
                   id="register-email"
                   type="email"
                   name="email"
-                  value={formData.email}
-                  onChange={handleChange}
+                  value={
+                    formData.email
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Enter your email"
                   autoComplete="email"
-                  disabled={isLoading}
+                  disabled={
+                    isLoading
+                  }
                 />
               </div>
 
@@ -316,11 +425,17 @@ const Register = () => {
                   id="register-phone"
                   type="tel"
                   name="phone"
-                  value={formData.phone}
-                  onChange={handleChange}
+                  value={
+                    formData.phone
+                  }
+                  onChange={
+                    handleChange
+                  }
                   placeholder="Enter your phone number"
                   autoComplete="tel"
-                  disabled={isLoading}
+                  disabled={
+                    isLoading
+                  }
                 />
               </div>
 
@@ -332,32 +447,51 @@ const Register = () => {
                 </label>
 
                 <div className="register-password-wrapper">
+
                   <input
                     id="register-password"
-                    type={showPassword ? "text" : "password"}
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
                     name="password"
-                    value={formData.password}
-                    onChange={handleChange}
+                    value={
+                      formData.password
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Create a password"
                     autoComplete="new-password"
-                    disabled={isLoading}
+                    disabled={
+                      isLoading
+                    }
                   />
 
                   <button
                     type="button"
                     className="register-password-toggle"
                     onClick={() =>
-                      setShowPassword((previous) => !previous)
+                      setShowPassword(
+                        (previous) =>
+                          !previous
+                      )
                     }
                     aria-label={
                       showPassword
                         ? "Hide password"
                         : "Show password"
                     }
-                    disabled={isLoading}
+                    disabled={
+                      isLoading
+                    }
                   >
-                    {showPassword ? "Hide" : "Show"}
+                    {showPassword
+                      ? "Hide"
+                      : "Show"}
                   </button>
+
                 </div>
               </div>
 
@@ -369,6 +503,7 @@ const Register = () => {
                 </label>
 
                 <div className="register-password-wrapper">
+
                   <input
                     id="register-confirm-password"
                     type={
@@ -377,11 +512,17 @@ const Register = () => {
                         : "password"
                     }
                     name="confirmPassword"
-                    value={formData.confirmPassword}
-                    onChange={handleChange}
+                    value={
+                      formData.confirmPassword
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Confirm your password"
                     autoComplete="new-password"
-                    disabled={isLoading}
+                    disabled={
+                      isLoading
+                    }
                   />
 
                   <button
@@ -389,7 +530,8 @@ const Register = () => {
                     className="register-password-toggle"
                     onClick={() =>
                       setShowConfirmPassword(
-                        (previous) => !previous
+                        (previous) =>
+                          !previous
                       )
                     }
                     aria-label={
@@ -397,29 +539,42 @@ const Register = () => {
                         ? "Hide password"
                         : "Show password"
                     }
-                    disabled={isLoading}
+                    disabled={
+                      isLoading
+                    }
                   >
-                    {showConfirmPassword ? "Hide" : "Show"}
+                    {showConfirmPassword
+                      ? "Hide"
+                      : "Show"}
                   </button>
+
                 </div>
               </div>
 
               {/* Terms */}
 
               <label className="register-terms">
+
                 <input
                   type="checkbox"
-                  checked={agreeTerms}
-                  onChange={(event) =>
-                    setAgreeTerms(event.target.checked)
+                  checked={
+                    agreeTerms
                   }
-                  disabled={isLoading}
+                  onChange={(event) =>
+                    setAgreeTerms(
+                      event.target.checked
+                    )
+                  }
+                  disabled={
+                    isLoading
+                  }
                 />
 
                 <span>
                   I agree to the Terms & Conditions and Privacy
                   Policy.
                 </span>
+
               </label>
 
               {/* Submit */}
@@ -427,14 +582,21 @@ const Register = () => {
               <button
                 type="submit"
                 className="register-submit-button"
-                disabled={isLoading}
+                disabled={
+                  isLoading
+                }
               >
-                {isLoading ? "Creating Account..." : "Create Account"}
+                {isLoading
+                  ? "Creating Account..."
+                  : "Create Account"}
               </button>
+
             </form>
 
             <div className="register-divider">
-              <span>or</span>
+              <span>
+                or
+              </span>
             </div>
 
             <Link
@@ -448,8 +610,10 @@ const Register = () => {
               Your account is securely created using the store
               backend.
             </p>
+
           </div>
         </div>
+
       </div>
     </div>
   );

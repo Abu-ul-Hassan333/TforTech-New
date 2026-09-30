@@ -10,9 +10,10 @@ import Footer from "../../components/Footer/Footer";
 
 import "./Checkout.css";
 
-
-const API_URL = "http://127.0.0.1:8000";
-
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 function Checkout() {
   const navigate = useNavigate();
@@ -26,7 +27,6 @@ function Checkout() {
     clearCart,
   } = useCart();
 
-
   const [formData, setFormData] = useState({
     fullName: "",
     phone: "",
@@ -35,22 +35,15 @@ function Checkout() {
     city: "",
   });
 
-
   const [errors, setErrors] = useState({});
-
   const [orderPlaced, setOrderPlaced] = useState(false);
-
   const [isPlacingOrder, setIsPlacingOrder] = useState(false);
-
   const [orderError, setOrderError] = useState("");
-
   const [orderId, setOrderId] = useState("");
-
 
   // ==========================================
   // HANDLE INPUT CHANGE
   // ==========================================
-
   const handleChange = (event) => {
     const { name, value } = event.target;
 
@@ -67,68 +60,72 @@ function Checkout() {
     setOrderError("");
   };
 
-
   // ==========================================
   // VALIDATE FORM
   // ==========================================
-
   const validateForm = () => {
     const newErrors = {};
 
-
     if (!formData.fullName.trim()) {
-      newErrors.fullName = "Please enter your full name.";
+      newErrors.fullName =
+        "Please enter your full name.";
     }
-
 
     if (!formData.phone.trim()) {
-      newErrors.phone = "Please enter your phone number.";
-    } else if (formData.phone.trim().length < 10) {
-      newErrors.phone = "Please enter a valid phone number.";
+      newErrors.phone =
+        "Please enter your phone number.";
+    } else if (
+      formData.phone.trim().length < 10
+    ) {
+      newErrors.phone =
+        "Please enter a valid phone number.";
     }
 
-
     if (!formData.email.trim()) {
-      newErrors.email = "Please enter your email address.";
+      newErrors.email =
+        "Please enter your email address.";
     } else {
-      const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      const emailPattern =
+        /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-      if (!emailPattern.test(formData.email.trim())) {
-        newErrors.email = "Please enter a valid email address.";
+      if (
+        !emailPattern.test(
+          formData.email.trim()
+        )
+      ) {
+        newErrors.email =
+          "Please enter a valid email address.";
       }
     }
 
-
     if (!formData.address.trim()) {
-      newErrors.address = "Please enter your complete address.";
+      newErrors.address =
+        "Please enter your complete address.";
     }
-
 
     if (!formData.city.trim()) {
-      newErrors.city = "Please enter your city.";
+      newErrors.city =
+        "Please enter your city.";
     }
-
 
     setErrors(newErrors);
 
-    return Object.keys(newErrors).length === 0;
+    return (
+      Object.keys(newErrors).length === 0
+    );
   };
-
 
   // ==========================================
   // PLACE ORDER
   // ==========================================
-
   const handlePlaceOrder = async (event) => {
     if (event) {
       event.preventDefault();
     }
 
-
     if (cartItems.length === 0) {
       return;
     }
-
 
     const isValid = validateForm();
 
@@ -136,17 +133,14 @@ function Checkout() {
       return;
     }
 
-
     setOrderError("");
-
     setIsPlacingOrder(true);
 
-
     try {
-      const token = localStorage.getItem(
-        "tfortech_access_token"
-      );
-
+      const token =
+        localStorage.getItem(
+          "tfortech_access_token"
+        );
 
       // User must be logged in before placing an order.
       if (!token) {
@@ -154,51 +148,58 @@ function Checkout() {
         return;
       }
 
-
       // Convert cart items into the structure
       // expected by the FastAPI Orders API.
-      const orderItems = cartItems.map((item) => {
-        const productId = String(
-          item.id || item._id || ""
-        );
+      const orderItems = cartItems.map(
+        (item) => {
+          const productId = String(
+            item.id || item._id || ""
+          );
 
-
-        return {
-          product_id: productId,
-          product_name: item.name || "Product",
-          quantity: Number(item.quantity || 1),
-          price: Number(item.price || 0),
-          image: item.image || null,
-        };
-      });
-
+          return {
+            product_id: productId,
+            product_name:
+              item.name || "Product",
+            quantity: Number(
+              item.quantity || 1
+            ),
+            price: Number(
+              item.price || 0
+            ),
+            image:
+              item.image || null,
+          };
+        }
+      );
 
       // Combine address + city because the backend
       // stores the complete shipping address together.
       const shippingAddress =
         `${formData.address.trim()}, ${formData.city.trim()}`;
 
-
       const response = await fetch(
         `${API_URL}/api/auth/orders`,
         {
           method: "POST",
-
           headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-            Accept: "application/json",
+            Authorization:
+              `Bearer ${token}`,
+            "Content-Type":
+              "application/json",
+            Accept:
+              "application/json",
           },
-
           body: JSON.stringify({
             items: orderItems,
-            shipping_address: shippingAddress,
-            phone: formData.phone.trim(),
-            payment_method: "Cash on Delivery",
+            shipping_address:
+              shippingAddress,
+            phone:
+              formData.phone.trim(),
+            payment_method:
+              "Cash on Delivery",
           }),
         }
       );
-
 
       // Authentication problem
       if (response.status === 401) {
@@ -239,13 +240,11 @@ function Checkout() {
         );
 
         navigate("/login");
-
         return;
       }
 
-
-      const data = await response.json();
-
+      const data =
+        await response.json();
 
       if (!response.ok) {
         throw new Error(
@@ -254,15 +253,14 @@ function Checkout() {
         );
       }
 
-
       // Save returned order ID for the success screen.
-      setOrderId(data.id || "");
-
+      setOrderId(
+        data.id || ""
+      );
 
       // Only clear the cart AFTER the backend
       // confirms that the order was successfully created.
       clearCart();
-
 
       setOrderPlaced(true);
     } catch (error) {
@@ -270,7 +268,6 @@ function Checkout() {
         "Place order error:",
         error
       );
-
 
       setOrderError(
         error.message ||
@@ -281,12 +278,13 @@ function Checkout() {
     }
   };
 
-
   // ==========================================
   // EMPTY CART
   // ==========================================
-
-  if (cartItems.length === 0 && !orderPlaced) {
+  if (
+    cartItems.length === 0 &&
+    !orderPlaced
+  ) {
     return (
       <>
         <Navbar />
@@ -294,7 +292,6 @@ function Checkout() {
         <main className="checkout-page">
           <section className="checkout-empty">
             <div className="checkout-empty-inner">
-
               <div className="checkout-empty-icon">
                 🛒
               </div>
@@ -315,7 +312,6 @@ function Checkout() {
               >
                 Browse Products
               </Link>
-
             </div>
           </section>
         </main>
@@ -325,11 +321,9 @@ function Checkout() {
     );
   }
 
-
   // ==========================================
   // ORDER SUCCESS
   // ==========================================
-
   if (orderPlaced) {
     return (
       <>
@@ -337,9 +331,7 @@ function Checkout() {
 
         <main className="checkout-page">
           <section className="checkout-success">
-
             <div className="checkout-success-card">
-
               <div className="checkout-success-icon">
                 ✓
               </div>
@@ -359,7 +351,6 @@ function Checkout() {
                 delivery details.
               </p>
 
-
               {orderId && (
                 <p>
                   <strong>
@@ -369,9 +360,7 @@ function Checkout() {
                 </p>
               )}
 
-
               <div className="checkout-success-actions">
-
                 <Link
                   to="/products"
                   className="checkout-primary-button"
@@ -392,11 +381,8 @@ function Checkout() {
                 >
                   Back to Home
                 </Link>
-
               </div>
-
             </div>
-
           </section>
         </main>
 
@@ -405,11 +391,9 @@ function Checkout() {
     );
   }
 
-
   // ==========================================
   // MAIN CHECKOUT
   // ==========================================
-
   return (
     <>
       <Navbar />
@@ -419,10 +403,8 @@ function Checkout() {
         {/* ==========================================
             CHECKOUT HERO
         ========================================== */}
-
         <section className="checkout-hero">
           <div className="checkout-container">
-
             <span className="checkout-eyebrow">
               SECURE CHECKOUT
             </span>
@@ -435,33 +417,25 @@ function Checkout() {
               Enter your delivery information and
               review your order before placing it.
             </p>
-
           </div>
         </section>
-
 
         {/* ==========================================
             CHECKOUT CONTENT
         ========================================== */}
-
         <section className="checkout-section">
-
           <div className="checkout-container checkout-layout">
 
             {/* ==========================================
                 CUSTOMER INFORMATION
             ========================================== */}
-
             <div className="checkout-form-card">
-
               <div className="checkout-card-heading">
-
                 <span className="checkout-step-number">
                   01
                 </span>
 
                 <div>
-
                   <h2>
                     Customer Information
                   </h2>
@@ -470,18 +444,17 @@ function Checkout() {
                     Enter your details for order
                     delivery.
                   </p>
-
                 </div>
-
               </div>
 
-
-              <form onSubmit={handlePlaceOrder}>
+              <form
+                onSubmit={
+                  handlePlaceOrder
+                }
+              >
 
                 {/* FULL NAME */}
-
                 <div className="checkout-form-group">
-
                   <label htmlFor="fullName">
                     Full Name
                     <span>*</span>
@@ -491,32 +464,35 @@ function Checkout() {
                     id="fullName"
                     name="fullName"
                     type="text"
-                    value={formData.fullName}
-                    onChange={handleChange}
+                    value={
+                      formData.fullName
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Enter your full name"
                     className={
                       errors.fullName
                         ? "checkout-input checkout-input-error"
                         : "checkout-input"
                     }
-                    disabled={isPlacingOrder}
+                    disabled={
+                      isPlacingOrder
+                    }
                   />
 
                   {errors.fullName && (
                     <small className="checkout-error">
-                      {errors.fullName}
+                      {
+                        errors.fullName
+                      }
                     </small>
                   )}
-
                 </div>
 
-
                 {/* PHONE + EMAIL */}
-
                 <div className="checkout-form-row">
-
                   <div className="checkout-form-group">
-
                     <label htmlFor="phone">
                       Phone Number
                       <span>*</span>
@@ -526,28 +502,33 @@ function Checkout() {
                       id="phone"
                       name="phone"
                       type="tel"
-                      value={formData.phone}
-                      onChange={handleChange}
+                      value={
+                        formData.phone
+                      }
+                      onChange={
+                        handleChange
+                      }
                       placeholder="03XX XXXXXXX"
                       className={
                         errors.phone
                           ? "checkout-input checkout-input-error"
                           : "checkout-input"
                       }
-                      disabled={isPlacingOrder}
+                      disabled={
+                        isPlacingOrder
+                      }
                     />
 
                     {errors.phone && (
                       <small className="checkout-error">
-                        {errors.phone}
+                        {
+                          errors.phone
+                        }
                       </small>
                     )}
-
                   </div>
 
-
                   <div className="checkout-form-group">
-
                     <label htmlFor="email">
                       Email Address
                       <span>*</span>
@@ -557,32 +538,35 @@ function Checkout() {
                       id="email"
                       name="email"
                       type="email"
-                      value={formData.email}
-                      onChange={handleChange}
+                      value={
+                        formData.email
+                      }
+                      onChange={
+                        handleChange
+                      }
                       placeholder="you@example.com"
                       className={
                         errors.email
                           ? "checkout-input checkout-input-error"
                           : "checkout-input"
                       }
-                      disabled={isPlacingOrder}
+                      disabled={
+                        isPlacingOrder
+                      }
                     />
 
                     {errors.email && (
                       <small className="checkout-error">
-                        {errors.email}
+                        {
+                          errors.email
+                        }
                       </small>
                     )}
-
                   </div>
-
                 </div>
 
-
                 {/* ADDRESS */}
-
                 <div className="checkout-form-group">
-
                   <label htmlFor="address">
                     Complete Address
                     <span>*</span>
@@ -591,8 +575,12 @@ function Checkout() {
                   <textarea
                     id="address"
                     name="address"
-                    value={formData.address}
-                    onChange={handleChange}
+                    value={
+                      formData.address
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="House/Flat number, street, area..."
                     rows="4"
                     className={
@@ -600,22 +588,22 @@ function Checkout() {
                         ? "checkout-input checkout-textarea checkout-input-error"
                         : "checkout-input checkout-textarea"
                     }
-                    disabled={isPlacingOrder}
+                    disabled={
+                      isPlacingOrder
+                    }
                   />
 
                   {errors.address && (
                     <small className="checkout-error">
-                      {errors.address}
+                      {
+                        errors.address
+                      }
                     </small>
                   )}
-
                 </div>
 
-
                 {/* CITY */}
-
                 <div className="checkout-form-group">
-
                   <label htmlFor="city">
                     City
                     <span>*</span>
@@ -625,36 +613,39 @@ function Checkout() {
                     id="city"
                     name="city"
                     type="text"
-                    value={formData.city}
-                    onChange={handleChange}
+                    value={
+                      formData.city
+                    }
+                    onChange={
+                      handleChange
+                    }
                     placeholder="Enter your city"
                     className={
                       errors.city
                         ? "checkout-input checkout-input-error"
                         : "checkout-input"
                     }
-                    disabled={isPlacingOrder}
+                    disabled={
+                      isPlacingOrder
+                    }
                   />
 
                   {errors.city && (
                     <small className="checkout-error">
-                      {errors.city}
+                      {
+                        errors.city
+                      }
                     </small>
                   )}
-
                 </div>
 
-
                 {/* PAYMENT INFO */}
-
                 <div className="checkout-payment-note">
-
                   <div className="checkout-payment-icon">
                     ✓
                   </div>
 
                   <div>
-
                     <strong>
                       Cash on Delivery
                     </strong>
@@ -663,14 +654,10 @@ function Checkout() {
                       Payment method will be confirmed
                       during order confirmation.
                     </p>
-
                   </div>
-
                 </div>
 
-
                 {/* BACKEND ERROR */}
-
                 {orderError && (
                   <div
                     className="checkout-error"
@@ -683,34 +670,27 @@ function Checkout() {
                   </div>
                 )}
 
-
                 {/* PLACE ORDER MOBILE/FORM BUTTON */}
-
                 <button
                   type="submit"
                   className="checkout-place-order-mobile"
-                  disabled={isPlacingOrder}
+                  disabled={
+                    isPlacingOrder
+                  }
                 >
                   {isPlacingOrder
                     ? "Placing Order..."
                     : `Place Order — PKR ${grandTotal.toLocaleString()}`}
                 </button>
-
               </form>
-
             </div>
-
 
             {/* ==========================================
                 ORDER SUMMARY
             ========================================== */}
-
             <aside className="checkout-summary-card">
-
               <div className="checkout-summary-heading">
-
                 <div>
-
                   <span className="checkout-summary-label">
                     YOUR ORDER
                   </span>
@@ -718,7 +698,6 @@ function Checkout() {
                   <h2>
                     Order Summary
                   </h2>
-
                 </div>
 
                 <span className="checkout-item-count">
@@ -727,92 +706,82 @@ function Checkout() {
                     ? "item"
                     : "items"}
                 </span>
-
               </div>
-
 
               {/* PRODUCTS */}
-
               <div className="checkout-products">
+                {cartItems.map(
+                  (item) => {
+                    const productId =
+                      item.id || item._id;
 
-                {cartItems.map((item) => {
+                    return (
+                      <div
+                        className="checkout-product"
+                        key={productId}
+                      >
+                        <div className="checkout-product-image">
+                          {item.image ? (
+                            <img
+                              src={item.image}
+                              alt={
+                                item.name
+                              }
+                            />
+                          ) : (
+                            <div className="checkout-product-placeholder">
+                              Laptop
+                            </div>
+                          )}
+                        </div>
 
-                  const productId =
-                    item.id || item._id;
+                        <div className="checkout-product-info">
+                          <Link
+                            to={`/products/${productId}`}
+                            className="checkout-product-name"
+                          >
+                            {item.name}
+                          </Link>
 
-                  return (
-                    <div
-                      className="checkout-product"
-                      key={productId}
-                    >
-
-                      <div className="checkout-product-image">
-
-                        {item.image ? (
-                          <img
-                            src={item.image}
-                            alt={item.name}
-                          />
-                        ) : (
-                          <div className="checkout-product-placeholder">
-                            Laptop
+                          <div className="checkout-product-meta">
+                            Qty:{" "}
+                            {item.quantity}
                           </div>
-                        )}
 
-                      </div>
-
-
-                      <div className="checkout-product-info">
-
-                        <Link
-                          to={`/products/${productId}`}
-                          className="checkout-product-name"
-                        >
-                          {item.name}
-                        </Link>
-
-                        <div className="checkout-product-meta">
-                          Qty: {item.quantity}
+                          <div className="checkout-product-price">
+                            PKR{" "}
+                            {(
+                              Number(
+                                item.price || 0
+                              ) *
+                              Number(
+                                item.quantity || 0
+                              )
+                            ).toLocaleString()}
+                          </div>
                         </div>
-
-                        <div className="checkout-product-price">
-                          PKR{" "}
-                          {(
-                            Number(item.price || 0) *
-                            Number(item.quantity || 0)
-                          ).toLocaleString()}
-                        </div>
-
                       </div>
-
-                    </div>
-                  );
-                })}
-
+                    );
+                  }
+                )}
               </div>
 
-
               {/* TOTALS */}
-
               <div className="checkout-summary-divider">
               </div>
 
-
               <div className="checkout-total-row">
-
                 <span>
                   Subtotal
                 </span>
 
                 <strong>
-                  PKR {subtotal.toLocaleString()}
+                  PKR{" "}
+                  {subtotal.toLocaleString()}
                 </strong>
-
               </div>
 
-
               <div className="checkout-total-row">
-
                 <span>
                   Delivery
                 </span>
@@ -822,9 +791,7 @@ function Checkout() {
                     ? "FREE"
                     : `PKR ${delivery.toLocaleString()}`}
                 </strong>
-
               </div>
-
 
               {delivery === 0 && (
                 <div className="checkout-free-delivery">
@@ -832,37 +799,35 @@ function Checkout() {
                 </div>
               )}
 
-
               <div className="checkout-summary-divider">
               </div>
 
-
               <div className="checkout-grand-total">
-
                 <span>
                   Total
                 </span>
 
                 <strong>
-                  PKR {grandTotal.toLocaleString()}
+                  PKR{" "}
+                  {grandTotal.toLocaleString()}
                 </strong>
-
               </div>
 
-
               {/* DESKTOP PLACE ORDER BUTTON */}
-
               <button
                 type="button"
                 className="checkout-place-order-button"
-                onClick={handlePlaceOrder}
-                disabled={isPlacingOrder}
+                onClick={
+                  handlePlaceOrder
+                }
+                disabled={
+                  isPlacingOrder
+                }
               >
                 {isPlacingOrder
                   ? "Placing Order..."
                   : "Place Order"}
               </button>
-
 
               <p className="checkout-security-note">
                 Your order information is kept secure
@@ -870,26 +835,20 @@ function Checkout() {
                 processing.
               </p>
 
-
               <Link
                 to="/cart"
                 className="checkout-back-cart"
               >
                 ← Back to Cart
               </Link>
-
             </aside>
-
           </div>
-
         </section>
-
       </main>
 
       <Footer />
     </>
   );
 }
-
 
 export default Checkout;

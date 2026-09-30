@@ -7,7 +7,10 @@ import React, {
   useState,
 } from "react";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 /* ============================================================
    EXISTING WEBSITE DEFAULT COLORS
@@ -113,8 +116,8 @@ const isCustomTheme = (theme) => {
   }
 
   /*
-    The old backend default is considered untouched
-    and must never activate custom theme overrides.
+     The old backend default is considered untouched
+     and must never activate custom theme overrides.
   */
 
   if (isLegacyDefaultTheme(theme)) {
@@ -122,9 +125,9 @@ const isCustomTheme = (theme) => {
   }
 
   /*
-    Compare only actual theme settings.
-    Extra backend fields such as _id / updated_at
-    are intentionally ignored.
+     Compare only actual theme settings.
+     Extra backend fields such as _id / updated_at
+     are intentionally ignored.
   */
 
   return Object.keys(DEFAULT_THEME).some(
@@ -360,7 +363,7 @@ export const ThemeProvider = ({ children }) => {
 
   /* ==========================================================
      APPLY THEME SITE-WIDE
-     
+
      IMPORTANT:
      This applies to BOTH customer and admin pages.
   ========================================================== */

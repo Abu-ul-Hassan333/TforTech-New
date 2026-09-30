@@ -4,7 +4,10 @@ import { useLocation } from "react-router-dom";
 
 import "./FloatingWhatsApp.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const LATEST_ORDER_STORAGE_KEY =
   "tfortech_latest_order_for_whatsapp";

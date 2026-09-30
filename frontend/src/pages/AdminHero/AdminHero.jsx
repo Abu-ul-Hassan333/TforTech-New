@@ -20,7 +20,10 @@ import AdminLayout from "../AdminLayout/AdminLayout";
 
 import "./AdminHero.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
 const MAX_VIDEO_SIZE = 10 * 1024 * 1024;

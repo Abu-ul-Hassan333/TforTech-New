@@ -18,7 +18,10 @@ import AdminLayout from "../AdminLayout/AdminLayout";
 
 import "./AdminHeaderFooter.css";
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = (
+  process.env.REACT_APP_BACKEND_URL ||
+  "http://127.0.0.1:8000"
+).replace(/\/+$/, "");
 
 const DEFAULT_SETTINGS = {
   header: {
